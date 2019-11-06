@@ -1,6 +1,10 @@
 'use strict';
 
 const Hapi = require('@hapi/hapi');
+const mongoose = require('mongoose');
+const keys = require('./config/keys');
+
+mongoose.connect(keys.mongoURI);
 
 const init = async () => {
 
