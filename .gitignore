@@ -1,1 +1,6 @@
+# IDEA project files
+.idea
+
+# Backend
 /backend/node_modules
+/backend/config/keys.js
