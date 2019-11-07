@@ -7,6 +7,7 @@ import {
   } from "react-router-dom";
 import Grades from './components/grades';
 import Demo from './components/demo';
+import SubjectsAndGrades from '../components/SubjectsAndGrades/index';
 
 class Parent extends React.Component{
     render(){

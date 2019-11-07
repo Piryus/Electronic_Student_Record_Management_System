@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import SubjectAndGrade from '../SubjectAndGrade';
+import SubjectAndGrade from '../SubjectAndGrade/index';
 import Title from '../SubjectAndGrade/Title';
-import Dropdown from '../Dropdown';
+import Dropdown from '../Dropdown/index';
 
 class SubjectsAndGrades extends Component {
 
@@ -45,7 +45,7 @@ class SubjectsAndGrades extends Component {
       <div>
         <Title /> { /*SubjectAndGrade and props to be craeted and filled dynamically from a json file */ }
         { this.grades.map(this.renderItem) }
-        { /* table version yet to be styled 
+        {  //table version yet to be styled 
         <table>
           <tr>
             <th>Subject</th>
@@ -53,7 +53,7 @@ class SubjectsAndGrades extends Component {
             <th></th>
           </tr>
           { this.grades.map(this.renderTableItem) }
-        </table> */}
+        </table> }
       </div>
     )
   }
