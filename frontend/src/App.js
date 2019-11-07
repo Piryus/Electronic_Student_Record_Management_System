@@ -1,8 +1,10 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-//import DailyLecture from './components/components/DailyLecture';
+
+//import EnrolmentForm from './components/components/EnrolmentForm';
 //import SubjectsAndGrades from './components/components/SubjectsAndGrades';
+
 
 function App() {
   return (
@@ -21,6 +23,7 @@ function App() {
           Learn React
         </a>
       </header>
+
     </div>
   );
 }
