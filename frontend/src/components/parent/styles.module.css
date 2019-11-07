@@ -1,0 +1,43 @@
+
+.panelElement{
+    width: 50%;
+    font-size: 150%;
+    color: black;
+    position: relative;
+    left: 25%;
+    background-color: rgb(189, 189, 189);
+    border-radius: 10.0px;
+}
+
+.link{
+    text-decoration: none;
+    position: relative;
+}
+
+.header{
+    width: 12%;
+    position: absolute;
+    left: 2%;
+    top: 2%;
+    background-color: teal;
+    color: white;
+    border-top-left-radius: 10.0px;
+    border-top-right-radius: 10.0px;
+}
+
+.panel{
+    width: 12%;
+    position: absolute;
+    top: 17%;
+    left: 2%;
+    background-color: rgb(88, 87, 87);
+    border-radius: 10.0px;
+}
+
+.panelElement:hover{
+    background-color: rgb(85, 168, 106);
+    color: white;
+}
+
+
+

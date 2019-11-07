@@ -2,6 +2,8 @@ import React from 'react';
 import Dropdown from '../../components/Dropdown';
 import SubjectAndGrade from '../../components/SubjectAndGrade';
 import Title from '../../components/SubjectAndGrade/Title';
+import styles from './styles.module.css';
+
 
 class Grades extends React.Component{
 
@@ -41,7 +43,7 @@ class Grades extends React.Component{
 
     render(){
         return (
-            <div>
+            <div className={styles.gradesPage}>
                 <h1>Grades page</h1>
                 <Title /> { /*SubjectAndGrade and props to be craeted and filled dynamically from a json file */ }
         { this.grades.map(this.renderItem) }

@@ -6,45 +6,35 @@ import {
     Link
   } from "react-router-dom";
 import Grades from './components/grades';
-import Demo from './components/demo';
 import SubjectsAndGrades from '../components/SubjectsAndGrades/index';
+import styles from './styles.module.css';
 
 class Parent extends React.Component{
     render(){
         return (
-            <div>
-                <div className="header">
+            <div className={styles.body}>
+                <div className={styles.header}>
                     <h1>Parent section</h1>
                 </div>
-                <div className="panel">
+                <div>
                     <Router>
                         <div>
-                            <table>
+                            <table className={styles.panel}>
                                 <tr>
                                     <td>
-                                        <Link to="/components/grades.js">
-                                            <div className="panelElement">
+                                        <Link className={styles.link} to="/components/grades.js">
+                                            <div className={styles.panelElement}>
                                                 <p>Grades</p>
                                             </div>
-                                        </Link>
+                                        </Link >
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <Link to="/components/demo.js">
-                                            <div className="panelElement">
-                                                <p>Demo</p>
-                                            </div>
-                                        </Link>
-                                    </td>
                                 </tr>
                             </table>
 
                             <Switch>
                                 <Route path="/components/grades.js" render={(props) => <Grades {...props} />} />
-                            </Switch>
-                            <Switch>
-                                <Route path="/components/demo.js" render={(props) => <Demo {...props} />} />
                             </Switch>
 
                        </div>
