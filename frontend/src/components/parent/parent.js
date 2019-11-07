@@ -7,16 +7,35 @@ import {
   } from "react-router-dom";
 import Grades from './components/grades';
 import SubjectsAndGrades from '../components/SubjectsAndGrades/index';
+import Login from '../components/Login/index';
 import styles from './styles.module.css';
 
 class Parent extends React.Component{
+
+
+    constructor(props){
+        super(props);
+        this.state = {
+            loggingIn: false
+        };
+
+    }
+
+    handleLogin = (val) => {
+        this.setState({loggingIn: val})
+    }
+
     render(){
         return (
             <div className={styles.body}>
-                <div className={styles.header}>
-                    <h1>Parent section</h1>
-                </div>
-                <div>
+                {this.state.loggingIn === false && (
+                  <Login handleLogin = {this.handleLogin} />
+                )}
+                
+                {this.state.loggingIn === true && (<div>
+                    <div className={styles.header}>
+                        <h1>Parent section</h1>
+                    </div>
                     <Router>
                         <div>
                             <table className={styles.panel}>
@@ -39,7 +58,9 @@ class Parent extends React.Component{
 
                        </div>
                     </Router>
+                    
                 </div>
+                )}   
             </div>
         );
     }
