@@ -1,7 +1,6 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Login from './components/components/Login';
 //import DailyLecture from './components/components/DailyLecture';
 //import SubjectsAndGrades from './components/components/SubjectsAndGrades';
 
@@ -22,7 +21,6 @@ function App() {
           Learn React
         </a>
       </header>
-      <Login />
     </div>
   );
 }
