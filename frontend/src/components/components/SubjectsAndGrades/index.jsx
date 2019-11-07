@@ -46,7 +46,7 @@ class SubjectsAndGrades extends Component {
         <Title /> { /*SubjectAndGrade and props to be craeted and filled dynamically from a json file */ }
         { this.grades.map(this.renderItem) }
         {  //table version yet to be styled 
-        <table>
+        <table style= {{width: "100%"}}>
           <tr>
             <th>Subject</th>
             <th>Grade</th>
