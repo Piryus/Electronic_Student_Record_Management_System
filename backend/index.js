@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const keys = require('./config/keys');
 const routes = require('./routes');
+
 const cookieStrategy = require('./cookieStrategy');
 
 mongoose.connect(keys.mongoURI);
@@ -17,7 +18,7 @@ const init = async () => {
     });
 
     await server.register(require('@hapi/cookie'));
-
+    
     server.auth.strategy('session', 'cookie', cookieStrategy);
     server.auth.default('session');
 
