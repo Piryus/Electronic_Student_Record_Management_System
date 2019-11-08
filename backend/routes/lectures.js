@@ -46,7 +46,7 @@ const routes = [
             validate: {
                 payload: {
                     classId: Valid.id,
-                    weekhourId: Valid.weekhourId,
+                    datetime: Valid.date,
                     topics: Valid.longText
                 }
             }
