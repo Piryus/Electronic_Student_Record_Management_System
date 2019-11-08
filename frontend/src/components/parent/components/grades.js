@@ -7,7 +7,7 @@ import styles from './styles.module.css';
 
 class Grades extends React.Component{
 
-  grades = [
+  grades = {'JD1' : [
     {
       subject: "Math",
       grade: "10",
@@ -24,7 +24,23 @@ class Grades extends React.Component{
       details: "23/10/2019 9.0, 19/09/2019 8.0, 05/08/2019 9.0, 18/10/2019 7.0",
     },
 
-  ];
+  ],
+  "WW1" : [
+    {
+      subject: "Math",
+      grade: "10",
+      details: "29/10/2019 9.0, 23/09/2019 8.0, 09/08/2019 9.0, 02/10/2019 7.0",
+    }
+  ]
+}
+
+  constructor(props){
+    super(props);
+    this.state = {
+      id: this.props.childId
+    };
+
+  }
 
   renderItem = (item, index) => {
     return (
@@ -46,7 +62,7 @@ class Grades extends React.Component{
             <div className={styles.gradesPage}>
                 <h1>Grades page</h1>
                 <Title /> { /*SubjectAndGrade and props to be craeted and filled dynamically from a json file */ }
-        { this.grades.map(this.renderItem) }
+        { this.grades[this.state.id].map(this.renderItem) }
         {  //table version yet to be styled 
         /*<table>
           <tr>

@@ -15,9 +15,40 @@ class Parent extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            loggingIn: false
+            loggingIn: false,
+            showingGrades: false,
+            childSelected: 'JD1',
+            child: [
+                {
+                    name: 'John',
+                    surname: 'Doe',
+                    id: 'JD1'
+                },
+                {
+                    name: 'Walter',
+                    surname: 'White',
+                    id: 'WW1'
+                }
+            ]
         };
         this.handleLogin = this.handleLogin.bind(this);
+    }
+
+    renderChildItem = (item, index) => {
+        return(
+        <option value={item.id} >{item.surname + ' ' + item.name}</option>
+        );
+    }
+
+    selectChild = (e) => {
+        this.setState({
+            showingGrades: false,
+            childSelected: e.target.value,
+        });
+    }
+
+    setShowGrades = (val) => {
+        this.setState({showingGrades: true});
     }
 
     handleLogin(username, password) {
@@ -59,6 +90,13 @@ class Parent extends React.Component{
                     <div className={styles.header}>
                         <h1>Parent section</h1>
                     </div>
+
+                    <div className={styles.selectorWrapper}>
+                        <select className={styles.childSelector} onChange={(e) => this.selectChild(e)}>
+                            {this.state.child.map(this.renderChildItem)}
+                        </select>
+                    </div>
+
                     <Router>
                         <div>
                             <table className={styles.panel}>
@@ -76,7 +114,7 @@ class Parent extends React.Component{
                             </table>
 
                             <Switch>
-                                <Route path="/components/grades.js" render={(props) => <Grades {...props} />} />
+                                <Route path="/components/grades.js" render={(props) => <Grades {...props} childId = {this.state.childSelected} showGrades = {this.setShowGrades} />} />
                             </Switch>
 
                        </div>
