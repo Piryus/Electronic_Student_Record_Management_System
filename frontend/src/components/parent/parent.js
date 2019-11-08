@@ -6,7 +6,6 @@ import {
     Link
   } from "react-router-dom";
 import Grades from './components/grades';
-import SubjectsAndGrades from '../components/SubjectsAndGrades/index';
 import Login from '../components/Login/index';
 import styles from './styles.module.css';
 
