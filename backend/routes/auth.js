@@ -2,19 +2,18 @@
 
 const User = require('../models/User');
 
-const login = async function(request, h) {
+const login = async function (request, h) {
     try {
         const {mail, password} = request.payload;
-        const user = await User.findOne({ mail: mail });
+        const user = await User.findOne({mail: mail});
         if (user === null || password !== user.password) {
-            return { error: true };
-        } else {
-            request.cookieAuth.set({
-                id: user._id
-            });
-            return { success: true };
+            return {error: true};
         }
-    } catch(err) {
+        request.cookieAuth.set({
+            id: user._id
+        });
+        return {success: true};
+    } catch (err) {
         return Boom.badImplementation(err);
     }
 };
