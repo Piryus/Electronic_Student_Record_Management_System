@@ -1,4 +1,10 @@
+const Nodemailer = require('nodemailer');
+
+const keys = require('../config/keys');
+const welcomeEmail = require('./welcomeEmail');
+
 const startHour = 8, numHours = 6;
+const transporter = Nodemailer.createTransport(keys.email);
 
 Date.prototype.getNormalizedDay = function() {
     return this.getDay() === 0 ? 6 : this.getDay() - 1;
@@ -32,7 +38,17 @@ const dateToWeekhour = function(d) {
     return weekdayIndex + '_' + hourIndex;
 };
 
+const sendWelcomeEmail = function(to, fullname, password) {
+    transporter.sendMail({
+        from: '"ESRMS" <esrms.h@gmail.com>',
+        to,
+        subject: 'Your Credentials',
+        html: welcomeEmail(fullname, password)
+    });
+};
+
 module.exports = {
     weekhourToDate,
-    dateToWeekhour
+    dateToWeekhour,
+    sendWelcomeEmail
 };
