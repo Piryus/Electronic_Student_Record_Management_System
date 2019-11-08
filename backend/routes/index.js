@@ -1,9 +1,11 @@
 'use strict';
 
-const grades = require('./grades');
 const auth = require('./auth');
+const grades = require('./grades');
+const lectures = require('./lectures');
 
 module.exports = [
     ...auth,
-    ...grades
+    ...grades,
+    ...lectures
 ];
