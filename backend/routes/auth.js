@@ -4,14 +4,13 @@ const User = require('../models/User');
 
 const login = async function(request, h) {
     try {
-        const {username, password} = request.payload;
-        const user = await User.findOne({ username: username });
+        const {mail, password} = request.payload;
+        const user = await User.findOne({ mail: mail });
         if (user === null || password !== user.password) {
             return { error: true };
         } else {
             request.cookieAuth.set({
-                id: user._id,
-                role: user.role
+                id: user._id
             });
             return { success: true };
         }
