@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const lectureSchema = new Schema({
-    classId: ObjectId,
+    classId: mongoose.Types.ObjectId,
     weekhourId: String,
     topics: String
 });
