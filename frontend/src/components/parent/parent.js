@@ -1,10 +1,4 @@
 import React from 'react';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link
-  } from "react-router-dom";
 import Grades from './components/grades';
 import Login from '../components/Login/index';
 import styles from './styles.module.css';
@@ -16,7 +10,7 @@ class Parent extends React.Component{
         super(props);
         this.state = {
             loggingIn: false,
-            showingGrades: false,
+            userRequest: '',
             childSelected: 'JD1',
             child: [
                 {
@@ -32,6 +26,7 @@ class Parent extends React.Component{
             ]
         };
         this.handleLogin = this.handleLogin.bind(this);
+        this.setUserRequest = this.setUserRequest.bind(this);
     }
 
     renderChildItem = (item, index) => {
@@ -42,13 +37,13 @@ class Parent extends React.Component{
 
     selectChild = (e) => {
         this.setState({
-            showingGrades: false,
             childSelected: e.target.value,
+            userRequest: ''
         });
     }
 
-    setShowGrades = (val) => {
-        this.setState({showingGrades: true});
+    setUserRequest(e) {
+        this.setState({userRequest: 'grades'});
     }
 
     handleLogin(username, password) {
@@ -97,28 +92,26 @@ class Parent extends React.Component{
                         </select>
                     </div>
 
-                    <Router>
                         <div>
                             <table className={styles.panel}>
                                 <tr>
                                     <td>
-                                        <Link className={styles.link} to="/components/grades.js">
+                                        <button  onClick = {this.setUserRequest} className={styles.link}>
                                             <div className={styles.panelElement}>
                                                 <p>Grades</p>
                                             </div>
-                                        </Link >
+                                        </button >
                                     </td>
                                 </tr>
                                 <tr>
                                 </tr>
                             </table>
 
-                            <Switch>
-                                <Route path="/components/grades.js" render={(props) => <Grades {...props} childId = {this.state.childSelected} showGrades = {this.setShowGrades} />} />
-                            </Switch>
+                            {this.state.userRequest === 'grades' && (
+                                <Grades  childId = {this.state.childSelected} />
+                            )}
 
                        </div>
-                    </Router>
                     
                 </div>
                 )}   
