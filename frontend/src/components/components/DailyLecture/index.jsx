@@ -29,7 +29,6 @@ class DailyLecture extends Component {
     if(this.state.date === "" || this.state.subject === "" || this.state.summary === ""){
       alert(error);
     }
-
     if(d2 > d){
       alert("You cannot record a future date");
       event.preventDefault(); 
@@ -44,13 +43,24 @@ class DailyLecture extends Component {
     event.preventDefault();
   }
 
+  setUpper = (event) => {
+    var tmp= event.target.value;
+    var tmp2= event.target.name;
+    tmp= tmp.toUpperCase();
+
+    if(tmp2 == "subject"){
+      this.setState( { subject: tmp } )
+    }
+    
+  }
+
    render() {
     
     return (
       <div>
         <form action= "" onSubmit= { values => this.validateData(values) }>
          Date: <input type= "date" name= "date" className= "dlDate" onChange= { (event) => this.setState({date: event.target.value})} /> <br/>
-         Subject: <input type= "text" name="subject" className= "dlSubject" onChange= { (event) => this.setState({subject: event.target.value})} /><br/><br/>
+         Subject: <input type= "text" name="subject" value= {this.state.subject} className= "dlSubject" onChange= { (event) => this.setUpper(event) } /><br/><br/>
           <textarea rows= "4" cols="50" placeholder= "Fill lecture summary here" onChange= { (event) => this.setState({summary: event.target.value})} ></textarea><br/><br/>
           <input type="submit" value= "Send"/>
         </form>
@@ -60,3 +70,5 @@ class DailyLecture extends Component {
 }
 
 export default DailyLecture;
+
+
