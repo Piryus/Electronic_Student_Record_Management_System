@@ -21,7 +21,7 @@ const init = async () => {
                 headers: ['Authorization'], // an array of strings - 'Access-Control-Allow-Headers'
                 exposedHeaders: ['Accept'], // an array of exposed headers - 'Access-Control-Expose-Headers',
                 additionalExposedHeaders: ['Accept'], // an array of additional exposed headers
-                maxAge: 60 * 60 * 1000 * 30,
+                maxAge: 24 * 60 * 60 * 1000 * 30, // 30 days expiration
                 credentials: true // boolean - 'Access-Control-Allow-Credentials'
             }
         }
