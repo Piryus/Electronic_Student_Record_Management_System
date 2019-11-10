@@ -1,26 +1,28 @@
 'use strict';
 
+const Joi = require('@hapi/joi');
+
 const User = require('../models/User');
 
-const isAdmin = async function(request, h) {
+const isAdmin = async function (request, h) {
     return true;
 };
 
-const addUser = async function(request, h) {
+const addUser = async function (request, h) {
     try {
-        const {mail, password, scope, children} = request.payload;
-        const user = await User.findOne({ mail: mail });
+        const {mail, password, scope} = request.payload;
+        const user = await User.findOne({mail: mail});
         if (user === null) {
-            const newUser = new User({mail: mail, password: password, scope: scope, children: children});
+            const newUser = new User({mail: mail, password: password, scope: scope});
             newUser.save(function (err, user) {
                 if (err) return console.error(err);
                 console.log(user.name + " added to the database.");
             });
-            return { success: true };
+            return {success: true};
         } else {
-            return { error: true };
+            return Boom.badRequest('The user already exists.');
         }
-    } catch(err) {
+    } catch (err) {
         return Boom.badImplementation(err);
     }
 };
@@ -30,26 +32,34 @@ const routes = [
     {
         method: 'GET',
         path: '/admin/status/',
-        config: {
+        handler: isAdmin,
+        options: {
             auth: {
                 strategy: 'session',
                 scope: 'admin'
-            } ,
-            handler: isAdmin
+            }
         }
     },
     // Route to add a user into the database
     {
         method: 'POST',
         path: '/admin/users/new',
-        config: {
+        handler: addUser,
+        options: {
             auth: {
                 strategy: 'session',
                 scope: 'admin'
             },
-            handler: addUser
+            validate: {
+                payload: {
+                    mail: Joi.string().email().required(),
+                    password: Joi.string().min(8).max(56).required(),
+                    scope: Joi.string().required()
+                }
+            }
         }
-    }
+    },
+    // Route to add a parent into the database
 ];
 
 module.exports = routes;
