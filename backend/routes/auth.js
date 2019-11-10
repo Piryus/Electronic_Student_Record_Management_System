@@ -9,12 +9,13 @@ const login = async function (request, h) {
         const {mail, password} = request.payload;
         const user = await User.findOne({mail: mail});
         if (user === null || password !== user.password) {
-            return {error: true};
+            return Boom.forbidden('Invalid mail/password.');
+        } else {
+            request.cookieAuth.set({
+                id: user._id
+            });
+            return {success: true};
         }
-        request.cookieAuth.set({
-            id: user._id
-        });
-        return {success: true};
     } catch (err) {
         return Boom.badImplementation(err);
     }
