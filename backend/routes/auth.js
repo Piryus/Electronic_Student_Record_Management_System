@@ -31,8 +31,8 @@ const routes = [
             },
             validate: {
                 payload: {
-                    mail: Joi.string().required(),
-                    password: Joi.string().required()
+                    mail: Joi.string().email().required(),
+                    password: Joi.string().min(8).max(56).required()
                 }
             }
         }
