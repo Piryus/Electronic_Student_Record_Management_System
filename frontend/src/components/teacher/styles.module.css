@@ -1,18 +1,31 @@
-
-.panelElement{
-    width: 50%;
-    font-size: 150%;
-    color: black;
-    position: relative;
-    left: 25%;
-    background-color: rgb(189, 189, 189);
-    border-radius: 10.0px;
-}
-
 .link{
-    text-decoration: none;
     position: relative;
+    left: 15%;
+    width: 70%;
+    border-radius: 20.0px;
+    background-color: whitesmoke;
+    font-size: 150%;
 }
+
+.link:hover{
+    background-color: white;
+}
+
+.selectorWrapper{
+    position: absolute;
+    left: 20%;
+    top: 3%;
+}
+
+.childSelector{
+    width: 150%;
+    height: 150%;
+    font-size: 150%;
+    border-top-left-radius: 10.0px;
+    border-top-right-radius: 10.0px;
+}
+
+
 
 .header{
     width: 12%;
@@ -34,10 +47,7 @@
     border-radius: 10.0px;
 }
 
-.panelElement:hover{
-    background-color: rgb(85, 168, 106);
-    color: white;
-}
+
 
 
 

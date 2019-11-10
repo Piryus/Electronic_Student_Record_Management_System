@@ -1,5 +1,7 @@
 'use strict';
 
+const Joi = require('@hapi/joi');
+
 const User = require('../models/User');
 
 const login = async function (request, h) {
@@ -26,6 +28,12 @@ const routes = [
         options: {
             auth: {
                 mode: 'try'
+            },
+            validate: {
+                payload: {
+                    mail: Joi.string().required(),
+                    password: Joi.string().required()
+                }
             }
         }
     }
