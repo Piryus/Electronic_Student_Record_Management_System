@@ -1,27 +1,58 @@
 import React from 'react';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link
-  } from "react-router-dom";
 import Login from '../components/Login/index';
-import DailyLecture from './components/index';
 import styles from './styles.module.css';
+import TeacherLectureSummary from './components/TeacherLectureSummary/index';
 
-class Teacher extends React.Component{
+class Parent extends React.Component{
 
 
     constructor(props){
         super(props);
         this.state = {
-            loggingIn: false
+            loggingIn: false,
+            userRequest: '',
         };
-
+        this.handleLogin = this.handleLogin.bind(this);
+        this.setUserRequest = this.setUserRequest.bind(this);
     }
 
-    handleLogin = (val) => {
-        this.setState({loggingIn: val})
+    renderChildItem = (item, index) => {
+        return(
+        <option value={item.id} >{item.surname + ' ' + item.name}</option>
+        );
+    }
+
+
+    setUserRequest(e) {
+        this.setState({userRequest: 'lectures'});
+    }
+
+    handleLogin(username, password) {
+        const url = 'http://localhost:3000/login';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                mail: username,
+                password: password
+            })
+        };
+        fetch(url, options)
+            .then(response => response.json())
+            .then(response => {
+                if (response.success === true) {
+                    this.setState({loggingIn: true});
+                } else {
+                    // Connection rejected handler
+                    console.log(response);
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            });
     }
 
     render(){
@@ -31,33 +62,35 @@ class Teacher extends React.Component{
                   <Login handleLogin = {this.handleLogin} />
                 )}
                 
-                {this.state.loggingIn === true && (
-                <div>
+                {this.state.loggingIn === true && (<div>
                     <div className={styles.header}>
                         <h1>Teacher section</h1>
                     </div>
-                    <Router>
+
+                    <div className={styles.selectorWrapper}>
+
+                    </div>
+
                         <div>
                             <table className={styles.panel}>
                                 <tr>
                                     <td>
-                                        <Link className={styles.link} to="/components/index.jsx">
+                                        <button  onClick = {this.setUserRequest} className={styles.link}>
                                             <div className={styles.panelElement}>
-                                                <p>Daily lecture</p>
+                                                <p>Lectures</p>
                                             </div>
-                                        </Link >
+                                        </button >
                                     </td>
                                 </tr>
                                 <tr>
                                 </tr>
                             </table>
 
-                            <Switch>
-                                <Route path="/components/index.jsx" render={(props) => <DailyLecture {...props} />} />
-                            </Switch>
+                            {this.state.userRequest === 'lectures' && (
+                                <TeacherLectureSummary/>
+                            )}
 
                        </div>
-                    </Router>
                     
                 </div>
                 )}   
@@ -66,4 +99,4 @@ class Teacher extends React.Component{
     }
 }
 
-export default Teacher;
+export default Parent;
