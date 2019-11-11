@@ -1,31 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Parent from './components/parent/parent';
+import Teacher from './components/teacher/teacher';
 
-//import EnrolmentForm from './components/components/EnrolmentForm';
-//import SubjectsAndGrades from './components/components/SubjectsAndGrades';
+class App extends React.Component{
 
+  constructor(props){
+    super(props);
+    this.state = {
+      loggingIn: this.props.loggingIn,
+      whoAmI: 'teacher', /*to be made dynamic using props because it is inherited from login component*/
+    }
+  }
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-
-    </div>
-  );
+  render(){
+    return(
+      <div>
+        {this.state.loggingIn === true && this.state.whoAmI === 'parent' && (
+          <Parent loggingIn = {this.state.loggingIn}/>
+        )}
+        {this.state.loggingIn === true && this.state.whoAmI === 'teacher' && (
+          <Teacher loggingIn = {this.state.loggingIn}/>
+        )}
+      </div>
+    );
+  }
 }
 
 export default App;

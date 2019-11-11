@@ -1,6 +1,5 @@
 import React from 'react';
 import Grades from './components/grades';
-import Login from '../components/Login/index';
 import styles from './styles.module.css';
 
 class Parent extends React.Component{
@@ -9,8 +8,8 @@ class Parent extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-            loggingIn: false,
             userRequest: '',
+            loggingIn: this.props.loggingIn,
             childSelected: 'JD1',
             child: [
                 {
@@ -25,7 +24,6 @@ class Parent extends React.Component{
                 }
             ]
         };
-        this.handleLogin = this.handleLogin.bind(this);
         this.setUserRequest = this.setUserRequest.bind(this);
     }
 
@@ -46,40 +44,38 @@ class Parent extends React.Component{
         this.setState({userRequest: 'grades'});
     }
 
-    handleLogin(username, password) {
-        const url = 'http://localhost:3000/login';
-        const options = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                mail: username,
-                password: password
-            })
-        };
-        fetch(url, options)
-            .then(response => response.json())
-            .then(response => {
-                if (response.success === true) {
-                    this.setState({loggingIn: true});
-                } else {
-                    // Connection rejected handler
-                    console.log(response);
-                }
-            })
-            .catch(error => {
-                console.log(error)
-            });
-    }
+    // handleLogin(username, password) {
+    //     const url = 'http://localhost:3000/login';
+    //     const options = {
+    //         method: 'POST',
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             mail: username,
+    //             password: password
+    //         })
+    //     };
+    //     fetch(url, options)
+    //         .then(response => response.json())
+    //         .then(response => {
+    //             if (response.success === true) {
+    //                 this.setState({loggingIn: true});
+    //             } else {
+    //                 // Connection rejected handler
+    //                 console.log(response);
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.log(error)
+    //         });
+    // }
 
     render(){
         return (
             <div className={styles.body}>
-                {this.state.loggingIn === false && (
-                  <Login handleLogin = {this.handleLogin} />
-                )}
+
                 
                 {this.state.loggingIn === true && (<div>
                     <div className={styles.header}>

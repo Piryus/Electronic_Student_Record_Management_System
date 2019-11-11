@@ -1,24 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
-import App from './App';
-import Admin from './components/admin/admin';
-import Officer from './components/officer/officer';
-import Teacher from './components/teacher/teacher';
-import Parent from './components/parent/parent';
+import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
+import Login from './components/components/Login/index';
 import * as serviceWorker from './serviceWorker';
 
 //ReactDOM.render(<App />, document.getElementById('root'));
 
+
+
+
 const routing = (
+
     <Router>
         <Switch>
-            <Route exact path='/' render={() => <App />} />
-            <Route path="/teacher" render={(props) => <Teacher {...props} />} />
-            <Route path="/parent" render={(props) => <Parent {...props} />} />
-            <Route path="/officer" render={(props) => <Officer {...props} />} />
-            <Route path='/admin' render={(props) => <Admin {...props} />} />
+            <Route path='/login' render={(props) => <Login {...props} />} />
+            <Redirect to='/login' />)
         </Switch>
     </Router>
 );
