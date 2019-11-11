@@ -21,6 +21,24 @@ const login = async function (request, h) {
     }
 };
 
+const authCheck = async function (request, h) {
+    try {
+        if (request.auth.isAuthenticated) {
+            const userRole = request.auth.credentials.scope;
+            return {
+                isAuth: true,
+                role: userRole
+            };
+        } else { // User is not authenticated
+            return {
+                isAuth: false
+            }
+        }
+    } catch (e) {
+        return Boom.badImplementation(e);
+    }
+};
+
 const routes = [
     {
         method: 'POST',
@@ -37,7 +55,17 @@ const routes = [
                 }
             }
         }
-    }
+    },
+    {
+        method: 'GET',
+        path: '/auth/check',
+        handler: authCheck,
+        options: {
+            auth: {
+                mode: 'optional'
+            },
+        }
+    },
 ];
 
 module.exports = routes;
