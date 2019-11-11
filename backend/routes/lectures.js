@@ -43,11 +43,9 @@ const routes = [
         path: '/lectures',
         handler: recordDailyLectureTopics,
         options: {
-            options: {
-                auth: {
-                    strategy: 'session',
-                    scope: 'teacher'
-                }
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
             },
             validate: {
                 payload: {
