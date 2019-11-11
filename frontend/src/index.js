@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import Login from './components/components/Login/index';
 import * as serviceWorker from './serviceWorker';

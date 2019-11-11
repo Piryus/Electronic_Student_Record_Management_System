@@ -40,37 +40,9 @@ class Parent extends React.Component{
         });
     }
 
-    setUserRequest(e) {
-        this.setState({userRequest: 'grades'});
+    setUserRequest(e, choice) {
+        this.setState({userRequest: choice});
     }
-
-    // handleLogin(username, password) {
-    //     const url = 'http://localhost:3000/login';
-    //     const options = {
-    //         method: 'POST',
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //             mail: username,
-    //             password: password
-    //         })
-    //     };
-    //     fetch(url, options)
-    //         .then(response => response.json())
-    //         .then(response => {
-    //             if (response.success === true) {
-    //                 this.setState({loggingIn: true});
-    //             } else {
-    //                 // Connection rejected handler
-    //                 console.log(response);
-    //             }
-    //         })
-    //         .catch(error => {
-    //             console.log(error)
-    //         });
-    // }
 
     render(){
         return (
@@ -92,7 +64,7 @@ class Parent extends React.Component{
                             <table className={styles.panel}>
                                 <tr>
                                     <td>
-                                        <button  onClick = {this.setUserRequest} className={styles.link}>
+                                        <button  onClick = {(e) => this.setUserRequest(e, "grades")} className={styles.link}>
                                             <div className={styles.panelElement}>
                                                 <p>Grades</p>
                                             </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import Parent from './components/parent/parent';
 import Teacher from './components/teacher/teacher';
+import Officer from './components/officer/officer';
 
 class App extends React.Component{
 
@@ -8,7 +9,7 @@ class App extends React.Component{
     super(props);
     this.state = {
       loggingIn: this.props.loggingIn,
-      whoAmI: 'teacher', /*to be made dynamic using props because it is inherited from login component*/
+      whoAmI: 'officer', /*to be made dynamic using props because it is inherited from login component*/
     }
   }
 
@@ -20,6 +21,9 @@ class App extends React.Component{
         )}
         {this.state.loggingIn === true && this.state.whoAmI === 'teacher' && (
           <Teacher loggingIn = {this.state.loggingIn}/>
+        )}
+        {this.state.loggingIn === true && this.state.whoAmI === 'officer' && (
+          <Officer loggingIn = {this.state.loggingIn}/>
         )}
       </div>
     );

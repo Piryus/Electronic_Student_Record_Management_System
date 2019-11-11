@@ -1,0 +1,53 @@
+.link{
+    position: relative;
+    left: 15%;
+    width: 70%;
+    border-radius: 20.0px;
+    background-color: whitesmoke;
+    font-size: 150%;
+}
+
+.link:hover{
+    background-color: white;
+}
+
+.selectorWrapper{
+    position: absolute;
+    left: 20%;
+    top: 3%;
+}
+
+.childSelector{
+    width: 150%;
+    height: 150%;
+    font-size: 150%;
+    border-top-left-radius: 10.0px;
+    border-top-right-radius: 10.0px;
+}
+
+
+
+.header{
+    width: 12%;
+    position: absolute;
+    left: 2%;
+    top: 2%;
+    background-color: teal;
+    color: white;
+    border-top-left-radius: 10.0px;
+    border-top-right-radius: 10.0px;
+}
+
+.panel{
+    width: 12%;
+    position: absolute;
+    top: 17%;
+    left: 2%;
+    background-color: rgb(88, 87, 87);
+    border-radius: 10.0px;
+}
+
+
+
+
+

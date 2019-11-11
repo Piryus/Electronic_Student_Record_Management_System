@@ -14,15 +14,9 @@ class Parent extends React.Component{
         this.setUserRequest = this.setUserRequest.bind(this);
     }
 
-    renderChildItem = (item, index) => {
-        return(
-        <option value={item.id} >{item.surname + ' ' + item.name}</option>
-        );
-    }
 
-
-    setUserRequest(e) {
-        this.setState({userRequest: 'lectures'});
+    setUserRequest(e, choice) {
+        this.setState({userRequest: choice});
     }
 
 
@@ -44,7 +38,7 @@ class Parent extends React.Component{
                             <table className={styles.panel}>
                                 <tr>
                                     <td>
-                                        <button  onClick = {this.setUserRequest} className={styles.link}>
+                                        <button  onClick = {(e) => this.setUserRequest(e, "lectures")} className={styles.link}>
                                             <div className={styles.panelElement}>
                                                 <p>Lectures</p>
                                             </div>
