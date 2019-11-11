@@ -6,8 +6,8 @@ const User = require('../models/User');
 
 const login = async function (request, h) {
     try {
-        const { mail, password } = request.payload;
-        const user = await User.findOne({ mail });
+        const {mail, password} = request.payload;
+        const user = await User.findOne({mail});
         if (user === null || password !== user.password) {
             return Boom.forbidden('Invalid mail/password.');
         } else {
@@ -18,6 +18,15 @@ const login = async function (request, h) {
         }
     } catch (err) {
         return Boom.badImplementation(err);
+    }
+};
+
+const logout = async function (request, h) {
+    try {
+        request.cookieAuth.clear();
+        return true;
+    } catch (e) {
+        Boom.badImplementation(e);
     }
 };
 
@@ -66,6 +75,17 @@ const routes = [
             },
         }
     },
+    {
+        method: 'GET',
+        path: '/logout',
+        handler: logout,
+        options: {
+            auth: {
+                mode: 'required',
+                strategy: 'session'
+            }
+        }
+    }
 ];
 
 module.exports = routes;
