@@ -13,6 +13,7 @@ const gradeSchema = new Schema({
 });
 
 const studentSchema = new Schema({
+    ssn: String,
     name: String,
     surname: String,
     grades: [gradeSchema]

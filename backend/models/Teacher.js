@@ -4,12 +4,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const timetableEntrySchema = new Schema({
-    weekhour: String,
-    classId: Schema.Types.ObjectId
+    classId: Schema.Types.ObjectId,
+    subject: String,
+    weekhour: String
 });
 
 const teacherSchema = new Schema({
     userId: Schema.Types.ObjectId,
+    ssn: String,
     name: String,
     surname: String,
     subjects: [String],
