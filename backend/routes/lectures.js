@@ -14,7 +14,7 @@ const recordDailyLectureTopics = async function(request, h) {
 
         datetime.setMinutes(0, 0, 0);
         const weekhour = Utils.dateToWeekhour(datetime);
-        const teacher = await Teacher.findOne({ userId: request.auth.credentials._id });
+        const teacher = await Teacher.findOne({ userId: request.auth.credentials.id });
 
         if(teacher === null || weekhour === null)
             return Boom.badRequest();
@@ -43,6 +43,12 @@ const routes = [
         path: '/lectures',
         handler: recordDailyLectureTopics,
         options: {
+            options: {
+                auth: {
+                    strategy: 'session',
+                    scope: 'teacher'
+                }
+            },
             validate: {
                 payload: {
                     classId: Valid.id,

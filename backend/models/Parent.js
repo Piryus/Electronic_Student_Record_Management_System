@@ -7,7 +7,7 @@ const parentSchema = new Schema({
     userId: Schema.Types.ObjectId,
     name: String,
     surname: String,
-    children: Array
+    children: [Schema.Types.ObjectId]
 });
 
 module.exports = mongoose.model('Parent', parentSchema);

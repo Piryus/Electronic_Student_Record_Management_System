@@ -9,9 +9,9 @@ const timetableEntrySchema = new Schema({
 });
 
 const teacherSchema = new Schema({
+    userId: Schema.Types.ObjectId,
     name: String,
     surname: String,
-    userId: Schema.Types.ObjectId,
     subjects: [String],
     timetable: [timetableEntrySchema]
 });

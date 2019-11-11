@@ -10,14 +10,11 @@ const isAdmin = async function (request, h) {
 
 const addUser = async function (request, h) {
     try {
-        const {mail, password, scope} = request.payload;
+        const { mail, password, scope } = request.payload;
         const user = await User.findOne({mail: mail});
-        if (user === null) {
-            const newUser = new User({mail: mail, password: password, scope: scope});
-            newUser.save(function (err, user) {
-                if (err) return console.error(err);
-                console.log(user.name + " added to the database.");
-            });
+        if(user === null) {
+            const newUser = new User({ mail, password, scope });
+            newUser.save();
             return {success: true};
         } else {
             return Boom.badRequest('The user already exists.');
