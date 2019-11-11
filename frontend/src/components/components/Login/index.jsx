@@ -29,7 +29,6 @@ class Login extends Component {
               password: password
           })
       };
-      this.setState({loggingIn: true});
       fetch(url, options)
           .then(response => response.json())
           .then(response => {
