@@ -1,0 +1,42 @@
+# Mock database
+
+## SchoolClass
+
+|_id|name|
+|---|----|
+|5dc9c3112d698031f441e1c9|1A|
+|5dc9cb36ee91b7384cbd7fd7|1B|
+|5dc9cb4b797f6936680521b9|1C|
+
+## Teacher
+
+|_id|userId|ssn|name|surname|subjects|
+|---|---|---|---|---|---|
+|5dca698eed550e4ca4aba7f5|?|DJRFUC56J13E485F|Marco|Bianchi|Italian, History|
+|5dca69cf048e8e40d434017f|?|CMFOLR29R45S203O|Roberta|Verdi|Math, Physics|
+|5dca6cbe7adca3346c5983cb|?|LDFVUI17P04D491B|Stefano|Rossi|Latin|
+|5dca6cd5b83a1f3ef03e962b|?|SCBGMN21E45O956Q|Peter|Posta|Art|
+|5dca6cf0a92bbb4dd8c0e817|?|PLVCGT02S19R549A|Federica|Valli|English|
+|5dca6d0801ea271794cb650e|?|LCFTUI58S49G910R|Cinzia|Tollo|Science|
+|5dca6d2038627d0bfc4167b0|?|QASVUM68G45D297P|Dario|Resti|Gym|
+|5dca6d3620607b1e30dea42a|?|NCFTOG69F23B796K|Nina|Fassio|Religion|
+
+## Student
+
+|_id|ssn|name|surname|classId|
+|---|---|---|---|---|
+|5dca711c89bf46419cf5d483|MDFGKO06L02F082G|Marco|Cremonesi|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d484|FCEEHG02B04N054D|Luca|Longo|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d485|JPCOME07O02C034H|Alice|Capon|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d486|JLMLBH00B07K064G|Alessio|Mazzi|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d487|CCJNJM09K01P046D|Maria|Palermo|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d488|LMNNML01B05F051C|Silvia|Ferrari|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d489|MGOAAP05I08P020M|Enzo|Cremonesi|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d48a|NAMAKH06I03P070A|Francesca|Trentino|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d48b|OJCHFE07F05M064L|Myriam|Manfrin|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d48c|IFHMHK01L07L058D|Giacomo|Lori|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d48d|KDKNJL01L05F034A|Paolo|Pirozzi|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d48e|PBFNDJ01E04O002B|Anna|Bianchi|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d48f|AKFKCL03M05K075K|Geremia|Costa|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d490|GPNCID08N09N089B|Riccardo|Cocci|5dc9c3112d698031f441e1c9|
+|5dca711c89bf46419cf5d491|EOANEJ00J04K037K|Vittoria|Bianchi|5dc9c3112d698031f441e1c9|
