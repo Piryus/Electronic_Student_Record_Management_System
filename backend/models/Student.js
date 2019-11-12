@@ -16,6 +16,7 @@ const studentSchema = new Schema({
     ssn: String,
     name: String,
     surname: String,
+    classId: Schema.Types.ObjectId,
     grades: [gradeSchema]
 });
 
