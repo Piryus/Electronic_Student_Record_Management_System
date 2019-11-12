@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 import Login from './components/components/Login/index';
 import * as serviceWorker from './serviceWorker';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 //ReactDOM.render(<App />, document.getElementById('root'));
 
