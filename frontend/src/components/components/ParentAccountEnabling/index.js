@@ -1,4 +1,5 @@
 import React from 'react';
+import SearchBar from '../SearchBar/index';
 import styles from './styles.module.css';
 
 class ParentAccountEnabling extends React.Component{
@@ -31,6 +32,10 @@ class ParentAccountEnabling extends React.Component{
             ],
             suggestions: [],
         }
+        this.updateSuggestions = this.updateSuggestions.bind(this);
+        this.updateStudentFound = this.updateStudentFound.bind(this);
+        this.suggestionSelected = this.suggestionSelected.bind(this);
+        this.functionToFixElements = this.functionToFixElements.bind(this);
     }
 
     validateEmail(){
@@ -66,9 +71,29 @@ class ParentAccountEnabling extends React.Component{
         this.resetPage();
     }
 
+    functionToFixElements = (elements) => {
+        let vect = [];
+        elements.map((item) => vect.push(item.surname + ' ' + item.name + ' ' + item.ssnCode));
+        return vect;
+    }
+
+    updateStudentFound = (value) => {
+        this.setState({studentFound: value});
+    }
+
+    updateSuggestions = (value) => {
+        this.setState({suggestions: value});
+    }
+
+    suggestionSelected = (value) => {
+        this.setState({
+            studentFound: value,
+        });
+    }
+
     submitChildForm(){
 
-        if(this.state.studentFound === '' || this.state.suggestions.length == 0){
+        if(this.state.studentFound === '' || this.state.suggestions.length === 0){
             alert('Please specify an existing student.');
         }else{
             var res = this.state.studentFound.split(" ");
@@ -81,37 +106,6 @@ class ParentAccountEnabling extends React.Component{
             }
         }
  
-    }
-
-    onTextChanged = (e) => {
-        const value = e.target.value;
-        let sugg = [];
-        let vect = [];
-        this.setState({studentFound: value});
-        if(value.length >= 3){
-            const regex = new RegExp(`${value}`, 'i');
-            this.state.students.map((item) => vect.push(item.surname + ' ' + item.name + ' ' + item.ssnCode));
-            sugg = vect.filter(v => regex.test(v));
-        }
-        this.setState({suggestions: sugg});
-    }
-
-    renderSuggestions(){
-        const  sugg = this.state.suggestions;
-        if(sugg.lenght == 0){
-            return null;
-        }
-        return(
-            <ul className={styles.suggestions}>Stundents found:<br/>
-                {sugg.map((item) => <li onClick={() => this.suggestionSelected(item)} className={styles.studentFound}>{item}</li>)}
-            </ul>
-        );
-    }
-
-    suggestionSelected(value){
-        this.setState({
-            studentFound: value,
-        });
     }
 
 
@@ -134,8 +128,8 @@ class ParentAccountEnabling extends React.Component{
                     <div>
                         <span className={styles.parentEmailSpan}>Choose a Student from the panel on the right..</span><br/>
                         <form className={styles.parentForm} onSubmit={event => { event.preventDefault(); this.submitChildForm();}}>
-                            <input value={this.state.studentFound} type= "text" name="email" placeholder= "Search by SNN code or Surname" className={styles.inputEmail} onChange = {this.onTextChanged} required /><br/>
-                            {this.renderSuggestions()}
+                            <SearchBar updateStudent = {this.updateStudentFound} elementFound = {this.state.studentFound} elements = {this.state.students} functionToFixElements = {this.functionToFixElements} suggestions = {this.state.suggestions} updateSuggestions = {this.updateSuggestions} updateSuggestionSelected = {this.suggestionSelected}/>
+                            <span className={styles.selectedSpan}>Selected: </span><span className={styles.selectedEffectivelySpan}>{this.state.studentFound}</span>
                             <button className={styles.continueButton}>Continue</button>
                             <button onClick={this.resetPage} className={styles.cancelButton}>Cancel</button>
                         </form>

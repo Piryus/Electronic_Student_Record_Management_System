@@ -30,7 +30,7 @@
 
 .continueButton{
     font-size: 150%;
-    margin-top: 13%;
+    margin-top: 7%;
     margin-left: 27%;
     border-radius: 20.0px;
     padding: 2%;
@@ -144,24 +144,4 @@
 .cancelButtonFinal:hover{
     color: whitesmoke;
     background-color: rgb(182, 51, 51);
-}
-
-.selectedSpan{
-    position: absolute;
-    top: 55%;
-    left: 20%;
-    font-size: 120%;
-    font-weight: bold;
-}
-
-.selectedEffectivelySpan{
-    position: absolute;
-    top: 65%;
-    left: 20%;
-    font-size: 120%;
-    font-weight: bold;
-    background-color: whitesmoke;
-    color: rgb(182, 51, 51);
-    border-radius: 20.0px;
-    padding: 1%;
 }
