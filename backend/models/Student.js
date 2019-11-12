@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 
 const gradeSchema = new Schema({
     value: Number,
-    topic: String,
+    subject: String,
     date: {
         type: Date,
         default: Date.now
