@@ -12,14 +12,14 @@
 
 |_id|userId|ssn|name|surname|subjects|
 |---|---|---|---|---|---|
-|5dca698eed550e4ca4aba7f5|?|DJRFUC56J13E485F|Marco|Bianchi|Italian, History|
-|5dca69cf048e8e40d434017f|?|CMFOLR29R45S203O|Roberta|Verdi|Math, Physics|
-|5dca6cbe7adca3346c5983cb|?|LDFVUI17P04D491B|Stefano|Rossi|Latin|
-|5dca6cd5b83a1f3ef03e962b|?|SCBGMN21E45O956Q|Peter|Posta|Art|
-|5dca6cf0a92bbb4dd8c0e817|?|PLVCGT02S19R549A|Federica|Valli|English|
-|5dca6d0801ea271794cb650e|?|LCFTUI58S49G910R|Cinzia|Tollo|Science|
-|5dca6d2038627d0bfc4167b0|?|QASVUM68G45D297P|Dario|Resti|Gym|
-|5dca6d3620607b1e30dea42a|?|NCFTOG69F23B796K|Nina|Fassio|Religion|
+|5dca698eed550e4ca4aba7f5|5dca7e2b461dc52d681804f1|DJRFUC56J13E485F|Marco|Bianchi|Italian, History|
+|5dca69cf048e8e40d434017f|5dca7e2b461dc52d681804f2|CMFOLR29R45S203O|Roberta|Verdi|Math, Physics|
+|5dca6cbe7adca3346c5983cb|5dca7e2b461dc52d681804f3|LDFVUI17P04D491B|Stefano|Rossi|Latin|
+|5dca6cd5b83a1f3ef03e962b|5dca7e2b461dc52d681804f4|SCBGMN21E45O956Q|Peter|Posta|Art|
+|5dca6cf0a92bbb4dd8c0e817|5dca7e2b461dc52d681804f5|PLVCGT02S19R549A|Federica|Valli|English|
+|5dca6d0801ea271794cb650e|5dca7e2b461dc52d681804f6|LCFTUI58S49G910R|Cinzia|Tollo|Science|
+|5dca6d2038627d0bfc4167b0|5dca7e2b461dc52d681804f7|QASVUM68G45D297P|Dario|Resti|Gym|
+|5dca6d3620607b1e30dea42a|5dca7e2b461dc52d681804f8|NCFTOG69F23B796K|Nina|Fassio|Religion|
 
 ## Student
 
@@ -45,9 +45,29 @@
 
 |_id|userId|ssn|name|surname|children|
 |---|---|---|---|---|---|
-|5dca77de05972e0898e9c68d|?|FAHKGA04F01L081M|Davide|Capon|5dca711c89bf46419cf5d485|
-|5dca77f47af8500cf8668f06|?|JFMCL00C02H025N|Tiziana|Gentile|5dca711c89bf46419cf5d485|
-|5dca781462307a4f84dd86d5|?|ELFLIP03J08D056L|Barbara|Galli|5dca711c89bf46419cf5d483, 5dca711c89bf46419cf5d489|
-|5dca7825e60dac32e4828699|?|GCOLGO03C09K019O|Fabio|Cremonesi|5dca711c89bf46419cf5d483, 5dca711c89bf46419cf5d489|
-|5dca784dcf1db14678f3cadb|?|BCOAEN01B09O049L|Lucia|Monge|5dca711c89bf46419cf5d48e, 5dca711c89bf46419cf5d491|
-|5dca78645953000328b6131b|?|GELOEN01E09P064N|Corrado|Bianchi|5dca711c89bf46419cf5d48e, 5dca711c89bf46419cf5d491|
+|5dca77de05972e0898e9c68d|5dca7e2b461dc52d681804f9|FAHKGA04F01L081M|Davide|Capon|5dca711c89bf46419cf5d485|
+|5dca77f47af8500cf8668f06|5dca7e2b461dc52d681804fa|JFMCL00C02H025N|Tiziana|Gentile|5dca711c89bf46419cf5d485|
+|5dca781462307a4f84dd86d5|5dca7e2b461dc52d681804fb|ELFLIP03J08D056L|Barbara|Galli|5dca711c89bf46419cf5d483, 5dca711c89bf46419cf5d489|
+|5dca7825e60dac32e4828699|5dca7e2b461dc52d681804fc|GCOLGO03C09K019O|Fabio|Cremonesi|5dca711c89bf46419cf5d483, 5dca711c89bf46419cf5d489|
+|5dca784dcf1db14678f3cadb|5dca7e2b461dc52d681804fd|BCOAEN01B09O049L|Lucia|Monge|5dca711c89bf46419cf5d48e, 5dca711c89bf46419cf5d491|
+|5dca78645953000328b6131b|5dca7e2b461dc52d681804fe|GELOEN01E09P064N|Corrado|Bianchi|5dca711c89bf46419cf5d48e, 5dca711c89bf46419cf5d491|
+
+## User
+
+|_id|mail|password|scope
+|---|---|---|---|
+|5dca7e2b461dc52d681804f0|admin@admin.com|admin|admin|
+|5dca7e2b461dc52d681804f1|mario.bianchi@teacher.com|teacher1|teacher|
+|5dca7e2b461dc52d681804f2|roberta.verdi@teacher.com|teacher2|teacher|
+|5dca7e2b461dc52d681804f3|stefano.rossi@teacher.com|teacher3|teacher|
+|5dca7e2b461dc52d681804f4|peter.posta@teacher.com|teacher4|teacher|
+|5dca7e2b461dc52d681804f5|federica.valli@teacher.com|teacher5|teacher|
+|5dca7e2b461dc52d681804f6|cinzia.tollo@teacher.com|teacher6|teacher|
+|5dca7e2b461dc52d681804f7|dario.resti@teacher.com|teacher7|teacher|
+|5dca7e2b461dc52d681804f8|nina.fassio@teacher.com|teacher8|teacher|
+|5dca7e2b461dc52d681804f9|davide.capon@parent.com|parentA_1|parent|
+|5dca7e2b461dc52d681804fa|tiziana.gentile@parent.com|parentA_2|parent|
+|5dca7e2b461dc52d681804fb|barbara.galli@parent.com|parentB_1|parent|
+|5dca7e2b461dc52d681804fc|fabio.cremonesi@parent.com|parentB_2|parent|
+|5dca7e2b461dc52d681804fd|lucia.monge@parent.com|parentC_1|parent|
+|5dca7e2b461dc52d681804fe|corrado.bianchi@parent.com|parentC_2|parent|
