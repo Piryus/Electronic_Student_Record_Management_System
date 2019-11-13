@@ -1,9 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
-import Login from '../login';
-import Parent from '../parent/parent';
-import Teacher from '../teacher/teacher';
-import Officer from '../officer/officer';
+import Routes from '../routes/routes';
 
 class App extends React.Component {
 
@@ -11,48 +7,24 @@ class App extends React.Component {
         super(props);
         this.state = {
             authenticated: false,
-            role: 'officer', /*to be made dynamic using props because it is inherited from login component*/
-        }
+            role: [], /*to be made dynamic using props because it is inherited from login component*/
+        };
+        this.setAppProps = this.setAppProps.bind(this)
+    }
+
+    setAppProps(authenticated, role) {
+        this.setState({
+            authenticated,
+            role
+        });
     }
 
     render() {
+        const authenticated = this.state.authenticated;
+        const role = this.state.role;
+        const setAppProps = this.setAppProps;
         return (
-            <Router>
-                <Switch>
-                    {!this.state.authenticated && (
-                        <div>
-                            <Route exact path='/login'>
-                                <Login loggingIn={this.state.loggingIn}/>
-                            </Route>
-                            <Redirect to='/login'/>
-                        </div>
-                    )}
-                    {this.state.authenticated && this.state.role === 'parent' && (
-                        <div>
-                            <Route exact path='/parent'>
-                                <Parent loggingIn={this.state.loggingIn}/>
-                            </Route>
-                            <Redirect to='/parent'/>
-                        </div>
-                    )}
-                    {this.state.authenticated && this.state.role === 'teacher' && (
-                        <div>
-                            <Route exact path='/teacher'>
-                                <Teacher loggingIn={this.state.loggingIn}/>
-                            </Route>
-                            <Redirect to='/teacher'/>
-                        </div>
-                    )}
-                    {this.state.authenticated && this.state.role === 'officer' && (
-                        <div>
-                            <Route exact path='/officer'>
-                                <Officer loggingIn={this.state.loggingIn}/>
-                            </Route>
-                            <Redirect to='/officer'/>
-                        </div>
-                    )}
-                </Switch>
-            </Router>
+            <Routes appProps={{authenticated, role, setAppProps}} />
         );
     }
 }
