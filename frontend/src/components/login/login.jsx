@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import './style.sass';
+import './login.sass';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Alert from 'react-bootstrap/Alert';
 
 class Login extends Component {
 
@@ -9,7 +10,9 @@ class Login extends Component {
         super(props);
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            error: false,
+            errorUnknown: false,
         };
     }
 
@@ -42,24 +45,34 @@ class Login extends Component {
                 } else {
                     // Connection rejected handler
                     console.log(response);
+                    this.setState({password: '', error: true, unknownError: false});
                 }
             })
             .catch(error => {
-                console.log(error)
+                console.log(error);
+                this.setState({password: '', unknownError: true, error: false});
             });
 
     }
 
     render() {
+        let error;
+        if (this.state.error) {
+            error = <Alert variant={'danger'} >Sorry, the mail or password was incorrect.</Alert>
+        }
+        if (this.state.unknownError) {
+            error = <Alert variant={'danger'} >Sorry, an unknown error happened... It's not you, it's us.</Alert>
+        }
         return (<div className="loginContainer">
                 <h2 className={'loginText'}>Log in to continue</h2>
+                {error}
                 <Form onSubmit={event => {
                     event.preventDefault();
                     this.handleLogin(this.state.username, this.state.password);
                 }}>
-                    <Form.Control type="email" placeholder="Email address"
+                    <Form.Control value={this.state.username} type="email" placeholder="Email address"
                                   onChange={(e) => this.setState({username: e.target.value})}/>
-                    <Form.Control type="password" name="password" placeholder="Password"
+                    <Form.Control value={this.state.password} type="password" name="password" placeholder="Password"
                                   onChange={(e) => this.setState({password: e.target.value})} required/>
                     <Button disabled={!this.validateForm()} type="submit" block>Log in</Button>
                 </Form>

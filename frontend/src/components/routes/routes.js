@@ -1,6 +1,6 @@
 import React from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
-import Login from "../login";
+import Login from "../login/login";
 import Parent from "../parent/parent";
 import Teacher from "../teacher/teacher";
 import Officer from "../officer/officer";
