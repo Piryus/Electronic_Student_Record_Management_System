@@ -7,24 +7,27 @@ class App extends React.Component {
         super(props);
         this.state = {
             authenticated: false,
-            role: [], /*to be made dynamic using props because it is inherited from login component*/
+            role: [],
+            children: []
         };
         this.setAppProps = this.setAppProps.bind(this)
     }
 
-    setAppProps(authenticated, role) {
+    setAppProps(authenticated, role, children) {
         this.setState({
             authenticated,
-            role
+            role,
+            children
         });
     }
 
     render() {
         const authenticated = this.state.authenticated;
         const role = this.state.role;
+        const children = this.state.children;
         const setAppProps = this.setAppProps;
         return (
-            <Routes appProps={{authenticated, role, setAppProps}} />
+            <Routes appProps={{authenticated, role, children, setAppProps}} />
         );
     }
 }

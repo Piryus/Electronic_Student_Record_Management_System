@@ -9,18 +9,7 @@ export default class Parent extends React.Component {
         this.state = {
             userRequest: '',
             childSelected: 'JD1',
-            child: [
-                {
-                    name: 'John',
-                    surname: 'Doe',
-                    id: 'JD1'
-                },
-                {
-                    name: 'Walter',
-                    surname: 'White',
-                    id: 'WW1'
-                }
-            ]
+            children: props.children,
         };
         this.setUserRequest = this.setUserRequest.bind(this);
     }
@@ -52,7 +41,7 @@ export default class Parent extends React.Component {
 
                     <div className={styles.selectorWrapper}>
                         <select className={styles.childSelector} onChange={(e) => this.selectChild(e)}>
-                            {this.state.child.map(this.renderChildItem)}
+                            {this.state.children.map(this.renderChildItem)}
                         </select>
                     </div>
 

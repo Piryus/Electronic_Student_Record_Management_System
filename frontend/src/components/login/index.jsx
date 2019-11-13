@@ -34,7 +34,11 @@ class Login extends Component {
             .then(response => response.json())
             .then(response => {
                 if (response.success === true) {
-                    this.props.setAppProps(true, response.scope);
+                    let children = [];
+                    if (response.hasOwnProperty('children')) {
+                        children = response.children;
+                    }
+                    this.props.setAppProps(true, response.scope, children);
                 } else {
                     // Connection rejected handler
                     console.log(response);
