@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
-import App from '../../../App'
+import App from '../App/App'
 import './style.sass';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -54,6 +54,7 @@ class Login extends Component {
             <div>
                 {this.state.loggingIn === false && (
                     <div className="loginContainer">
+                        <h2 className={'loginText'}>Log in to continue</h2>
                         <Form onSubmit={event => {
                             event.preventDefault();
                             this.handleLogin(this.state.username, this.state.password);
@@ -62,7 +63,7 @@ class Login extends Component {
                                           onChange={(e) => this.setState({username: e.target.value})}/>
                             <Form.Control type="password" name="password" placeholder="Password"
                                           onChange={(e) => this.setState({password: e.target.value})} required/>
-                            <Button type="submit" block>Login</Button>
+                            <Button type="submit" block>Log in</Button>
                         </Form>
                     </div>
                 )}

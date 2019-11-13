@@ -1,7 +1,7 @@
 import React from 'react';
-import Parent from './components/parent/parent';
-import Teacher from './components/teacher/teacher';
-import Officer from './components/officer/officer';
+import Parent from '../parent/parent';
+import Teacher from '../teacher/teacher';
+import Officer from '../officer/officer';
 
 class App extends React.Component{
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import SearchBar from '../SearchBar/index';
+import SearchBar from './search-bar/officer-parent-access-search-bar';
 import styles from './styles.module.css';
 
 class ParentAccountEnabling extends React.Component{

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import './style.sass';
-import Dropdown from '../Dropdown';
+import './item.sass';
+import Dropdown from '../../../utils/dropdown';
 
 class SubjectAndGrade extends Component {
 

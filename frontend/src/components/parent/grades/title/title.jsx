@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './style.sass';
+import '../item/item.sass';
 
 class Title extends Component {
 

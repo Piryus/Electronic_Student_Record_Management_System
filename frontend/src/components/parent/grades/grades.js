@@ -1,7 +1,7 @@
 import React from 'react';
-import Dropdown from '../../components/Dropdown';
-import SubjectAndGrade from '../../components/SubjectAndGrade';
-import Title from '../../components/SubjectAndGrade/Title';
+import Dropdown from '../../utils/dropdown';
+import SubjectAndGrade from './item/item';
+import Title from './title/title';
 import styles from './styles.module.css';
 
 

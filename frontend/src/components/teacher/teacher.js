@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './styles.module.css';
-import TeacherLectureSummary from './components/TeacherLectureSummary/index';
+import TeacherLectureSummary from './lecture-summary/teacher-lecture-summary';
 
 class Parent extends React.Component{
 

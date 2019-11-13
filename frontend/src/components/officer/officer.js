@@ -1,5 +1,5 @@
 import React from 'react';
-import ParentAccountEnabling from '../components/ParentAccountEnabling/index';
+import ParentAccountEnabling from './parent-access/officer-parent-access';
 import styles from './styles.module.css';
 
 class Officer extends React.Component{

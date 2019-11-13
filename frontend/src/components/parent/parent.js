@@ -1,5 +1,5 @@
 import React from 'react';
-import Grades from './components/grades';
+import Grades from './grades/grades';
 import styles from './styles.module.css';
 
 class Parent extends React.Component{
