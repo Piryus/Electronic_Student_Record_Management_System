@@ -1,15 +1,13 @@
 'use strict';
 
-const auth = require('./auth');
-const grades = require('./grades');
-const lectures = require('./lectures');
 const admin = require('./admin');
-const parent = require('./parent');
+const auth = require('./auth');
+const lectures = require('./lectures');
+const students = require('./students');
 
 module.exports = [
-    ...auth,
-    ...grades,
-    ...lectures,
     ...admin,
-    ...parent
+    ...auth,
+    ...lectures,
+    ...students
 ];
