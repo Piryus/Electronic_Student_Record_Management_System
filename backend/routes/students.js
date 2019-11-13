@@ -3,6 +3,8 @@
 const Boom = require('boom');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
+const Joi = require('@hapi/joi');
+
 
 const getGrades = async function(request, h) {
     try {
@@ -17,6 +19,17 @@ const getGrades = async function(request, h) {
     }
 };
 
+const addStudent = async function(request, h){
+    try{
+        const { ssn, name, surname } = request.payload;
+        const newStudent = new Student({ ssn, name, surname });
+        newStudent.save();
+        return {success: true};
+    } catch(err) {
+        return Boom.badImplementation(err);
+    }
+}
+
 const routes = [
     {
         method: 'GET',
@@ -26,6 +39,24 @@ const routes = [
             auth: {
                 strategy: 'session',
                 scope: 'parent'
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/students',
+        handler: addStudent,
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    ssn: Joi.string().required(),
+                    name: Joi.string().required(),
+                    surname: Joi.string().required()
+                }
             }
         }
     }
