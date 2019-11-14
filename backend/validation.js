@@ -6,7 +6,7 @@ const schema = {
     ssn: Joi.string(),
     name: Joi.string(),
     date: Joi.date(),
-    class: Joi.string().regex(/^[1-5][a-zA-Z]$/),
+    className: Joi.string().regex(/^[1-5][a-zA-Z]$/),
     longText: Joi.string().min(1).max(4096)
 };
 
