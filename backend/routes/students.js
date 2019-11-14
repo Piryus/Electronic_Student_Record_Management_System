@@ -3,9 +3,10 @@
 const Boom = require('boom');
 
 const Valid = require('../validation');
+
+const Parent = require('../models/Parent');
 const SchoolClass = require ('../models/SchoolClass');
 const Student = require('../models/Student');
-const Parent = require('../models/Parent');
 
 const getGrades = async function(request, h) {
     try {
@@ -20,8 +21,8 @@ const getGrades = async function(request, h) {
     }
 };
 
-const addStudent = async function(request, h){
-    try{
+const addStudent = async function(request, h) {
+    try {
         const { ssn, name, surname } = request.payload;
         const newStudent = new Student({ ssn, name, surname });
         newStudent.save();
@@ -31,31 +32,13 @@ const addStudent = async function(request, h){
     }
 };
 
-const addSchoolClass = async function(request, h){
-    try{
-        const { className, classStudents } = request.payload;
-        const effectiveClassName = className.toUpperCase();
-        var schoolClass = await SchoolClass.findOne({name: effectiveClassName});
-        if(schoolClass === null){
-            const newSchoolClass = new SchoolClass({name: effectiveClassName });
-            await newSchoolClass.save();
-            schoolClass = await SchoolClass.findOne({name: effectiveClassName});
-        }
-        const classId = schoolClass._id;
-        const oldStudents = await Student.find({classId: classId});
-        var index;
-        for(index in oldStudents){
-            if(!classStudents.includes(oldStudents[index]._id.toString())){
-                oldStudents[index].classId = undefined;
-                oldStudents[index].save();
-            }
-        }
-        for(index in classStudents){
-            var studentToBeUpdated = await Student.findOne({_id: classStudents[index]});
-            studentToBeUpdated.classId = classId;
-            studentToBeUpdated.save();
-        }
-        return {success: true};
+const addSchoolClass = async function(request, h) {
+    try {
+        const { name, students } = request.payload;
+        const schoolClass = await SchoolClass.findOneAndUpdate({ name: name.toUpperCase() }, {}, { upsert: true });
+        await Student.updateMany({ classId: schoolClass._id }, { classId: undefined });
+        await Student.updateMany({ _id: { $in: students } }, { classId: schoolClass._id });
+        return { success: true };
     } catch(err) {
         return Boom.badImplementation(err);
     }
@@ -107,8 +90,8 @@ const routes = [
             },
             validate: {
                 payload: {
-                    className: Valid.class.required(),
-                    classStudents: Valid.studentsArray.required()
+                    name: Valid.className.required(),
+                    students: Valid.array.items(Valid.id).required()
                 }
             }
         }
