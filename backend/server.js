@@ -5,11 +5,12 @@ const Hapi = require('@hapi/hapi');
 const routes = require('./routes');
 const cookieStrategy = require('./cookieStrategy');
 
-const init = async () => {
+const init = async (debug) => {
 
     const server = Hapi.server({
         port: 3000,
         host: 'localhost',
+        debug,
         routes: {
             cors: {
                 origin: ['*'],
@@ -27,10 +28,6 @@ const init = async () => {
     server.auth.default('session');
 
     server.route(routes);
-
-    await server.start();
-    console.log('Server running on %s', server.info.uri);
-
     return server;
     
 };
