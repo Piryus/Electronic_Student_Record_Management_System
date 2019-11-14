@@ -36,6 +36,13 @@ suite('students', () => {
             { value: 6.5, subject: 'History' },
             { value: 7, subject: 'Gym' },
         ];
+        const auth = {
+            strategy: 'session',
+            credentials: {
+                scope: 'parent',
+                id: '5dca711c89bf46419cf5d48d'
+            }
+        };
 
         const parentFindOne = Sinon.stub(Parent, 'findOne');
         const studentFindOne = Sinon.stub(Student, 'findOne');
@@ -71,33 +78,36 @@ suite('students', () => {
 
         const options3 = {
             method: 'GET',
-            url: '/grades/5dca6cf0a92bbb4dd8c0e817',
-            auth: {
-                strategy: 'session',
-                credentials: {
-                    scope: 'parent',
-                    id: '5dca711c89bf46419cf5d48d'
-                }
-            }
+            url: '/grades/zzzz',
+            auth
         };
-        // #3 - parent not found
+        // #3 - wrong parameters
         const res3 = await server.inject(options3);
-        // #4 - student not found
-        const res4 = await server.inject(options3);
-        // #5 - student is not child of parent
-        const res5 = await server.inject(options3);
-        // #6 - unknown error
-        const res6 = await server.inject(options3);
-        // #7 - success
-        const res7 = await server.inject(options3);
+
+        const options4 = {
+            method: 'GET',
+            url: '/grades/5dca6cf0a92bbb4dd8c0e817',
+            auth
+        };
+        // #4 - parent not found
+        const res4 = await server.inject(options4);
+        // #5 - student not found
+        const res5 = await server.inject(options4);
+        // #6 - student is not child of parent
+        const res6 = await server.inject(options4);
+        // #7 - unknown error
+        const res7 = await server.inject(options4);
+        // #8 - success
+        const res8 = await server.inject(options4);
 
         expect(res1.statusCode).to.equal(302);
         expect(res2.statusCode).to.equal(403);
         expect(res3.statusCode).to.equal(400);
         expect(res4.statusCode).to.equal(400);
         expect(res5.statusCode).to.equal(400);
-        expect(res6.statusCode).to.equal(500);
-        expect(res7.result.grades).to.equal(grades);
+        expect(res6.statusCode).to.equal(400);
+        expect(res7.statusCode).to.equal(500);
+        expect(res8.result.grades).to.equal(grades);
 
         expect(parentFindOne.callCount).to.equal(5);
         expect(parentFindOne.calledWithExactly({ userId: '5dca711c89bf46419cf5d48d' })).to.be.true();

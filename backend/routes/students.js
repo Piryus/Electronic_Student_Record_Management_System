@@ -1,10 +1,11 @@
 'use strict';
 
 const Boom = require('boom');
+
+const Valid = require('../validation');
+
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
-const Joi = require('@hapi/joi');
-
 
 const getGrades = async function(request, h) {
     try {
@@ -39,6 +40,11 @@ const routes = [
             auth: {
                 strategy: 'session',
                 scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
             }
         }
     },
@@ -53,9 +59,9 @@ const routes = [
             },
             validate: {
                 payload: {
-                    ssn: Joi.string().required(),
-                    name: Joi.string().required(),
-                    surname: Joi.string().required()
+                    ssn: Valid.ssn.required(),
+                    name: Valid.name.required(),
+                    surname: Valid.name.required()
                 }
             }
         }
