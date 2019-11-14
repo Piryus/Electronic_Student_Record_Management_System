@@ -3,7 +3,7 @@
 const Boom = require('boom');
 
 const Valid = require('../validation');
-
+const SchoolClass = require ('../models/SchoolClass');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
 
@@ -29,7 +29,37 @@ const addStudent = async function(request, h){
     } catch(err) {
         return Boom.badImplementation(err);
     }
-}
+};
+
+const addSchoolClass = async function(request, h){
+    try{
+        const { className, classStudents } = request.payload;
+        const effectiveClassName = className.toUpperCase();
+        var schoolClass = await SchoolClass.findOne({name: effectiveClassName});
+        if(schoolClass === null){
+            const newSchoolClass = new SchoolClass({name: effectiveClassName });
+            await newSchoolClass.save();
+            schoolClass = await SchoolClass.findOne({name: effectiveClassName});
+        }
+        const classId = schoolClass._id;
+        const oldStudents = await Student.find({classId: classId});
+        var index;
+        for(index in oldStudents){
+            if(!classStudents.includes(oldStudents[index]._id.toString())){
+                oldStudents[index].classId = undefined;
+                oldStudents[index].save();
+            }
+        }
+        for(index in classStudents){
+            var studentToBeUpdated = await Student.findOne({_id: classStudents[index]});
+            studentToBeUpdated.classId = classId;
+            studentToBeUpdated.save();
+        }
+        return {success: true};
+    } catch(err) {
+        return Boom.badImplementation(err);
+    }
+};
 
 const routes = [
     {
@@ -62,6 +92,23 @@ const routes = [
                     ssn: Valid.ssn.required(),
                     name: Valid.name.required(),
                     surname: Valid.name.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/classes',
+        handler: addSchoolClass,
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    className: Valid.class.required(),
+                    classStudents: Valid.studentsArray.required()
                 }
             }
         }
