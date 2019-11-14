@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import DailyLecture from '../DailyLecture/index';
-import './style.sass';
+import DailyLecture from '../daily-lecture/teacher-daily-lecture';
+import './teacher-lecture-summary.sass';
 
 class TeacherLectureSummary extends Component {
 

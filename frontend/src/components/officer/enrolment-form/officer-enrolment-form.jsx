@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './style.sass';
+import './officer-enrolment-form.sass';
 
 class EnrolmentForm extends Component {
 

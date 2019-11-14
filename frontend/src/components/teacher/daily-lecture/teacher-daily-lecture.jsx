@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './style.sass';
+import './teacher-daily-lecture.sass';
 
 class DailyLecture extends Component {
 

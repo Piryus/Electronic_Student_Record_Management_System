@@ -1,14 +1,13 @@
 import React from 'react';
 import styles from './styles.module.css';
-import TeacherLectureSummary from './components/TeacherLectureSummary/index';
+import TeacherLectureSummary from './lecture-summary/teacher-lecture-summary';
 
-class Parent extends React.Component{
+export default class Parent extends React.Component {
 
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            loggingIn: this.props.loggingIn,
             userRequest: '',
         };
         this.setUserRequest = this.setUserRequest.bind(this);
@@ -20,12 +19,10 @@ class Parent extends React.Component{
     }
 
 
-    render(){
+    render() {
         return (
             <div className={styles.body}>
-
-                
-                {this.state.loggingIn === true && (<div>
+                <div>
                     <div className={styles.header}>
                         <h1>Teacher section</h1>
                     </div>
@@ -34,32 +31,27 @@ class Parent extends React.Component{
 
                     </div>
 
-                        <div>
-                            <table className={styles.panel}>
-                                <tr>
-                                    <td>
-                                        <button  onClick = {(e) => this.setUserRequest(e, "lectures")} className={styles.link}>
-                                            <div className={styles.panelElement}>
-                                                <p>Lectures</p>
-                                            </div>
-                                        </button >
-                                    </td>
-                                </tr>
-                                <tr>
-                                </tr>
-                            </table>
+                    <div>
+                        <table className={styles.panel}>
+                            <tr>
+                                <td>
+                                    <button onClick={(e) => this.setUserRequest(e, "lectures")} className={styles.link}>
+                                        <div className={styles.panelElement}>
+                                            <p>Lectures</p>
+                                        </div>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                            </tr>
+                        </table>
 
-                            {this.state.userRequest === 'lectures' && (
-                                <TeacherLectureSummary/>
-                            )}
-
-                       </div>
-                    
+                        {this.state.userRequest === 'lectures' && (
+                            <TeacherLectureSummary/>
+                        )}
+                    </div>
                 </div>
-                )}   
             </div>
         );
     }
 }
-
-export default Parent;
