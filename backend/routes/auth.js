@@ -25,7 +25,7 @@ const login = async function (request, h) {
                     return Boom.badRequest();
                 }
                 // Retrieves the parent's children using the parent's children's IDs
-                const children = await Student.find({'_id': { $in: parent.children}});
+                const children = await Student.find({'_id': {$in: parent.children}});
                 // For each children, keep only the necessary data and push those in an array
                 let childrenFiltered = [];
                 for (const childKey in children) {
@@ -60,11 +60,38 @@ const logout = async function (request, h) {
 const authCheck = async function (request, h) {
     try {
         if (request.auth.isAuthenticated) {
-            const userRole = request.auth.credentials.scope;
-            return {
-                isAuth: true,
-                role: userRole
-            };
+            const user = await User.findOn
+            if (request.auth.credentials.scope.includes('parent')) {
+                // Retrieves the parent in the DB using the user ID
+                const parent = await Parent.findOne({userId: request.auth.credentials._id});
+                // If the parent isn't found, it shouldn't happen, throw an error
+                if (parent === null) {
+                    return Boom.badRequest();
+                }
+                // Retrieves the parent's children using the parent's children's IDs
+                const children = await Student.find({'_id': {$in: parent.children}});
+                // For each children, keep only the necessary data and push those in an array
+                let childrenFiltered = [];
+                for (const childKey in children) {
+                    let childFiltered = {
+                        _id: children[childKey]._id,
+                        ssn: children[childKey].ssn,
+                        name: children[childKey].name,
+                        surname: children[childKey].surname
+                    };
+                    childrenFiltered.push(childFiltered);
+                }
+                return {
+                    isAuth: true,
+                    role: request.auth.credentials.scope,
+                    children: childrenFiltered
+                }
+            } else {
+                return {
+                    isAuth: true,
+                    role: request.auth.credentials.scope
+                }
+            }
         } else { // User is not authenticated
             return {
                 isAuth: false

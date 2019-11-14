@@ -16,7 +16,13 @@ const init = async () => {
         port: 3000,
         host: 'localhost',
         routes: {
-            cors: true
+            cors: {
+                origin: ['*'],
+                maxAge: 86400,
+                headers: ['Accept', 'Authorization', 'Content-Type', 'If-None-Match'],
+                exposedHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+                credentials: true
+            }
         }
     });
 
