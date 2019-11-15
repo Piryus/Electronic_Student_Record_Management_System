@@ -3,6 +3,9 @@ const Nodemailer = require('nodemailer');
 const keys = require('../config/keys');
 const welcomeEmail = require('./welcomeEmail');
 
+const hour = 60 * 60 * 1000;
+const day = 24 * hour;
+
 const startHour = 8, numHours = 6;
 const transporter = Nodemailer.createTransport(keys.email);
 
@@ -10,27 +13,23 @@ Date.prototype.getNormalizedDay = function() {
     return this.getDay() === 0 ? 6 : this.getDay() - 1;
 }
 Date.prototype.weekStart = function() {
-    let ws = new Date();
-    ws.setHours(0, 0, 0, 0);
-    ws.setDate(ws.getDate() - ws.getNormalizedDay());
+    let ws = this;
+    ws.setMinutes(0, 0, 0);
+    ws.setTime(ws.getTime() - ws.getNormalizedDay() * day - ws.getHours() * hour);
     return ws;
 }
 
 const weekhourToDate = function(wh) {
-    let d = new Date();
-    const [weekdayIndex, hourIndex] = wh.split('_');
+    let d = new Date().weekStart();
+    const [weekdayIndex, hourIndex] = wh.split('_').map(x => parseInt(x));
 
-    // transform (sunday = 0, monday = 1, ..) into (monday = 0, .., sunday = 6)
-    const daysDelta = weekdayIndex - d.getNormalizedDay();
-    
-    d.setDate(d.getDate() + daysDelta);
-    d.setHours(hourIndex + startHour, 0, 0, 0);
+    d.setTime(d.getTime() + weekdayIndex * day + (hourIndex + startHour) * hour);
     return d;
 };
 
 const dateToWeekhour = function(d) {
     // saturday (6) and sunday (0) have to be excluded
-    if([0,6].includes(d.getDay()) || d.getHours() < startHour || d.getHours > (startHour + numHours))
+    if([0, 6].includes(d.getDay()) || d.getHours() < startHour || d.getHours() > (startHour + numHours - 1))
         return null;
 
     const weekdayIndex = d.getDay() - 1;
@@ -48,6 +47,9 @@ const sendWelcomeEmail = function(to, fullname, password) {
 };
 
 module.exports = {
+    hour,
+    day,
+    startHour,
     weekhourToDate,
     dateToWeekhour,
     sendWelcomeEmail
