@@ -118,5 +118,126 @@ suite('students', () => {
         studentFindOne.restore();
 
     });
+
+    test('addStudent', async () =>{
+
+        const auth = {
+            strategy: 'session',
+            credentials: {
+                scope: 'officer',
+                id: '5dca711c89bf46419cf5d48d'
+            }
+        };
+
+
+        const studentSave = Sinon.stub(Student.prototype, 'save');
+
+        studentSave.onCall(0).throws();
+        studentSave.onCall(1).returns({success: true});
+
+
+        const options1 = {
+            method: 'POST',
+            url: '/students'
+        };
+
+        // #1 - No authentication
+        const res1 = await server.inject(options1);
+
+        const options2 = {
+            method: 'POST',
+            url: '/students',
+            auth: {
+                strategy: 'session',
+                credentials: {
+                    scope: 'parent',
+                    id: '5dca711c89bf46419cf5d48d'
+                }
+            }
+        };
+
+        // #2 - Inappropriate scope
+        const res2 = await server.inject(options2);
+
+        const options3 = {
+            method: 'POST',
+            url: '/students',
+            auth
+        };
+        // #3 - No payload
+        const res3 = await server.inject(options3);
+
+        const options4 = {
+            method: 'POST',
+            url: '/students',
+            auth,
+            payload: {
+                name: 'Giorgio',
+                surname: 'Verdi'
+            }
+        };
+
+        // #4 - No ssn in payload
+        const res4 = await server.inject(options4);
+
+        const options5 = {
+            method: 'POST',
+            url: '/students',
+            auth,
+            payload: {
+                ssn: "GVSSN",
+                surname: 'Verdi'
+            }
+        };
+
+        // #5 - No name in payload
+        const res5 = await server.inject(options5);
+
+        const options6 = {
+            method: 'POST',
+            url: '/students',
+            auth,
+            payload: {
+                ssn: "GVSSN",
+                name: 'Giorgio'
+            }
+        };
+
+        // #6 - No surname in payload
+        const res6 = await server.inject(options6);
+
+
+        const options7 = {
+            method: 'POST',
+            url: '/students',
+            auth,
+            payload: {
+                ssn: "GVSSN",
+                name: 'Giorgio',
+                surname: 'Verdi'
+            }
+        };
+
+        // #7 - Unknown error
+        const res7 = await server.inject(options7);
+
+        // #8 - Success scenario
+        const res8 = await server.inject(options7);
+
+
+        //Tests assertions
+        expect(res1.statusCode).to.equal(302);
+        expect(res2.statusCode).to.equal(403);
+        expect(res3.statusCode).to.equal(400);
+        expect(res4.statusCode).to.equal(400);
+        expect(res5.statusCode).to.equal(400);
+        expect(res6.statusCode).to.equal(400);
+        expect(res7.statusCode).to.equal(500);
+        expect(res8.result.success).to.be.true();
+
+        expect(studentSave.callCount).to.equal(2);
+
+
+    });
     
 });
