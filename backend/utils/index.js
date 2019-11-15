@@ -13,7 +13,7 @@ Date.prototype.getNormalizedDay = function() {
     return this.getDay() === 0 ? 6 : this.getDay() - 1;
 }
 Date.prototype.weekStart = function() {
-    let ws = this;
+    let ws = new Date(this.getTime());
     ws.setMinutes(0, 0, 0);
     ws.setTime(ws.getTime() - ws.getNormalizedDay() * day - ws.getHours() * hour);
     return ws;
