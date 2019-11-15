@@ -6,6 +6,8 @@ const Sinon = require('sinon');
 
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
+const SchoolClass = require ('../models/SchoolClass');
+
 
 const expect = Code.expect;
 const lab = exports.lab = Lab.script();
@@ -119,7 +121,7 @@ suite('students', () => {
 
     });
 
-    test('addStudent', async () =>{
+    test('addStudent', async () => {
 
         const auth = {
             strategy: 'session',
@@ -237,6 +239,137 @@ suite('students', () => {
 
         expect(studentSave.callCount).to.equal(2);
 
+
+    });
+
+    test('addSchoolClass', async () => {
+
+        const students = [
+            "5dca711c89bf46419cf5d483",
+            "5dca711c89bf46419cf5d484"
+        ];
+
+        const auth = {
+            strategy: 'session',
+            credentials: {
+                scope: 'officer',
+                id: '5dca711c89bf46419cf5d48d'
+            }
+        };
+
+        const schoolClassFindOneAndUpdate = Sinon.stub(SchoolClass, 'findOneAndUpdate');
+        const studentUpdateMany = Sinon.stub(Student, 'updateMany');
+
+        schoolClassFindOneAndUpdate.onCall(0).throws();
+        schoolClassFindOneAndUpdate.onCall(1).resolves({_id: "5dc9cb4b797f6936680521b9", name: "1A"});
+        schoolClassFindOneAndUpdate.onCall(2).resolves({_id: "5dc9cb4b797f6936680521b9", name: "1A"});
+
+        studentUpdateMany.onCall(0).throws();
+        studentUpdateMany.onCall(2).returns({success: true});
+
+
+        const options1 = {
+            method: 'POST',
+            url: '/classes'
+        };
+
+        // #1 - No authentication
+        const res1 = await server.inject(options1);
+
+        const options2 = {
+            method: 'POST',
+            url: '/classes',
+            auth: {
+                strategy: 'session',
+                credentials: {
+                    scope: 'parent',
+                    id: '5dca711c89bf46419cf5d48d'
+                }
+            }
+        };
+
+        // #2 - Inappropriate scope
+        const res2 = await server.inject(options2);
+
+        const options3 = {
+            method: 'POST',
+            url: '/classes',
+            auth
+        };
+        // #3 - No payload
+        const res3 = await server.inject(options3);
+
+        const options4 = {
+            method: 'POST',
+            url: '/classes',
+            auth,
+            payload: {
+                students: students
+            }
+        };
+
+        // #4 - No class name in payload
+        const res4 = await server.inject(options4);
+
+        const options5 = {
+            method: 'POST',
+            url: '/classes',
+            auth,
+            payload: {
+                name: '1A'
+            }
+        };
+
+        // #5 - No vector of students in payload
+        const res5 = await server.inject(options5);
+
+        const options6 = {
+            method: 'POST',
+            url: '/classes',
+            auth,
+            payload: {
+                name: '1A',
+                students: students
+            }
+        };
+
+        // #6 - Unknown error - on schoolFineOneAndUpdate
+        const res6 = await server.inject(options6);
+
+        // #7 - Unknown error - on studentUpdateMany
+        const res7 = await server.inject(options6);
+
+        const options8 = {
+            method: 'POST',
+            url: '/classes',
+            auth,
+            payload: {
+                name: 'zzz',
+                students: students
+            }
+        };
+
+        // #8 - Wrong class name
+        const res8 = await server.inject(options8);
+
+        // #9 - Success scenario
+        const res9 = await server.inject(options6);
+
+
+        //Tests assertions
+        expect(res1.statusCode).to.equal(302);
+        expect(res2.statusCode).to.equal(403);
+        expect(res3.statusCode).to.equal(400);
+        expect(res4.statusCode).to.equal(400);
+        expect(res5.statusCode).to.equal(400);
+        expect(res6.statusCode).to.equal(500);
+        expect(res7.statusCode).to.equal(500);
+        expect(res8.statusCode).to.equal(400);
+        expect(res9.result.success).to.be.true();
+
+        expect(schoolClassFindOneAndUpdate.calledWith({name: '1A'})).to.be.true();
+        expect(schoolClassFindOneAndUpdate.callCount).to.equal(3);
+        expect(studentUpdateMany.callCount).to.equal(3);
 
     });
     
