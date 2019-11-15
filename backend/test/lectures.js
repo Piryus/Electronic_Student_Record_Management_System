@@ -33,8 +33,9 @@ suite('lectures', () => {
         
         const now = new Date();
         const ws = now.weekStart();
-        const future = new Date().setTime(now.getTime() + 2 * Utils.day);
-        const beforeWeekStart = new Date().setTime(ws.getTime() - 3 * Utils.day);
+        const future = new Date(now.getTime() + 2 * Utils.day);
+        const beforeWeekStart = new Date(ws.getTime() - 3 * Utils.day);
+        const datetime = new Date(ws.getTime() + 8 * Utils.hour + 5029);
 
         const auth = {
             strategy: 'session',
@@ -45,12 +46,49 @@ suite('lectures', () => {
         };
 
         const teacherFindOne = Sinon.stub(Teacher, 'findOne');
+        const lectureFindOneAndUpdate = Sinon.stub(Lecture, 'findOneAndUpdate');
         const utilsDateToWeekhour = Sinon.stub(Utils, 'dateToWeekhour');
 
         teacherFindOne.onCall(0).resolves(null);
-        teacherFindOne.resolves({ });
+        teacherFindOne.onCall(5).throws();
+        teacherFindOne.onCall(6).resolves({
+            _id: '5dca698eed550e4ca4aba7f5',
+            userId: '6dc7a207b74c6e7109ba53cd',
+            subjects: ['Italian', 'History'],
+            ssn: 'DJRFUC56J13E485F',
+            name: 'Marco',
+            surname: 'Bianchi',
+            timetable: [
+                {
+                    classId: 'd894ca1038f854aa19b73de4',
+                    subject: 'Italian',
+                    weekhour: '0_0'
+                },
+                {
+                    classId: 'd894ca1038f854aa19b73de4',
+                    subject: 'History',
+                    weekhour: '1_0'
+                }
+            ]
+        });
+        teacherFindOne.resolves({
+            _id: '5dca698eed550e4ca4aba7f5',
+            userId: '6dc7a207b74c6e7109ba53cd',
+            subjects: ['Italian', 'History'],
+            ssn: 'DJRFUC56J13E485F',
+            name: 'Marco',
+            surname: 'Bianchi',
+            timetable: [
+                {
+                    classId: 'd894ca1038f854aa19b73de4',
+                    subject: 'Italian',
+                    weekhour: '3_0'
+                }
+            ]
+        });
 
         utilsDateToWeekhour.onCall(1).returns(null);
+        utilsDateToWeekhour.onCall(6).returns('0_0');
         utilsDateToWeekhour.returns('2_4');
 
         const options1 = {
@@ -138,7 +176,7 @@ suite('lectures', () => {
             },
             auth
         };
-        // #7 - day in the future
+        // #8 - day in the future
         const res8 = await server.inject(options7);
 
         const options8 = {
@@ -151,8 +189,25 @@ suite('lectures', () => {
             },
             auth
         };
-        // #8 - day before week start
+        // #9 - day before week start
         const res9 = await server.inject(options8);
+
+        const options9 = {
+            method: 'POST',
+            url: '/lectures',
+            payload: {
+                classId: 'd894ca1038f854aa19b73de4',
+                datetime,
+                topics: 'some long description'
+            },
+            auth
+        };
+        // #10 - teacher has not lecture in that hour in that class
+        const res10 = await server.inject(options9);
+        // #11 - unknown error
+        const res11 = await server.inject(options9);
+        // #12 - success
+        const res12 = await server.inject(options9);
         
         expect(res1.statusCode).to.equal(302);
         expect(res2.statusCode).to.equal(403);
@@ -163,13 +218,30 @@ suite('lectures', () => {
         expect(res7.statusCode).to.equal(400);
         expect(res8.statusCode).to.equal(400);
         expect(res9.statusCode).to.equal(400);
+        expect(res10.statusCode).to.equal(400);
+        expect(res11.statusCode).to.equal(500);
+        expect(res12.result.success).to.be.true();
 
-        expect(teacherFindOne.callCount).to.equal(4);
+        expect(teacherFindOne.callCount).to.equal(7);
         expect(teacherFindOne.calledWithExactly({ userId: '6dc7a207b74c6e7109ba53cd' })).to.be.true();
-        expect(utilsDateToWeekhour.callCount).to.equal(4);
+        expect(utilsDateToWeekhour.callCount).to.equal(7);
         expect(utilsDateToWeekhour.calledWithExactly(new Date('2019-11-10T12:00:00'))).to.be.true();
+        expect(utilsDateToWeekhour.calledWithExactly(new Date(future.getTime() - future.getTime() % 3600000))).to.be.true();
+        expect(utilsDateToWeekhour.calledWithExactly(beforeWeekStart)).to.be.true();
+        expect(utilsDateToWeekhour.calledWithExactly(new Date(datetime.getTime() - datetime.getTime() % 3600000))).to.be.true();
+        expect(lectureFindOneAndUpdate.callCount).to.equal(1);
+        expect(lectureFindOneAndUpdate.calledWithExactly(
+            {
+                classId: 'd894ca1038f854aa19b73de4',
+                weekhour: '0_0',
+                datetime: new Date(datetime.getTime() - datetime.getTime() % 3600000)
+            },
+            { topics: 'some long description' },
+            { upsert: true }
+        )).to.be.true();
 
         teacherFindOne.restore();
+        lectureFindOneAndUpdate.restore();
         utilsDateToWeekhour.restore();
 
     });
