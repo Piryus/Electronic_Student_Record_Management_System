@@ -1,5 +1,4 @@
 import React from 'react';
-import Grades from './grades/grades';
 import styles from './styles.module.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -28,12 +27,16 @@ export default class Parent extends React.Component {
     }
 
     async componentDidMount() {
-        await this.getChildGrades(this.state.childSelected);
+        await this.getChildGrades();
     }
 
-    async getChildGrades(childSelected) {
+    async componentWillUpdate() {
+        await this.getChildGrades();
+    }
+
+    async getChildGrades() {
         // Query child's grades
-        const url = 'http://localhost:3000/grades/' + childSelected._id;
+        const url = 'http://localhost:3000/grades/' + this.state.childSelected._id;
         const options = {
             method: 'GET',
             headers: {
@@ -47,11 +50,20 @@ export default class Parent extends React.Component {
         this.setState({
             childGrades: json.grades
         });
+        console.log(this.state.childGrades);
     }
 
-    selectChild = (e) => {
+    selectChild = (e, id) => {
+        let index = 0;
+        let childIndex = 0;
+        this.state.children.forEach((c) => {
+            if(c._id === id){
+                childIndex = index;
+            }
+            index++;
+        });
         this.setState({
-            childSelected: e.target.value,
+            childSelected: this.state.children[childIndex],
             userRequest: ''
         });
     };
@@ -61,57 +73,49 @@ export default class Parent extends React.Component {
     }
 
     render() {
-        /*const old = {
-            <div className={styles.body}>
-                <div>
-                    <div className={styles.header}>
-                        <h1>Parent section</h1>
-                    </div>
-
-                    <div className={styles.selectorWrapper}>
-                        <select className={styles.childSelector} onChange={(e) => this.selectChild(e)}>
-                            {this.state.children.map(this.renderChildItem)}
-                        </select>
-                    </div>
-
-                    <div>
-                        <table className={styles.panel}>
-                            <tr>
-                                <td>
-                                    <button onClick={(e) => this.setUserRequest(e, "grades")} className={styles.link}>
-                                        <div className={styles.panelElement}>
-                                            <p>Grades</p>
-                                        </div>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                            </tr>
-                        </table>
-
-                        {this.state.userRequest === 'grades' && (
-                            <Grades childId={this.state.childSelected}/>
-                        )}
-                    </div>
-                </div>
-            </div>}*/
 
         const selectedChildId = this.state.childSelected._id;
         let childNotSelected = [];
         this.state.children.map((child) => {
             if (child._id !== selectedChildId)
-                childNotSelected.push(<Dropdown.Item key={child._id} href="#">{child.name}</Dropdown.Item>);
+                childNotSelected.push(<Dropdown.Item key={child._id} href="#" onClick={(e) => this.selectChild(e, child._id)}>{child.name}</Dropdown.Item>);
         });
 
-        // TODO Sort the grades into topics and create the DOM elements
-        // let gradesSortedTopic;
-        // let gradesDOM;
-        // if (this.state.childGrades !== null) {
-        //     this.state.childGrades.map((grade) => {
-        //
-        //     });
-        // }
-        // console.log(this.state.childGrades);
+        //Building of Grades and Subejects DOM
+        let gradesSortedTopic = [];
+        let gradesDOM = [];
+        let numberOfElements = 0;
+        if (this.state.childGrades !== null) {
+            this.state.childGrades.map((grade) => {
+                if(gradesSortedTopic[grade.subject] == null){
+                    gradesSortedTopic[grade.subject] = [];
+                }
+                let date = grade.date.split("T");
+                gradesSortedTopic[grade.subject].push(
+                <Accordion.Collapse eventKey={numberOfElements.toString()}>
+                    <Card.Body>Grade {gradesSortedTopic[grade.subject].length+1}: {grade.value} Date : {date[0]}</Card.Body>
+                </Accordion.Collapse>
+                );
+                numberOfElements++;
+            });
+            let index;
+            let eventKeyIndex = 0;
+            for(index in gradesSortedTopic){
+                gradesDOM.push(
+                <Card>
+                    <Card.Header>
+                        <Accordion.Toggle as={Button} variant="link" eventKey={eventKeyIndex.toString()}>
+                            {index}
+                        </Accordion.Toggle>
+                    </Card.Header>
+                    {gradesSortedTopic[index].map((grade) => {
+                        return grade;
+                    })}
+                </Card>
+                );
+                eventKeyIndex++;
+            }
+        }
 
         return (
             <div className={styles.root}>
@@ -138,26 +142,9 @@ export default class Parent extends React.Component {
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
                             <h2>Grades</h2>
                             <Accordion className={styles.gradesContainer} defaultActiveKey="0">
-                                <Card>
-                                    <Card.Header>
-                                        <Accordion.Toggle as={Button} variant="link" eventKey="0">
-                                            Maths
-                                        </Accordion.Toggle>
-                                    </Card.Header>
-                                    <Accordion.Collapse eventKey="0">
-                                        <Card.Body>Grade 1:....</Card.Body>
-                                    </Accordion.Collapse>
-                                </Card>
-                                <Card>
-                                    <Card.Header>
-                                        <Accordion.Toggle as={Button} variant="link" eventKey="1">
-                                            English
-                                        </Accordion.Toggle>
-                                    </Card.Header>
-                                    <Accordion.Collapse eventKey="1">
-                                        <Card.Body>Grades...</Card.Body>
-                                    </Accordion.Collapse>
-                                </Card>
+                                {gradesDOM.map((subject) => {
+                                    return subject;
+                                })}
                             </Accordion>
                         </main>
                     </Row>
