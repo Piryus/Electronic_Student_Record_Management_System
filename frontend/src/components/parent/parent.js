@@ -50,7 +50,6 @@ export default class Parent extends React.Component {
         this.setState({
             childGrades: json.grades
         });
-        console.log(this.state.childGrades);
     }
 
     selectChild = (e, id) => {
@@ -78,7 +77,7 @@ export default class Parent extends React.Component {
         let childNotSelected = [];
         this.state.children.map((child) => {
             if (child._id !== selectedChildId)
-                childNotSelected.push(<Dropdown.Item key={child._id} href="#" onClick={(e) => this.selectChild(e, child._id)}>{child.name}</Dropdown.Item>);
+                childNotSelected.push(<Dropdown.Item key={child._id} href="#" onClick={(e) => this.selectChild(e, child._id)}>{[child.name, child.surname].join(' ')}</Dropdown.Item>);
         });
 
         //Building of Grades and Subejects DOM
@@ -123,7 +122,7 @@ export default class Parent extends React.Component {
                     <Navbar.Brand>SE2</Navbar.Brand>
                     <Dropdown className={'ml-auto'}>
                         <Dropdown.Toggle id="dropdown-basic">
-                            {this.state.childSelected.name}
+                            {[this.state.childSelected.name, this.state.childSelected.surname].join(' ')}&nbsp;
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             {childNotSelected.map((child) => {
@@ -131,6 +130,7 @@ export default class Parent extends React.Component {
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
+                    <a class="btn btn-primary bg-danger border-danger ml-2" href="/logout" role="button">Logout</a>
                 </Navbar>
                 <Container fluid>
                     <Row>
