@@ -6,7 +6,15 @@ import Teacher from "../teacher/teacher";
 import Officer from "../officer/officer";
 import Admin from '../admin/admin';
 
+const cmps = {
+    admin: Admin,
+    officer: Officer,
+    teacher: Teacher,
+    parent: Parent
+};
+
 export default class Routes extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
@@ -21,13 +29,14 @@ export default class Routes extends React.Component {
         if (nextProps.appProps.authenticated !== prevState.authenticated) {
             return {
                 authenticated: nextProps.appProps.authenticated,
-                role: nextProps.appProps.role,
+                role: nextProps.appProps.role[0],
                 children: nextProps.appProps.children
             };
         } else return null;
     }
 
     render() {
+        const RootComponent = cmps[this.state.role] || null;
         return (
             <Router>
                 <Switch>
@@ -39,36 +48,12 @@ export default class Routes extends React.Component {
                             <Redirect to='/login'/>
                         </div>
                     )}
-                    {this.state.authenticated && this.state.role.includes('parent') && (
+                    {this.state.authenticated && ['admin', 'officer', 'teacher', 'parent'].includes(this.state.role) && (
                         <div>
-                            <Route exact path='/parent'>
-                                <Parent children={this.state.children} />
+                            <Route exact path='/'>
+                                <RootComponent children={this.state.children} />
                             </Route>
-                            <Redirect to='/parent'/>
-                        </div>
-                    )}
-                    {this.state.authenticated && this.state.role.includes('teacher') && (
-                        <div>
-                            <Route exact path='/teacher'>
-                                <Teacher />
-                            </Route>
-                            <Redirect to='/teacher'/>
-                        </div>
-                    )}
-                    {this.state.authenticated && this.state.role.includes('officer') && (
-                        <div>
-                            <Route exact path='/officer'>
-                                <Officer />
-                            </Route>
-                            <Redirect to='/officer'/>
-                        </div>
-                    )}
-                    {this.state.authenticated && this.state.role.includes('admin') && (
-                        <div>
-                            <Route exact path='/admin'>
-                                <Admin />
-                            </Route>
-                            <Redirect to='/admin'/>
+                            <Redirect to='/'/>
                         </div>
                     )}
                 </Switch>
