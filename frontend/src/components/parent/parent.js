@@ -83,7 +83,6 @@ export default class Parent extends React.Component {
         //Building of Grades and Subejects DOM
         let gradesSortedTopic = [];
         let gradesDOM = [];
-        let numberOfElements = 0;
         if (this.state.childGrades !== null) {
             this.state.childGrades.map((grade) => {
                 if(gradesSortedTopic[grade.subject] == null){
@@ -91,19 +90,17 @@ export default class Parent extends React.Component {
                 }
                 let date = grade.date.split("T");
                 gradesSortedTopic[grade.subject].push(
-                <Accordion.Collapse eventKey={numberOfElements.toString()}>
+                <Accordion.Collapse eventKey={grade.subject}>
                     <Card.Body>Grade {gradesSortedTopic[grade.subject].length+1}: {grade.value} Date : {date[0]}</Card.Body>
                 </Accordion.Collapse>
                 );
-                numberOfElements++;
             });
             let index;
-            let eventKeyIndex = 0;
             for(index in gradesSortedTopic){
                 gradesDOM.push(
                 <Card>
                     <Card.Header>
-                        <Accordion.Toggle as={Button} variant="link" eventKey={eventKeyIndex.toString()}>
+                        <Accordion.Toggle as={Button} variant="link" eventKey={index}>
                             {index}
                         </Accordion.Toggle>
                     </Card.Header>
@@ -112,7 +109,6 @@ export default class Parent extends React.Component {
                     })}
                 </Card>
                 );
-                eventKeyIndex++;
             }
         }
 

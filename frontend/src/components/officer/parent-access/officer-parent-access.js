@@ -1,6 +1,6 @@
 import React from 'react';
 import SearchBar from './search-bar/officer-parent-access-search-bar';
-import styles from './styles.module.css';
+//import styles from './styles.module.css';
 
 class ParentAccountEnabling extends React.Component{
 
@@ -113,35 +113,35 @@ class ParentAccountEnabling extends React.Component{
         return (
             <div>
 
-                <div className={styles.parentEmailContainer}>
+                <div >
                 {this.state.validParentEmail === false && this.state.showConfirmation === false &&(
                     <div>
-                        <span className={styles.parentEmailSpan}>Insert a parent's email..</span><br/>
-                        <form className={styles.parentForm} onSubmit={event => { event.preventDefault(); this.submitForm();}}>
-                            <input type= "text" name="email" placeholder= "Parent Email" className={styles.inputEmail} onChange = {(e) => this.setState({parentEmail: e.target.value})} required /><br/>
-                            <button className={styles.continueButton}>Continue</button>
-                            <button onClick={this.resetPage} className={styles.cancelButton}>Cancel</button>
+                        <span >Insert a parent's email..</span><br/>
+                        <form  onSubmit={event => { event.preventDefault(); this.submitForm();}}>
+                            <input type= "text" name="email" placeholder= "Parent Email"  onChange = {(e) => this.setState({parentEmail: e.target.value})} required /><br/>
+                            <button >Continue</button>
+                            <button onClick={this.resetPage} >Cancel</button>
                         </form>
                     </div>
                 )}
                 {this.state.validParentEmail === true  && this.state.showConfirmation === false &&(
                     <div>
-                        <span className={styles.parentEmailSpan}>Choose a Student from the panel on the right..</span><br/>
-                        <form className={styles.parentForm} onSubmit={event => { event.preventDefault(); this.submitChildForm();}}>
+                        <span >Choose a Student from the panel on the right..</span><br/>
+                        <form  onSubmit={event => { event.preventDefault(); this.submitChildForm();}}>
                             <SearchBar updateStudent = {this.updateStudentFound} elementFound = {this.state.studentFound} elements = {this.state.students} functionToFixElements = {this.functionToFixElements} suggestions = {this.state.suggestions} updateSuggestions = {this.updateSuggestions} updateSuggestionSelected = {this.suggestionSelected}/>
-                            <span className={styles.selectedSpan}>Selected: </span><span className={styles.selectedEffectivelySpan}>{this.state.studentFound}</span>
-                            <button className={styles.continueButton}>Continue</button>
-                            <button onClick={this.resetPage} className={styles.cancelButton}>Cancel</button>
+                            <span >Selected: </span><span >{this.state.studentFound}</span>
+                            <button >Continue</button>
+                            <button onClick={this.resetPage} >Cancel</button>
                         </form>
 
                     </div>
                 )}
                 {this.state.showConfirmation === true && (
                     <div>
-                        <span className={styles.descriptionSpan}>Email of parents's account: </span><span className={styles.finalEmail}>{this.state.parentEmail}</span><br></br>
-                        <span className={styles.descriptionSpan2}>Related student: </span><span className={styles.finalStudent}>{this.state.studentFound}</span><br></br>
-                        <button onClick={this.sendRequestToBackend} className={styles.continueButtonFinal}>Confirm</button>
-                        <button onClick={this.resetPage} className={styles.cancelButtonFinal}>Cancel</button>
+                        <span >Email of parents's account: </span><span >{this.state.parentEmail}</span><br></br>
+                        <span >Related student: </span><span >{this.state.studentFound}</span><br></br>
+                        <button onClick={this.sendRequestToBackend} >Confirm</button>
+                        <button onClick={this.resetPage} >Cancel</button>
                     </div>
                 )}
                 </div>

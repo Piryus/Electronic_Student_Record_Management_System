@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './styles.module.css';
+//import styles from './styles.module.css';
 
 
 class SearchBar extends React.Component{
@@ -36,8 +36,8 @@ class SearchBar extends React.Component{
             return null;
         }
         return(
-            <ul className={styles.suggestions}>Stundents found:<br/>
-                {sugg.map((item) => <li onClick={() => this.suggestionSelected(item)} className={styles.studentFound}>{item}</li>)}
+            <ul >Stundents found:<br/>
+                {sugg.map((item) => <li onClick={() => this.suggestionSelected(item)} >{item}</li>)}
             </ul>
         );
     }
@@ -52,7 +52,7 @@ class SearchBar extends React.Component{
     render(){
         return(
             <div>
-                <input value={this.state.elementFound} type= "text" name="email" placeholder= "Search by SNN code or Surname" className={styles.inputEmail} onChange = {this.onTextChanged} required /><br/>
+                <input value={this.state.elementFound} type= "text" name="email" placeholder= "Search by SNN code or Surname"  onChange = {this.onTextChanged} required /><br/>
                 {this.renderSuggestions()}
             </div>
         );

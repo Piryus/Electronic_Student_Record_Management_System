@@ -71,6 +71,7 @@
 |5dca7e2b461dc52d681804fc|fabio.cremonesi@parent.com|parentB_2|parent|
 |5dca7e2b461dc52d681804fd|lucia.monge@parent.com|parentC_1|parent|
 |5dca7e2b461dc52d681804fe|corrado.bianchi@parent.com|parentC_2|parent|
+|5dcc0bb71c9d440000330d8d|officer1@officer.com|officerofficer|
 
 ## Grades
 
