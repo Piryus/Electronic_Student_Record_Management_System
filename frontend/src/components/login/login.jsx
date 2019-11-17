@@ -37,16 +37,10 @@ class Login extends Component {
         fetch(url, options)
             .then(response => response.json())
             .then(response => {
-                console.log(response);
-                if (response.success === true) {
-                    let children = [];
-                    if (response.hasOwnProperty('children')) {
-                        children = response.children;
-                    }
-                    this.props.setAppProps(true, response.scope, children);
+                if(response.success === true) {
+                    this.props.setAppProps(true, response.scope, response.extra);
                 } else {
                     // Connection rejected handler
-                    console.log(response);
                     this.setState({password: '', error: true, unknownError: false});
                 }
             })
