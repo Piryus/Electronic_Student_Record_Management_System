@@ -35,7 +35,8 @@ const addStudent = async function(request, h) {
 const addSchoolClass = async function(request, h) {
     try {
         const { name, students } = request.payload;
-        const schoolClass = await SchoolClass.findOneAndUpdate({ name: name.toUpperCase() }, {}, { upsert: true });
+        var schoolClass = await SchoolClass.findOneAndUpdate({ name: name.toUpperCase() }, {}, { upsert: true });
+        schoolClass = await SchoolClass.findOne({ name: name.toUpperCase()});
         await Student.updateMany({ classId: schoolClass._id }, { classId: undefined });
         await Student.updateMany({ _id: { $in: students } }, { classId: schoolClass._id });
         return { success: true };
@@ -48,6 +49,15 @@ const getAllStudents = async function(request, h) {
     try{
         const students = await Student.find();
         return {students: students};
+    } catch(err) {
+        return Boom.badImplementation(err);
+    }
+};
+
+const getAllClasses = async function(request, h){
+    try{
+        const classes = await SchoolClass.find();
+        return {classes: classes};
     } catch(err) {
         return Boom.badImplementation(err);
     }
@@ -74,6 +84,17 @@ const routes = [
         method: 'GET',
         path: '/students/all',
         handler: getAllStudents,
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+        }
+    },
+    {
+        method: 'GET',
+        path: '/classes/all',
+        handler: getAllClasses,
         options: {
             auth: {
                 strategy: 'session',

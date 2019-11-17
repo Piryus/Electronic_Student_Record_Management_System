@@ -1,11 +1,9 @@
 import React from 'react';
 import styles from './styles.module.css';
-import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Accordion from "react-bootstrap/Accordion";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import { ENGINE_METHOD_ALL } from 'constants';
 
 class Classes extends React.Component{
 
@@ -17,57 +15,94 @@ class Classes extends React.Component{
             classNameChosen: "",
             classIdNewClass: "",
             studentsForNewClass: [],
-            students: [     //We have here the list of all the students of the school
-                {
-                    id: "djdjsjjs",
-                    name: "Aldo",
-                    surname: "Brocchi",
-                    classId: "aaa"
-                },
-                {
-                    id: "ssssjs",
-                    name: "Giorgia",
-                    surname: "Bassi",
-                    classId: "aaa"
-                },
-                {
-                    id: "ggggggg",
-                    name: "Matteo",
-                    surname: "Grosso",
-                    classId: "bbb"
-                },
-                {
-                    id: "ppppppp",
-                    name: "Alberto",
-                    surname: "Albertini",
-                    classId: "bbb"
-                }
-            ],
-            classes: [
-                {
-                    classId: "aaa",
-                    name: "1A"
-                },
-                {
-                    classId: "bbb",
-                    name: "1B"
-                }
-            ]
+            students: [],
+            classes: []
         }
     }
 
-    createClass(){
+    async componentDidMount(){
+        await this.getAllStudents();
+    }
 
+    async componentWillMount(){
+        await this.getClasses();
+        let classesVectorWithClassNameAsIndex = [];
+        classesVectorWithClassNameAsIndex["No class"] = {name: "No class"};
+        this.state.classes.forEach((c) => {
+            classesVectorWithClassNameAsIndex[c._id.toString()] = c;
+        });
+        this.setState({classes: classesVectorWithClassNameAsIndex});
+    }
 
+    async getClasses(){
+        const url = 'http://localhost:3000/classes/all';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        this.setState({
+            classes: json.classes
+        });
+    }
+
+    async getAllStudents(){
+        const url = 'http://localhost:3000/students/all';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        this.setState({
+            students: json.students
+        });
+    }
+
+    async pushClassToDB(){
+        const url = 'http://localhost:3000/classes';
+        const jsonToSend = JSON.stringify({
+            name: this.state.classNameChosen,
+            students: this.state.studentsForNewClass
+        });
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: jsonToSend 
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        if(json.error != null){
+            alert('Error! Please insert a class Name');
+        } else{
+            alert('Class created successfully!');
+        }
+    }
+
+    async createClass(){
         //Send info to backend here
-
+        await this.pushClassToDB();
         //THEN
 
         this.setState({
             wantCreateAClass: false,
-            studentsForNewClass: []
+            studentsForNewClass: [],
+            classNameChosen: "",
         });
-
+        window.location.reload(false);
     }
 
     addStudentToNewClass(e){
@@ -85,7 +120,6 @@ class Classes extends React.Component{
             values = newVett;
         }
         this.setState({studentsForNewClass: values});
-
     }
 
     renderStudentsCheckbox(){
@@ -93,10 +127,9 @@ class Classes extends React.Component{
         this.state.students.forEach((student) => {
             checkboxToRender.push(
                 <Form.Check
-                    custom
                     type='checkbox'
-                    id= {student.id}
-                    label={student.surname + ' ' + student.name + ' ID: ' + student.id}
+                    id= {student._id.toString()}
+                    label={student.surname + ' ' + student.name + ' SSN: ' + student.ssn}
                     onChange={(e) => this.addStudentToNewClass(e)}
                 />
             );
@@ -111,12 +144,15 @@ class Classes extends React.Component{
         let gradesDOM = [];
         if (this.state.students !== null) {
             this.state.students.forEach((student) => {
+                if(student.classId == null){
+                    student.classId = "No class";
+                }
                 if(studentSortedClass[student.classId] == null){
                     studentSortedClass[student.classId] = [];
                 }
                 studentSortedClass[student.classId].push(
                 <Accordion.Collapse eventKey={student.classId.toString()}>
-                    <Card.Body>Student {studentSortedClass[student.classId].length+1}: Name: {student.name} Surname: {student.surname} ID: {student.id} </Card.Body>
+                    <Card.Body>Student {studentSortedClass[student.classId].length+1}: Name: {student.name} Surname: {student.surname} SSN: {student.ssn} </Card.Body>
                 </Accordion.Collapse>
                 );
             });
@@ -126,7 +162,7 @@ class Classes extends React.Component{
                 <Card>
                     <Card.Header>
                         <Accordion.Toggle as={Button} variant="link" eventKey={index.toString()}>
-                            Class Id: {index}
+                            Class name: {this.state.classes[index.toString()].name}
                         </Accordion.Toggle>
                     </Card.Header>
                     {studentSortedClass[index].map((student) => {
@@ -152,7 +188,7 @@ class Classes extends React.Component{
             </Accordion>)}
             {this.state.wantCreateAClass === true &&(
             <Accordion className={styles.gradesContainer} defaultActiveKey="0">
-                <Form onSubmit={() => this.createClass()}>
+                <Form /*onSubmit={() => this.createClass()}*/>
                     <Form.Group controlId="formBasicEmail">
                         <Form.Label>Class name</Form.Label>
                         <Form.Control type="text" placeholder="Class names examples: 1A, 1B, 3C, 5B" onChange={(e) => this.setState({classNameChosen: e.target.value})}/>
@@ -165,7 +201,7 @@ class Classes extends React.Component{
                         return c;
                     })}
                     </div>
-                    <Button variant="primary" type="submit">
+                    <Button variant="primary" onClick={() => this.createClass()}>
                         Submit
                     </Button>
                 </Form>
