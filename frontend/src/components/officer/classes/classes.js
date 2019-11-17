@@ -93,16 +93,22 @@ class Classes extends React.Component{
     }
 
     async createClass(){
-        //Send info to backend here
-        await this.pushClassToDB();
-        //THEN
 
-        this.setState({
-            wantCreateAClass: false,
-            studentsForNewClass: [],
-            classNameChosen: "",
-        });
-        window.location.reload(false);
+        if(this.state.classNameChosen === ""){
+            alert('Please insert a class name.');
+        }
+        else{
+            //Send info to backend here
+            await this.pushClassToDB();
+            //THEN
+
+            this.setState({
+                wantCreateAClass: false,
+                studentsForNewClass: [],
+                classNameChosen: "",
+            });
+            window.location.reload(false);
+        }
     }
 
     addStudentToNewClass(e){

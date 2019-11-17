@@ -1,90 +1,142 @@
 import React, { Component } from 'react';
-import './officer-enrolment-form.sass';
+import Table from 'react-bootstrap/table';
+import Form from 'react-bootstrap/form';
+
+
 
 class EnrolmentForm extends Component {
 
-  state = { 
-    studentClass: "",
-    fiscalCode: "",
-    mfiscalCode: "",
-    ffiscalCode: "",
-    name: "",
-    surname: "",
-  };
+  constructor(props){
+    super(props);
 
-  validateData = (event) => {
-    var tmp= this.state.studentClass;
-    var tmp2= tmp.split("");
-
-
-    if(isNaN(tmp2[0]) || !isNaN(tmp2[1]) || tmp2[0] > 5 || tmp2[0] < 1){
-      alert("The class is not vaild");
-    }
-  
-    event.preventDefault();
+    this.state = {
+      students: [],
+      ssn: "",
+      name: "",
+      surname: "",
+      wantEnroll: false
+    };
   }
-  setUpper = (event) => {
-    var tmp= event.target.value;
-    var tmp2= event.target.name;
-    tmp= tmp.toUpperCase();
-    if(tmp2 == "studentClass"){
-      this.setState( { studentClass: tmp } )
-    }
-    if(tmp2 == "fiscalCode"){
-      this.setState( { fiscalCode: tmp } )
-    }
-    if(tmp2 == "fatherFiscalCode"){
-      this.setState( { ffiscalCode: tmp } )
-    }
-    if(tmp2 == "motherFiscalCode"){
-      this.setState( { mfiscalCode: tmp } )
-    }
-    if(tmp2 == "name"){
-      this.setState( { name: tmp } )
-    }
-    if(tmp2 == "surname"){
-      this.setState( { surname: tmp } )
+
+  async componentDidMount(){
+    await this.getAllStudents();
+  }
+
+  async getAllStudents(){
+    const url = 'http://localhost:3000/students/all';
+    const options = {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    };
+    let response = await fetch(url, options);
+    const json = await response.json();
+    this.setState({
+        students: json.students
+    });
+  }
+
+  async enrollStudent(){
+    if(this.state.name === "" || this.state.surname === "" || this.state.ssn === ""){
+      alert('Please fill in all the fields.');
+    } else{
+      await this.pushEnrollmentToDB();
+      //Update state here
+      this.setState({
+        name: "",
+        surname: "",
+        ssn: "",
+        wantEnroll: false
+      });
+      window.location.reload(false);
     }
   }
+
+  async pushEnrollmentToDB(){
+    const url = 'http://localhost:3000/students';
+    const jsonToSend = JSON.stringify({
+        ssn: this.state.ssn,
+        name: this.state.name,
+        surname: this.state.surname
+    });
+    const options = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: jsonToSend 
+    };
+    let response = await fetch(url, options);
+    const json = await response.json();
+    if(json.error != null){
+        alert('Ops! There was an error. Please try again.');
+    } else{
+        alert('Student enrolled correctly!');
+    }
+  }
+
+
 
    render() {
     
+    let renderDOM = [];
+    this.state.students.forEach((s) => {
+      renderDOM.push(
+      <tr>
+        <td>{renderDOM.length+1}</td>
+        <td>{s.surname}</td>
+        <td>{s.name}</td>
+        <td>{s.ssn}</td>
+      </tr>
+      );
+    });
+
     return (
       <div>
-        <h3>Student online enrolment</h3>
-        <div style= {{width: "50%", margin: "auto", backgroundColor: "grey", align: "center"}}>
-        <form action= "" style= {{textAlign: "left"}} onSubmit= { values => this.validateData(values) }>
-          <table style={{width: "100%"}}>
+        {this.state.wantEnroll === false && (<div>
+        <h1>Enrolled Students</h1>
+        <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.setState({wantEnroll: true})} role="button">Enroll a Student</p>
+        <Table striped bordered hover size="sm">
+          <thead>
             <tr>
-              <td>Name <span style={{color: "red"}}>*</span></td>
-              <td><input type= "text" name= "name" value= {this.state.name} className= "efName" required onChange= { (event) => this.setUpper(event) } /></td>
+              <th>#</th>
+              <th>Last Name</th>
+              <th>First Name</th>
+              <th>SSN</th>
             </tr>
-            <tr>
-              <td>Surname <span style={{color: "red"}}>*</span></td>
-              <td><input type= "text" name="surname" value= {this.state.surname} className= "efSurname" required onChange= { (event) => this.setUpper(event) } /></td>
-            </tr>
-            <tr>
-              <td>Fiscal Code <span style={{color: "red"}}>*</span></td>
-              <td><input type= "text" name="fiscalCode" value= {this.state.fiscalCode} className= "efFiscalCode" maxlength= "16" required onChange= { (event) => this.setUpper(event) } /></td>
-            </tr>
-            <tr>
-              <td>Class <span style={{color: "red"}}>*</span></td>
-              <td><input type= "text" name="studentClass" className= "efclass" value= {this.state.studentClass} maxlength= "2" required onChange= { (event) => this.setUpper(event) } /></td>
-            </tr>
-            <tr>
-              <td>Father (Fiscal code) <span style={{color: "red"}}>*</span></td>
-              <td><input type= "text" name="fatherFiscalCode" value= {this.state.ffiscalCode} className= "efFiscalCode" maxlength= "16" required onChange= { (event) => this.setUpper(event) } /></td>
-            </tr>
-            <tr>
-              <td>Mother(Fiscal Code) <span style={{color: "red"}}>*</span></td>
-              <td><input type= "text" name="motherFiscalCode" value= {this.state.mfiscalCode} className= "efFiscalCode" maxlength= "16" required onChange= { (event) => this.setUpper(event) } /></td>
-            </tr>
-          </table>
-        
-          <br/><br/>
-          <input type="submit" value= "Send" style= {{width: "150px", margin: "0px 40%", align: "center"}}/>
-        </form>
+          </thead>
+          <tbody>
+            {renderDOM.map((toRender)=>{
+              return toRender;
+            })}
+          </tbody>
+        </Table>
         </div>
+        )}
+        {this.state.wantEnroll === true && (
+          <div>
+          <Form>
+            <Form.Group controlId="formGroupEmail">
+              <Form.Label>Surname</Form.Label>
+              <Form.Control type="text" placeholder="Enter Surname" onChange={(e) => this.setState({surname: e.target.value})}/>
+            </Form.Group>
+            <Form.Group controlId="formGroupPassword">
+              <Form.Label>Name</Form.Label>
+              <Form.Control type="text" placeholder="Enter Name" onChange={(e) => this.setState({name: e.target.value})}/>
+            </Form.Group>
+            <Form.Group controlId="formGroupPassword">
+              <Form.Label>SSN Code</Form.Label>
+              <Form.Control type="text" placeholder="Enter SSN Code" onChange={(e) => this.setState({ssn: e.target.value})}/>
+            </Form.Group>
+            <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.enrollStudent()} role="button">Enroll Student</p>
+            </Form>
+          </div>
+        )}
       </div>
     )
   }
