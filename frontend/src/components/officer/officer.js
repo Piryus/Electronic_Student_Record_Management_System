@@ -43,7 +43,7 @@ export default class Officer extends React.Component {
             <div className={styles.root}>
                 <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
                     <Navbar.Brand>SE2</Navbar.Brand>
-                    <a class="btn btn-primary bg-danger border-danger ml-2" href="/logout" role="button">Logout</a>
+                    <a class="btn btn-primary bg-danger border-danger ml-auto" href="/logout" role="button">Logout</a>
                 </Navbar>
                 <Container fluid>
                     <Row>

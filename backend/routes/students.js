@@ -47,7 +47,7 @@ const addSchoolClass = async function(request, h) {
 const getAllStudents = async function(request, h) {
     try{
         const students = await Student.find();
-        return {students: students};
+        return { students };
     } catch(err) {
         return Boom.badImplementation(err);
     }
