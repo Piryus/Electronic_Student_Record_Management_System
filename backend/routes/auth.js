@@ -5,6 +5,7 @@ const Boom = require('boom');
 const User = require('../models/User');
 const Parent = require('../models/Parent');
 const Student = require('../models/Student');
+const Teacher = require('../models/Teacher');
 
 const login = async function (request, h) {
     try {
@@ -38,7 +39,18 @@ const login = async function (request, h) {
                     childrenFiltered.push(childFiltered);
                 }
                 // Returns successful login, scope and parent's children
-                return {success: true, scope: user.scope, children: childrenFiltered};
+                return { success: true, scope: user.scope, extra: { children: childrenFiltered } };
+            }
+            // Case: user is a teacher
+            if (user.scope.includes('teacher')) {
+                // Retrieves the teacher in the DB using the user ID
+                const teacher = await Teacher.findOne({userId: user._id});
+                // If the teacher isn't found, it shouldn't happen, throw an error
+                if (teacher === null) {
+                    return Boom.badRequest();
+                }
+                // Returns successful login, scope and teacher's timetable
+                return { success: true, scope: user.scope, extra: { timetable: teacher.timetable } };
             }
             // Returns successful login and scope (admin or teacher)
             return {success: true, scope: user.scope};
@@ -60,7 +72,6 @@ const logout = async function (request, h) {
 const authCheck = async function (request, h) {
     try {
         if (request.auth.isAuthenticated) {
-            const user = await User.findOn
             if (request.auth.credentials.scope.includes('parent')) {
                 // Retrieves the parent in the DB using the user ID
                 const parent = await Parent.findOne({userId: request.auth.credentials._id});
@@ -84,7 +95,23 @@ const authCheck = async function (request, h) {
                 return {
                     isAuth: true,
                     role: request.auth.credentials.scope,
-                    children: childrenFiltered
+                    extra: {
+                        children: childrenFiltered
+                    }
+                }
+            } else if (request.auth.credentials.scope.includes('teacher')) {
+                // Retrieves the parent in the DB using the user ID
+                const teacher = await Teacher.findOne({userId: request.auth.credentials._id});
+                // If the parent isn't found, it shouldn't happen, throw an error
+                if (teacher === null) {
+                    return Boom.badRequest();
+                }
+                return {
+                    isAuth: true,
+                    role: request.auth.credentials.scope,
+                    extra: {
+                        timetable: teacher.timetable
+                    }
                 }
             } else {
                 return {

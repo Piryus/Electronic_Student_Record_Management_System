@@ -37,6 +37,7 @@ class Login extends Component {
         fetch(url, options)
             .then(response => response.json())
             .then(response => {
+                console.log(response);
                 if (response.success === true) {
                     let children = [];
                     if (response.hasOwnProperty('children')) {

@@ -8,7 +8,7 @@ class App extends React.Component {
         this.state = {
             authenticated: false,
             role: [],
-            children: []
+            extra: {}
         };
         this.setAppProps = this.setAppProps.bind(this)
     }
@@ -26,30 +26,31 @@ class App extends React.Component {
     componentDidMount() {
         this.checkAuth().then((response) => {
             if (response.isAuth) {
+                console.log(response);
                 this.setState({
                     authenticated: true,
                     role: response.role,
-                    children: response.children
+                    extra: response.extra
                 });
             }
         });
     }
 
-    setAppProps(authenticated, role, children) {
+    setAppProps(authenticated, role, extra) {
         this.setState({
             authenticated,
             role,
-            children
+            extra
         });
     }
 
     render() {
         const authenticated = this.state.authenticated;
         const role = this.state.role;
-        const children = this.state.children;
+        const extra = this.state.extra;
         const setAppProps = this.setAppProps;
         return (
-            <Routes appProps={{authenticated, role, children, setAppProps}}/>
+            <Routes appProps={{authenticated, role, extra, setAppProps}}/>
         );
     }
 }

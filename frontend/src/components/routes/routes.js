@@ -20,7 +20,7 @@ export default class Routes extends React.Component {
         this.state = {
             authenticated: this.props.appProps.authenticated,
             role: this.props.appProps.role,
-            children: this.props.appProps.children,
+            extra: this.props.appProps.extra,
             setAppProps: this.props.appProps.setAppProps
         };
     }
@@ -30,7 +30,7 @@ export default class Routes extends React.Component {
             return {
                 authenticated: nextProps.appProps.authenticated,
                 role: nextProps.appProps.role[0],
-                children: nextProps.appProps.children
+                extra: nextProps.appProps.extra
             };
         } else return null;
     }
@@ -51,7 +51,7 @@ export default class Routes extends React.Component {
                     {this.state.authenticated && ['admin', 'officer', 'teacher', 'parent'].includes(this.state.role) && (
                         <div>
                             <Route exact path='/'>
-                                <RootComponent children={this.state.children} />
+                                <RootComponent children={this.state.extra.children} timetable={this.state.extra.timetable} />
                             </Route>
                             <Redirect to='/'/>
                         </div>
