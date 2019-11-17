@@ -12,6 +12,8 @@ import {FaGraduationCap, FaCog} from 'react-icons/fa'
 
 import LectureTopics from './lecture-topics';
 
+import lib from '../../lib';
+
 export default class Teacher extends React.Component {
 
     constructor(props) {
@@ -21,6 +23,7 @@ export default class Teacher extends React.Component {
     }
 
     render() {
+        const now = new Date();
 
         return (
             <div className={styles.root}>
@@ -36,7 +39,7 @@ export default class Teacher extends React.Component {
                         </Nav>
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
                             <LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
-                                obj[x.weekhour] = x.subject;
+                                obj[x.weekhour] = { name: x.subject, active: lib.weekhourToDate(x.weekhour) < now };
                                 return obj;
                             }, {})} />
                         </main>

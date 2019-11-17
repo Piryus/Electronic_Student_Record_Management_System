@@ -36,6 +36,7 @@ export default class Routes extends React.Component {
     }
 
     render() {
+        const extra = this.state.extra;
         const RootComponent = cmps[this.state.role] || null;
         return (
             <Router>
@@ -51,7 +52,7 @@ export default class Routes extends React.Component {
                     {this.state.authenticated && ['admin', 'officer', 'teacher', 'parent'].includes(this.state.role) && (
                         <div>
                             <Route exact path='/'>
-                                <RootComponent children={this.state.extra.children} timetable={this.state.extra.timetable} />
+                                <RootComponent children={extra ? extra.children : null} timetable={extra ? extra.timetable : null} />
                             </Route>
                             <Redirect to='/'/>
                         </div>
