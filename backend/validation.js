@@ -8,7 +8,8 @@ const schema = {
     date: Joi.date(),
     weekhour: Joi.string().regex(/^[0-4]_[0-5]$/),
     className: Joi.string().regex(/^[1-5][a-zA-Z]$/),
-    longText: Joi.string().min(1).max(4096)
+    longText: Joi.string().min(1).max(4096),
+    mail: Joi.string().email()
 };
 
 module.exports = schema;
