@@ -29,7 +29,7 @@ export default class Teacher extends React.Component {
             <div className={styles.root}>
                 <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
                     <Navbar.Brand>SE2</Navbar.Brand>
-                    <a className="btn btn-primary bg-danger border-danger ml-auto" href="/logout" role="button">Logout</a>
+                    <a onClick={() => this.props.onLogout()} className="btn btn-primary bg-danger border-danger text-white ml-auto" role="button">Logout</a>
                 </Navbar>
                 <Container fluid>
                     <Row>

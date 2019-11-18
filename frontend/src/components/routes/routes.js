@@ -35,26 +35,42 @@ export default class Routes extends React.Component {
         } else return null;
     }
 
+    async logout() {
+        const url = 'http://localhost:3000/logout';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+        await fetch(url, options);
+        this.setState({
+            redirect: true
+        });
+    }
+
     render() {
         const extra = this.state.extra;
         const RootComponent = cmps[this.state.role] || null;
         return (
             <Router>
                 <Switch>
-                    {!this.state.authenticated && (
+                    {(this.state.redirect || !this.state.authenticated) && (
                         <div>
                             <Route exact path='/login'>
                                 <Login setAppProps={this.state.setAppProps} />
                             </Route>
-                            <Redirect to='/login'/>
+                            <Redirect to='/login' />
                         </div>
                     )}
                     {this.state.authenticated && ['admin', 'officer', 'teacher', 'parent'].includes(this.state.role) && (
                         <div>
                             <Route exact path='/'>
-                                <RootComponent children={extra ? extra.children : null} timetable={extra ? extra.timetable : null} />
+                                <RootComponent children={extra ? extra.children : null} timetable={extra ? extra.timetable : null} onLogout={() => this.logout()} />
                             </Route>
-                            <Redirect to='/'/>
+                            <Redirect to='/' />
                         </div>
                     )}
                 </Switch>

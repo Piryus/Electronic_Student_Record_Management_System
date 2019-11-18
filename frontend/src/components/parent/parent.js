@@ -126,7 +126,7 @@ export default class Parent extends React.Component {
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
-                    <a class="btn btn-primary bg-danger border-danger ml-2" href="/logout" role="button">Logout</a>
+                    <a onClick={() => this.props.onLogout()} class="btn btn-primary bg-danger border-danger text-white ml-2" role="button">Logout</a>
                 </Navbar>
                 <Container fluid>
                     <Row>
