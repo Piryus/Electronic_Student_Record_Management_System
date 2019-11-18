@@ -158,7 +158,7 @@ class Classes extends React.Component{
                 }
                 studentSortedClass[student.classId].push(
                 <Accordion.Collapse eventKey={student.classId.toString()}>
-                    <Card.Body>Student {studentSortedClass[student.classId].length+1}: Name: {student.name} Surname: {student.surname} SSN: {student.ssn} </Card.Body>
+                    <Card.Body>Student {studentSortedClass[student.classId].length+1}: {student.surname} {student.name} SSN: {student.ssn} </Card.Body>
                 </Accordion.Collapse>
                 );
             });
@@ -184,6 +184,7 @@ class Classes extends React.Component{
 
         return(
             <div>
+            <h1>Classes</h1>
             {this.state.wantCreateAClass === false && (
             <Accordion className={styles.gradesContainer} defaultActiveKey="0">
                 {gradesDOM.map((oneClass) => {
