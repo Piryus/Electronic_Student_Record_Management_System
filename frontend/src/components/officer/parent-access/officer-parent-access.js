@@ -1,155 +1,153 @@
 import React from 'react';
-import SearchBar from './search-bar/officer-parent-access-search-bar';
-//import styles from './styles.module.css';
+import {Button, Form, FormControl, InputGroup} from 'react-bootstrap';
+import Select from 'react-select';
+import styles from './styles.module.css';
+import Alert from "react-bootstrap/Alert";
 
-class ParentAccountEnabling extends React.Component{
+export default class ParentAccountEnabling extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            validParentEmail: false,
-            responseMessage: '',
             parentEmail: '',
-            studentFound: '',
-            showConfirmation: false,
-            ssnChosen: '', //Student chosen
-            students: [
-                {
-                    name: 'Giovanni',
-                    surname: 'Verdi',
-                    ssnCode: 'GVVVV1'
-                },
-                {
-                    name: 'Mario',
-                    surname: 'Rossi',
-                    ssnCode: 'GVVVV2'
-                },
-                {
-                    name: 'Marco',
-                    surname: 'Bianchi',
-                    ssnCode: 'MBBBB1'
-                }
-            ],
-            suggestions: [],
-        }
-        this.updateSuggestions = this.updateSuggestions.bind(this);
-        this.updateStudentFound = this.updateStudentFound.bind(this);
-        this.suggestionSelected = this.suggestionSelected.bind(this);
-        this.functionToFixElements = this.functionToFixElements.bind(this);
+            parentSsn: '',
+            parentName: '',
+            parentSurname: '',
+            students: [],
+            searchOptions: [],
+            selectedStudent: '',
+            alertDom: null,
+        };
     }
 
-    validateEmail(){
-        var re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/igm;
-        return re.test(String(this.state.parentEmail).toLowerCase());
+    async componentDidMount() {
+        await this.getStudents();
+        this.computeSearchOptions();
     }
 
-    submitForm(){
-        if(this.validateEmail() === false){
-            alert("Please insert a valid email.");
-        }
-        else{
-            this.setState({validParentEmail: true});
-        }
-    }
-
-
-    resetPage = () => {
+    async getStudents() {
+        // Query children list
+        const url = 'http://localhost:3000/students/all';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
         this.setState({
-            validParentEmail: false,
-            responseMessage: '',
-            parentEmail: '',
-            studentFound: '',
-            ssnChosen: '', //Student chosen
-            suggestions: [],
-            showConfirmation: false,
+            students: json.students
         });
     }
 
-    sendRequestToBackend = () => {
-        //Send here request to backend
-        alert('Response from server');
-        this.resetPage();
-    }
-
-    functionToFixElements = (elements) => {
-        let vect = [];
-        elements.map((item) => vect.push(item.surname + ' ' + item.name + ' ' + item.ssnCode));
-        return vect;
-    }
-
-    updateStudentFound = (value) => {
-        this.setState({studentFound: value});
-    }
-
-    updateSuggestions = (value) => {
-        this.setState({suggestions: value});
-    }
-
-    suggestionSelected = (value) => {
+    computeSearchOptions() {
+        let options = [];
+        this.state.students.map((student) => {
+            let option = {
+                value: student,
+                label: student.name + ' ' + student.surname + ' <' + student.ssn + '>'
+            };
+            options.push(option);
+        });
         this.setState({
-            studentFound: value,
+            searchOptions: options
         });
     }
 
-    submitChildForm(){
-
-        if(this.state.studentFound === '' || this.state.suggestions.length === 0){
-            alert('Please specify an existing student.');
-        }else{
-            var res = this.state.studentFound.split(" ");
-
-            if(res[2] != null){
-            this.setState({
-                ssnChosen: res[2],
-                showConfirmation: true,
-            });
-            }
+    async handleSubmitForm() {
+        const url = 'http://localhost:3000/parent/add';
+        const mail = this.state.parentEmail;
+        const name = this.state.parentName;
+        const surname = this.state.parentSurname;
+        const ssnParent = this.state.parentSsn;
+        const ssnChild = this.state.selectedStudent.value.ssn;
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                mail,
+                nameParent: name,
+                surnameParent: surname,
+                ssnParent: ssnParent,
+                ssnChild: ssnChild,
+            })
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        if (json.success === true) {
+            const alertDom = <Alert variant={'success'}>Parent account created! An email was sent to the parent with their credentials!</Alert>;
+            this.setState({alertDom});
+        } else {
+            const alertDom = <Alert variant={'danger'}>Parent account creation failed!</Alert>;
+            this.setState({alertDom});
         }
- 
     }
 
-
-    render(){
+    render() {
         return (
             <div>
-
-                <div >
-                {this.state.validParentEmail === false && this.state.showConfirmation === false &&(
-                    <div>
-                        <span >Insert a parent's email..</span><br/>
-                        <form  onSubmit={event => { event.preventDefault(); this.submitForm();}}>
-                            <input type= "text" name="email" placeholder= "Parent Email"  onChange = {(e) => this.setState({parentEmail: e.target.value})} required /><br/>
-                            <button >Continue</button>
-                            <button onClick={this.resetPage} >Cancel</button>
-                        </form>
-                    </div>
-                )}
-                {this.state.validParentEmail === true  && this.state.showConfirmation === false &&(
-                    <div>
-                        <span >Choose a Student from the panel on the right..</span><br/>
-                        <form  onSubmit={event => { event.preventDefault(); this.submitChildForm();}}>
-                            <SearchBar updateStudent = {this.updateStudentFound} elementFound = {this.state.studentFound} elements = {this.state.students} functionToFixElements = {this.functionToFixElements} suggestions = {this.state.suggestions} updateSuggestions = {this.updateSuggestions} updateSuggestionSelected = {this.suggestionSelected}/>
-                            <span >Selected: </span><span >{this.state.studentFound}</span>
-                            <button >Continue</button>
-                            <button onClick={this.resetPage} >Cancel</button>
-                        </form>
-
-                    </div>
-                )}
-                {this.state.showConfirmation === true && (
-                    <div>
-                        <span >Email of parents's account: </span><span >{this.state.parentEmail}</span><br></br>
-                        <span >Related student: </span><span >{this.state.studentFound}</span><br></br>
-                        <button onClick={this.sendRequestToBackend} >Confirm</button>
-                        <button onClick={this.resetPage} >Cancel</button>
-                    </div>
-                )}
-                </div>
+                <h1>Create a parent account</h1>
+                {this.state.alertDom}
+                <Form
+                    className={styles.formContainer}
+                    onSubmit={event => {
+                        event.preventDefault();
+                        this.handleSubmitForm();
+                    }}>
+                    <Form.Group controlId="formEmail">
+                        <Form.Label>Email address of the parent:</Form.Label>
+                        <Form.Control type="email"
+                                      placeholder="Enter email"
+                                      value={this.state.parentEmail}
+                                      onChange={(e) => this.setState({parentEmail: e.target.value})}/>
+                        <Form.Text className="text-muted">
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group controlId="formParentName">
+                        <Form.Label>Name of the parent:</Form.Label>
+                        <Form.Control type="string"
+                                      placeholder="Enter name"
+                                      value={this.state.parentName}
+                                      onChange={(e) => this.setState({parentName: e.target.value})}/>
+                        <Form.Text className="text-muted">
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group controlId="formParentSurname">
+                        <Form.Label>Surname of the parent:</Form.Label>
+                        <Form.Control type="string"
+                                      placeholder="Enter name"
+                                      value={this.state.parentSurname}
+                                      onChange={(e) => this.setState({parentSurname: e.target.value})}/>
+                        <Form.Text className="text-muted">
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group controlId="formSSN">
+                        <Form.Label>SSN of the parent:</Form.Label>
+                        <Form.Control type="string"
+                                      placeholder="Enter SSN"
+                                      value={this.state.parentSsn}
+                                      onChange={(e) => this.setState({parentSsn: e.target.value})}/>
+                        <Form.Text className="text-muted">
+                        </Form.Text>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Student to link to the parent account:</Form.Label>
+                        <Select
+                            value={this.state.selectedStudent}
+                            options={this.state.searchOptions}
+                            onChange={(selectedStudent) => this.setState({selectedStudent})}
+                        />
+                    </Form.Group>
+                    <Button variant="primary" type="submit">Create account</Button>
+                </Form>
             </div>
         );
     }
-
-
 }
-
-export default ParentAccountEnabling;
