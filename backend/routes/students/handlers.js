@@ -19,8 +19,7 @@ const addStudent = async function(ssn, name, surname) {
 };
 
 const addSchoolClass = async function(name, students) {
-    let schoolClass = await SchoolClass.findOneAndUpdate({ name: name.toUpperCase() }, {}, { upsert: true });
-    schoolClass = await SchoolClass.findOne({ name: name.toUpperCase()});
+    const schoolClass = await SchoolClass.findOneAndUpdate({ name: name.toUpperCase() }, {}, { new: true, upsert: true });
     await Student.updateMany({ classId: schoolClass._id }, { classId: undefined });
     await Student.updateMany({ _id: { $in: students } }, { classId: schoolClass._id });
     return { success: true };

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
+mongoose.set('useFindAndModify', false);
 const mongod = new MongoMemoryServer();
 
 module.exports.connect = async () => {

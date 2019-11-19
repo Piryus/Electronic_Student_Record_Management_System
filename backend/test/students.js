@@ -69,6 +69,32 @@ suite('students', () => {
     });
 
     test('addSchoolClass', async () => {
+        await Student.insertMany(testData.students);
+        await SchoolClass.insertMany(testData.classes);
+
+        const c1 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' });
+        const c2 = await Student.find({ classId: '5dc9cb36ee91b7384cbd7fd7' });
+        const c3 = await Student.find({ classId: '5dc9cb4b797f6936680521b9' });
+        await students.addSchoolClass('2B', ['5dca711c89bf46419cf5d488', '5dca711c89bf46419cf5d48d', '5dca711c89bf46419cf5d490', '5dca711c89bf46419cf5d484']);
+        await students.addSchoolClass('1A', ['5dca711c89bf46419cf5d486', '5dca711c89bf46419cf5d48b', '5dca711c89bf46419cf5d491', '5dca711c89bf46419cf5d48e', '5dca711c89bf46419cf5d48d']);
+        const c4 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' });
+        const sc = await SchoolClass.findOne({ name: '2B' });
+        await students.addSchoolClass('1C', ['5dca711c89bf46419cf5d483', '5dca711c89bf46419cf5d487', '5dca711c89bf46419cf5d48a', '5dca711c89bf46419cf5d48f', '5dca711c89bf46419cf5d489']);
+        const c5 = await Student.find({ classId: sc._id });
+        const c6 = await Student.find({ classId: '5dc9cb4b797f6936680521b9' });
+        const c7 = await Student.find({ classId: undefined });
+
+        expect(c1).to.have.length(15);
+        expect(c2).to.have.length(0);
+        expect(c3).to.have.length(0);
+        expect(c4).to.have.length(5);
+        expect(c4.map(s => s.ssn)).to.only.include(['JLMLBH00B07K064G', 'OJCHFE07F05M064L', 'EOANEJ00J04K037K', 'PBFNDJ01E04O002B', 'KDKNJL01L05F034A']);
+        expect(c5).to.have.length(3);
+        expect(c5.map(s => s.ssn)).to.only.include(['LMNNML01B05F051C', 'GPNCID08N09N089B', 'FCEEHG02B04N054D']);
+        expect(c6).to.have.length(5);
+        expect(c6.map(s => s.ssn)).to.only.include(['MDFGKO06L02F082G', 'CCJNJM09K01P046D', 'NAMAKH06I03P070A', 'AKFKCL03M05K075K', 'MGOAAP05I08P020M']);
+        expect(c7).to.have.length(2);
+        expect(c7.map(s => s.ssn)).to.only.include(['JPCOME07O02C034H', 'IFHMHK01L07L058D']);
     });
 
     test('getAllStudents', async () => {

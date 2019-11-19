@@ -24,4 +24,10 @@ after(async () => await db.closeDatabase());
 
 suite('lectures', () => {
     
+    test('getDailyLectureTopics', async () => {
+    });
+    
+    test('recordDailyLectureTopics', async () => {
+    });
+
 });

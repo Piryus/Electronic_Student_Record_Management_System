@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const keys = require('./config/keys');
 
 mongoose.connect(keys.mongoURI);
+mongoose.set('useFindAndModify', false);
 
 const start = async () => {
     const server = await require('./server')({ request: ['implementation'] });
