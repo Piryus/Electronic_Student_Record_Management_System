@@ -1,6 +1,7 @@
 'use strict';
 
 const Boom = require('boom');
+const Utils = require('../utils');
 const Valid = require('../validation');
 const User = require('../models/User');
 const Parent = require('../models/Parent');
@@ -36,7 +37,7 @@ const addParent = async function (request, h) {
                 children: [child._id]
             });
             newParent.save();
-            // TODO Send email to parent
+            Utils.sendWelcomeEmail(mail, surnameParent + ' ' + nameParent, password);
             return {success: true};
         }
     } catch (err) {
