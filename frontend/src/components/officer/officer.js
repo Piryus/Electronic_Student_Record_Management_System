@@ -46,10 +46,10 @@ export default class Officer extends React.Component {
                     <Row>
                         <Nav defaultActiveKey="/home"
                              className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
-                            <Nav.Link className={styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Accounts</Nav.Link>
-                            <Nav.Link className={styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "classes")}><FaLayerGroup/> Classes</Nav.Link>
-                            <Nav.Link className={styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "enrollStudent")}><FaGraduationCap/> Students</Nav.Link>
-                            <Nav.Link className={styles.sidebarLink} eventKey="link-1"><FaCog/> Settings</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'accounts' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Accounts</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'classes' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "classes")}><FaLayerGroup/> Classes</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'enrollStudent' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "enrollStudent")}><FaGraduationCap/> Students</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink} eventKey="link-1"><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
                                 {this.state.userRequest === 'accounts' &&(
