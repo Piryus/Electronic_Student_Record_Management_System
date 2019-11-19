@@ -28,7 +28,7 @@ const addParent = async function (request, h) {
         } else {
             const password = getRandomPassword();
             const newUser = new User({mail, password, scope: ['parent']});
-            newUser.save();
+            await newUser.save();
             const newParent = new Parent({
                 userId: newUser._id,
                 ssn: ssnParent,
@@ -36,7 +36,7 @@ const addParent = async function (request, h) {
                 surname: surnameParent,
                 children: [child._id]
             });
-            newParent.save();
+            await newParent.save();
             Utils.sendWelcomeEmail(mail, surnameParent + ' ' + nameParent, password);
             return {success: true};
         }

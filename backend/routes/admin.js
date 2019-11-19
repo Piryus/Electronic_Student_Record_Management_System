@@ -14,7 +14,7 @@ const addUser = async function (request, h) {
         const user = await User.findOne({mail: mail});
         if(user === null) {
             const newUser = new User({ mail, password, scope });
-            newUser.save();
+            await newUser.save();
             return {success: true};
         } else {
             return Boom.badRequest('The user already exists.');
