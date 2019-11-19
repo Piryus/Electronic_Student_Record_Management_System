@@ -3,6 +3,7 @@
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
 
+const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
@@ -28,6 +29,25 @@ afterEach(async () => await db.clearDatabase());
 after(async () => await db.closeDatabase());
 
 suite('students', () => {
+
+    test('getGrades', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+
+        // parent not found
+        const g1 = await students.getGrades('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
+        // student not found
+        const g2 = await students.getGrades('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const g3 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
+        // ok
+        const g4 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        expect(g1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(g4.grades).to.equal(testData.students.find(s => s._id === '5dca711c89bf46419cf5d489').grades);
+    });
     
     test('addStudent', async () => {
         const data = [
@@ -46,6 +66,9 @@ suite('students', () => {
         expect(empty).to.have.length(0);
         expect(full).to.have.length(6);
         data.forEach((s, i) => jexpect(full[i]).to.include(s));
+    });
+
+    test('addSchoolClass', async () => {
     });
 
     test('getAllStudents', async () => {

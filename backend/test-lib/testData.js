@@ -1,7 +1,5 @@
 'use strict';
 
-const mongoose = require('mongoose');
-
 const students = [
     {"_id":"5dca711c89bf46419cf5d483","ssn":"MDFGKO06L02F082G","name":"Marco","surname":"Cremonesi","grades":[{"date": "2019-10-16T07:58:00.000Z","_id":"5dca868936963d4b6ccb47a9","value":5,"subject":"Art"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
     {"_id":"5dca711c89bf46419cf5d484","ssn":"FCEEHG02B04N054D","name":"Luca","surname":"Longo","grades":[{"date": "2019-02-13T07:30:00.000Z","_id":"5dca86b02a65bd4eb0524e77","value":3,"subject":"English"},{"date": "2019-12-03T09:14:00.000Z","_id":"5dca86b02a65bd4eb0524e76","value":9.75,"subject":"Science"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
@@ -19,6 +17,14 @@ const students = [
     {"_id":"5dca711c89bf46419cf5d490","ssn":"GPNCID08N09N089B","name":"Riccardo","surname":"Cocci","grades":[{"date": "2019-11-13T11:55:00.000Z","_id":"5dca8759ba7eab125cef39e7","value":3.75,"subject":"Religion"},{"date": "2019-03-30T09:48:00.000Z","_id":"5dca8759ba7eab125cef39e6","value":6.5,"subject":"Physics"},{"date": "2019-12-27T12:08:00.000Z","_id":"5dca8759ba7eab125cef39e5","value":8.5,"subject":"Art"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
     {"_id":"5dca711c89bf46419cf5d491","ssn":"EOANEJ00J04K037K","name":"Vittoria","surname":"Bianchi","grades":[{"date": "2019-11-16T10:47:00.000Z","_id":"5dca87777a2b784f20309079","value":7.5,"subject":"Italian"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"}
 ];
+const parents = [
+    {"children":["5dca711c89bf46419cf5d485","5dca711c89bf46419cf5d48b"],"_id":"5dca77de05972e0898e9c68d","userId":"5dca7e2b461dc52d681804f9","ssn":"FAHKGA04F01L081M","name":"Davide","surname":"Capon","__v":0},
+    {"children":["5dca711c89bf46419cf5d485"],"_id":"5dca77f47af8500cf8668f06","userId":"5dca7e2b461dc52d681804fa","ssn":"JFMCL00C02H025N","name":"Tiziana","surname":"Gentile","__v":0},
+    {"children":["5dca711c89bf46419cf5d483","5dca711c89bf46419cf5d489"],"_id":"5dca781462307a4f84dd86d5","userId":"5dca7e2b461dc52d681804fb","ssn":"ELFLIP03J08D056L","name":"Barbara","surname":"Galli","__v":0},
+    {"children":["5dca711c89bf46419cf5d483","5dca711c89bf46419cf5d489"],"_id":"5dca7825e60dac32e4828699","userId":"5dca7e2b461dc52d681804fc","ssn":"GCOLGO03C09K019O","name":"Fabio","surname":"Cremonesi","__v":0},
+    {"children":["5dca711c89bf46419cf5d48e","5dca711c89bf46419cf5d491"],"_id":"5dca784dcf1db14678f3cadb","userId":"5dca7e2b461dc52d681804fd","ssn":"BCOAEN01B09O049L","name":"Lucia","surname":"Monge","__v":0},
+    {"children":["5dca711c89bf46419cf5d48e","5dca711c89bf46419cf5d491"],"_id":"5dca78645953000328b6131b","userId":"5dca7e2b461dc52d681804fe","ssn":"GELOEN01E09P064N","name":"Corrado","surname":"Bianchi","__v":0}
+];
 const classes = [
     {"_id":"5dc9c3112d698031f441e1c9","name":"1A","__v":0},
     {"_id":"5dc9cb36ee91b7384cbd7fd7","name":"1B","__v":0},
@@ -27,5 +33,6 @@ const classes = [
     
 module.exports = {
     students,
+    parents,
     classes
 };
