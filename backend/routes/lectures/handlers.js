@@ -2,10 +2,10 @@
 
 const Boom = require('boom');
 
-const Utils = require('../utils');
+const Utils = require('../../utils');
 
-const Lecture = require('../models/Lecture');
-const Teacher = require('../models/Teacher');
+const Lecture = require('../../models/Lecture');
+const Teacher = require('../../models/Teacher');
 
 const getDailyLectureTopics = async function(teacherUId, weekhour) {
     try {
