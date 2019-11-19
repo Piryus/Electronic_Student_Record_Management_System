@@ -2,375 +2,64 @@
 
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
-const Sinon = require('sinon');
+
+const db = require('../test-lib/db');
+const testData = require('../test-lib/testData');
 
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
 const SchoolClass = require ('../models/SchoolClass');
 
+const students = require ('../routes/students/handlers');
 
 const expect = Code.expect;
+const jexpect = (x) => expect(JSON.parse(JSON.stringify(x)));
 const lab = exports.lab = Lab.script();
 const suite = lab.suite;
 const test = lab.test;
 const before = lab.before;
+const afterEach = lab.afterEach;
+const after = lab.after;
 
-let server;
+before(async () =>  await db.connect());
 
-before(async () => {
-    try {
-        server = await require('../server')(false);
-        await server.initialize();
-    } catch(err) {
-        console.error(err);
-        process.exit(1);
-    }
-});
+afterEach(async () => await db.clearDatabase());
 
+after(async () => await db.closeDatabase());
 
 suite('students', () => {
     
-    test('getGrades', async () => {
-
-        const grades = [
-            { value: 5.0, subject: 'Math' },
-            { value: 8.25, subject: 'English' },
-            { value: 6.5, subject: 'History' },
-            { value: 7, subject: 'Gym' },
-        ];
-        const auth = {
-            strategy: 'session',
-            credentials: {
-                scope: 'parent',
-                id: '5dca711c89bf46419cf5d48d'
-            }
-        };
-
-        const parentFindOne = Sinon.stub(Parent, 'findOne');
-        const studentFindOne = Sinon.stub(Student, 'findOne');
-
-        parentFindOne.onCall(0).resolves(null);
-        parentFindOne.onCall(2).resolves({ children: ['eeeeeeeeeeeeeeeeeeeeeeee'] });
-        parentFindOne.resolves({ children: ['5dca6cf0a92bbb4dd8c0e817'] });
-        
-        studentFindOne.onCall(1).resolves(null);
-        studentFindOne.onCall(3).throws();
-        studentFindOne.resolves({ _id: '5dca6cf0a92bbb4dd8c0e817', grades });
-
-        const options1 = {
-            method: 'GET',
-            url: '/grades/5dca6cf0a92bbb4dd8c0e817'
-        };
-        // #1 - no auth
-        const res1 = await server.inject(options1);
-
-        const options2 = {
-            method: 'GET',
-            url: '/grades/5dca6cf0a92bbb4dd8c0e817',
-            auth: {
-                strategy: 'session',
-                credentials: {
-                    scope: 'teacher',
-                    id: '5dca711c89bf46419cf5d48d'
-                }
-            }
-        };
-        // #2 - inappropriate scope
-        const res2 = await server.inject(options2);
-
-        const options3 = {
-            method: 'GET',
-            url: '/grades/zzzz',
-            auth
-        };
-        // #3 - wrong parameters
-        const res3 = await server.inject(options3);
-
-        const options4 = {
-            method: 'GET',
-            url: '/grades/5dca6cf0a92bbb4dd8c0e817',
-            auth
-        };
-        // #4 - parent not found
-        const res4 = await server.inject(options4);
-        // #5 - student not found
-        const res5 = await server.inject(options4);
-        // #6 - student is not child of parent
-        const res6 = await server.inject(options4);
-        // #7 - unknown error
-        const res7 = await server.inject(options4);
-        // #8 - success
-        const res8 = await server.inject(options4);
-
-        expect(res1.statusCode).to.equal(302);
-        expect(res2.statusCode).to.equal(403);
-        expect(res3.statusCode).to.equal(400);
-        expect(res4.statusCode).to.equal(400);
-        expect(res5.statusCode).to.equal(400);
-        expect(res6.statusCode).to.equal(400);
-        expect(res7.statusCode).to.equal(500);
-        expect(res8.result.grades).to.equal(grades);
-
-        expect(parentFindOne.callCount).to.equal(5);
-        expect(parentFindOne.calledWithExactly({ userId: '5dca711c89bf46419cf5d48d' })).to.be.true();
-        expect(studentFindOne.callCount).to.equal(5);
-        expect(studentFindOne.calledWithExactly({ _id: '5dca6cf0a92bbb4dd8c0e817' })).to.be.true();
-
-        parentFindOne.restore();
-        studentFindOne.restore();
-
-    });
-
     test('addStudent', async () => {
-
-        const auth = {
-            strategy: 'session',
-            credentials: {
-                scope: 'officer',
-                id: '5dca711c89bf46419cf5d48d'
-            }
-        };
-
-
-        const studentSave = Sinon.stub(Student.prototype, 'save');
-
-        studentSave.onCall(0).throws();
-        studentSave.onCall(1).returns({success: true});
-
-
-        const options1 = {
-            method: 'POST',
-            url: '/students'
-        };
-
-        // #1 - No authentication
-        const res1 = await server.inject(options1);
-
-        const options2 = {
-            method: 'POST',
-            url: '/students',
-            auth: {
-                strategy: 'session',
-                credentials: {
-                    scope: 'parent',
-                    id: '5dca711c89bf46419cf5d48d'
-                }
-            }
-        };
-
-        // #2 - Inappropriate scope
-        const res2 = await server.inject(options2);
-
-        const options3 = {
-            method: 'POST',
-            url: '/students',
-            auth
-        };
-        // #3 - No payload
-        const res3 = await server.inject(options3);
-
-        const options4 = {
-            method: 'POST',
-            url: '/students',
-            auth,
-            payload: {
-                name: 'Giorgio',
-                surname: 'Verdi'
-            }
-        };
-
-        // #4 - No ssn in payload
-        const res4 = await server.inject(options4);
-
-        const options5 = {
-            method: 'POST',
-            url: '/students',
-            auth,
-            payload: {
-                ssn: "GVSSN",
-                surname: 'Verdi'
-            }
-        };
-
-        // #5 - No name in payload
-        const res5 = await server.inject(options5);
-
-        const options6 = {
-            method: 'POST',
-            url: '/students',
-            auth,
-            payload: {
-                ssn: "GVSSN",
-                name: 'Giorgio'
-            }
-        };
-
-        // #6 - No surname in payload
-        const res6 = await server.inject(options6);
-
-
-        const options7 = {
-            method: 'POST',
-            url: '/students',
-            auth,
-            payload: {
-                ssn: "GVSSN",
-                name: 'Giorgio',
-                surname: 'Verdi'
-            }
-        };
-
-        // #7 - Unknown error
-        const res7 = await server.inject(options7);
-
-        // #8 - Success scenario
-        const res8 = await server.inject(options7);
-
-
-        //Tests assertions
-        expect(res1.statusCode).to.equal(302);
-        expect(res2.statusCode).to.equal(403);
-        expect(res3.statusCode).to.equal(400);
-        expect(res4.statusCode).to.equal(400);
-        expect(res5.statusCode).to.equal(400);
-        expect(res6.statusCode).to.equal(400);
-        expect(res7.statusCode).to.equal(500);
-        expect(res8.result.success).to.be.true();
-
-        expect(studentSave.callCount).to.equal(2);
-
-
-    });
-
-    test('addSchoolClass', async () => {
-
-        const students = [
-            "5dca711c89bf46419cf5d483",
-            "5dca711c89bf46419cf5d484"
+        const data = [
+            { ssn: 'FCEEHG02B04N054D', name: 'Luca', surname: 'Longo' },
+            { ssn: 'JLMLBH00B07K064G', name: 'Alessio', surname: 'Mazzi' },
+            { ssn: 'MGOAAP05I08P020M', name: 'Enzo', surname: 'Cremonesi' },
+            { ssn: 'IFHMHK01L07L058D', name: 'Giacomo', surname: 'Lori' },
+            { ssn: 'PBFNDJ01E04O002B', name: 'Anna', surname: 'Bianchi' },
+            { ssn: 'GPNCID08N09N089B', name: 'Riccardo', surname: 'Cocci' }
         ];
 
-        const auth = {
-            strategy: 'session',
-            credentials: {
-                scope: 'officer',
-                id: '5dca711c89bf46419cf5d48d'
-            }
-        };
+        const empty = await Student.find({});
+        await Promise.all(data.map(s => students.addStudent(s.ssn, s.name, s.surname)));
+        const full = await Student.find({});
 
-        const schoolClassFindOneAndUpdate = Sinon.stub(SchoolClass, 'findOneAndUpdate');
-        const studentUpdateMany = Sinon.stub(Student, 'updateMany');
-
-        schoolClassFindOneAndUpdate.onCall(0).throws();
-        schoolClassFindOneAndUpdate.onCall(1).resolves({_id: "5dc9cb4b797f6936680521b9", name: "1A"});
-        schoolClassFindOneAndUpdate.onCall(2).resolves({_id: "5dc9cb4b797f6936680521b9", name: "1A"});
-
-        studentUpdateMany.onCall(0).throws();
-        studentUpdateMany.onCall(2).returns({success: true});
-
-
-        const options1 = {
-            method: 'POST',
-            url: '/classes'
-        };
-
-        // #1 - No authentication
-        const res1 = await server.inject(options1);
-
-        const options2 = {
-            method: 'POST',
-            url: '/classes',
-            auth: {
-                strategy: 'session',
-                credentials: {
-                    scope: 'parent',
-                    id: '5dca711c89bf46419cf5d48d'
-                }
-            }
-        };
-
-        // #2 - Inappropriate scope
-        const res2 = await server.inject(options2);
-
-        const options3 = {
-            method: 'POST',
-            url: '/classes',
-            auth
-        };
-        // #3 - No payload
-        const res3 = await server.inject(options3);
-
-        const options4 = {
-            method: 'POST',
-            url: '/classes',
-            auth,
-            payload: {
-                students: students
-            }
-        };
-
-        // #4 - No class name in payload
-        const res4 = await server.inject(options4);
-
-        const options5 = {
-            method: 'POST',
-            url: '/classes',
-            auth,
-            payload: {
-                name: '1A'
-            }
-        };
-
-        // #5 - No vector of students in payload
-        const res5 = await server.inject(options5);
-
-        const options6 = {
-            method: 'POST',
-            url: '/classes',
-            auth,
-            payload: {
-                name: '1A',
-                students: students
-            }
-        };
-
-        // #6 - Unknown error - on schoolFineOneAndUpdate
-        const res6 = await server.inject(options6);
-
-        // #7 - Unknown error - on studentUpdateMany
-        const res7 = await server.inject(options6);
-
-        const options8 = {
-            method: 'POST',
-            url: '/classes',
-            auth,
-            payload: {
-                name: 'zzz',
-                students: students
-            }
-        };
-
-        // #8 - Wrong class name
-        const res8 = await server.inject(options8);
-
-        // #9 - Success scenario
-        const res9 = await server.inject(options6);
-
-
-        //Tests assertions
-        expect(res1.statusCode).to.equal(302);
-        expect(res2.statusCode).to.equal(403);
-        expect(res3.statusCode).to.equal(400);
-        expect(res4.statusCode).to.equal(400);
-        expect(res5.statusCode).to.equal(400);
-        expect(res6.statusCode).to.equal(500);
-        expect(res7.statusCode).to.equal(500);
-        expect(res8.statusCode).to.equal(400);
-        expect(res9.result.success).to.be.true();
-
-        expect(schoolClassFindOneAndUpdate.calledWith({name: '1A'})).to.be.true();
-        expect(schoolClassFindOneAndUpdate.callCount).to.equal(3);
-        expect(studentUpdateMany.callCount).to.equal(3);
-
+        expect(empty).to.have.length(0);
+        expect(full).to.have.length(6);
+        data.forEach((s, i) => jexpect(full[i]).to.include(s));
     });
-    
+
+    test('getAllStudents', async () => {
+        await Student.insertMany(testData.students);
+        const all = await students.getAllStudents();
+
+        jexpect(all.students).to.equal(testData.students);
+    });
+
+    test('getAllClasses', async () => {
+        await SchoolClass.insertMany(testData.classes);
+        const all = await students.getAllClasses();
+
+        jexpect(all.classes).to.equal(testData.classes);
+    });
+
 });

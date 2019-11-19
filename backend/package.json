@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@hapi/lab": "21.x.x",
+    "mongodb-memory-server": "^6.0.1",
     "sinon": "7.5.x"
   }
 }
