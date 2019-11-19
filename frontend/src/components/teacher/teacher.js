@@ -1,17 +1,8 @@
 import React from 'react';
 import styles from './styles.module.css';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from "react-bootstrap/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
-import Accordion from "react-bootstrap/Accordion";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
+import {Container, Row, Nav, Navbar, Button} from 'react-bootstrap';
 import {FaGraduationCap, FaCog} from 'react-icons/fa'
-
 import LectureTopics from './lecture-topics';
-
 import lib from '../../lib';
 
 export default class Teacher extends React.Component {
@@ -19,7 +10,12 @@ export default class Teacher extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            userRequest: 'lecture',
         };
+    }
+
+    setUserRequest(e, choice) {
+        this.setState({userRequest: choice});
     }
 
     render() {
@@ -29,13 +25,13 @@ export default class Teacher extends React.Component {
             <div className={styles.root}>
                 <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
                     <Navbar.Brand>SE2</Navbar.Brand>
-                    <a onClick={() => this.props.onLogout()} className="btn btn-primary bg-danger border-danger text-white ml-auto" role="button">Logout</a>
+                    <Button onClick={() => this.props.onLogout()} variant='danger' className="ml-auto" role="button">Logout</Button>
                 </Navbar>
                 <Container fluid>
                     <Row>
-                        <Nav defaultActiveKey="/home" className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
-                            <Nav.Link className={styles.sidebarLink} href="/"><FaGraduationCap/> Lecture Topics</Nav.Link>
-                            <Nav.Link className={styles.sidebarLink} eventKey="link-1"><FaCog/> Settings</Nav.Link>
+                        <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
+                            <Nav.Link className={this.state.userRequest === 'lecture' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "lecture")}><FaGraduationCap/> Lecture Topics</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "settings")} ><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
                             <LectureTopics timetable={this.props.timetable.reduce((obj, x) => {

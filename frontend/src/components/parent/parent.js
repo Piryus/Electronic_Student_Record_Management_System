@@ -1,13 +1,6 @@
 import React from 'react';
 import styles from './styles.module.css';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from "react-bootstrap/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
-import Accordion from "react-bootstrap/Accordion";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
+import {Container, Row, Nav, Navbar, Button, Dropdown, Card, Accordion} from 'react-bootstrap';
 import {FaGraduationCap, FaCog} from 'react-icons/fa'
 
 export default class Parent extends React.Component {
@@ -18,7 +11,7 @@ export default class Parent extends React.Component {
         const childSelected = props.children[0];
 
         this.state = {
-            userRequest: '',
+            userRequest: 'grades',
             childSelected: childSelected,
             children: props.children,
             childGrades: null
@@ -63,7 +56,7 @@ export default class Parent extends React.Component {
         });
         this.setState({
             childSelected: this.state.children[childIndex],
-            userRequest: ''
+            userRequest: 'grades'
         });
     };
 
@@ -72,7 +65,6 @@ export default class Parent extends React.Component {
     }
 
     render() {
-
         const selectedChildId = this.state.childSelected._id;
         let childNotSelected = [];
         this.state.children.map((child) => {
@@ -126,14 +118,13 @@ export default class Parent extends React.Component {
                             })}
                         </Dropdown.Menu>
                     </Dropdown>
-                    <a onClick={() => this.props.onLogout()} class="btn btn-primary bg-danger border-danger text-white ml-2" role="button">Logout</a>
+                    <Button onClick={() => this.props.onLogout()} variant='danger' className="ml-2" role="button">Logout</Button>
                 </Navbar>
                 <Container fluid>
                     <Row>
-                        <Nav defaultActiveKey="/home"
-                             className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
-                            <Nav.Link className={styles.sidebarLink} href="/"><FaGraduationCap/> Grades</Nav.Link>
-                            <Nav.Link className={styles.sidebarLink} eventKey="link-1"><FaCog/> Settings</Nav.Link>
+                        <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
+                            <Nav.Link className={this.state.userRequest === 'grades' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "grades")}><FaGraduationCap/> Grades</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
                             <h2>Grades</h2>

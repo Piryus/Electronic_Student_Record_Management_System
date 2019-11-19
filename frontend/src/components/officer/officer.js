@@ -8,48 +8,36 @@ import ParentAccountEnabling from './parent-access/officer-parent-access';
 import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
 import {FaUserEdit, FaLayerGroup, FaCog, FaGraduationCap} from 'react-icons/fa';
+import Button from "react-bootstrap/Button";
 
 export default class Officer extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.state = {
-            userRequest: '', //By default
-
+            userRequest: 'grades',
         };
         this.setUserRequest = this.setUserRequest.bind(this);
     }
-
-    async componentDidMount() {
-        //await this.getChildGrades();
-    }
-
-    async componentWillUpdate() {
-        //await this.getChildGrades();
-    }
-
 
     setUserRequest(e, choice) {
         this.setState({userRequest: choice});
     }
 
     render() {
-
         return (
             <div className={styles.root}>
                 <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
                     <Navbar.Brand>SE2</Navbar.Brand>
-                    <a onClick={() => this.props.onLogout()} class="btn btn-primary bg-danger border-danger text-white ml-auto" role="button">Logout</a>
+                    <Button onClick={() => this.props.onLogout()} variant='danger' className="ml-2" role="button">Logout</Button>
                 </Navbar>
                 <Container fluid>
                     <Row>
-                        <Nav defaultActiveKey="/home"
-                             className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
+                        <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
                             <Nav.Link className={this.state.userRequest === 'accounts' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Accounts</Nav.Link>
                             <Nav.Link className={this.state.userRequest === 'classes' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "classes")}><FaLayerGroup/> Classes</Nav.Link>
                             <Nav.Link className={this.state.userRequest === 'enrollStudent' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "enrollStudent")}><FaGraduationCap/> Students</Nav.Link>
-                            <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink} eventKey="link-1"><FaCog/> Settings</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
                                 {this.state.userRequest === 'accounts' &&(
