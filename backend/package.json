@@ -5,15 +5,24 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "test": "lab -c -m 15000"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hapi/code": "7.0.x",
+    "@hapi/cookie": "^10.1.2",
     "@hapi/hapi": "^18.4.0",
+    "@hapi/joi": "14.x.x",
+    "boom": "7.x.x",
     "mongoose": "^5.7.8",
-    "nodemon": "^1.19.4",
-    "passport": "^0.4.0",
-    "passport-local": "^1.0.0"
+    "nodemailer": "6.3.x",
+    "nodemon": "^1.19.4"
+  },
+  "devDependencies": {
+    "@hapi/lab": "21.x.x",
+    "mongodb-memory-server": "^6.0.1",
+    "sinon": "7.5.x"
   }
 }
