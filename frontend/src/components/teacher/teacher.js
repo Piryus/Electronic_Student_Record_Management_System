@@ -4,6 +4,7 @@ import {Container, Row, Nav, Navbar, Button} from 'react-bootstrap';
 import {FaGraduationCap, FaCog} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import lib from '../../lib';
+import AppNavbar from "../navbar/navbar";
 
 export default class Teacher extends React.Component {
 
@@ -23,10 +24,7 @@ export default class Teacher extends React.Component {
 
         return (
             <div className={styles.root}>
-                <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
-                    <Navbar.Brand>SE2</Navbar.Brand>
-                    <Button onClick={() => this.props.onLogout()} variant='danger' className="ml-auto" role="button">Logout</Button>
-                </Navbar>
+                <AppNavbar type='classic' onLogout={() => this.props.onLogout()} />
                 <Container fluid>
                     <Row>
                         <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>

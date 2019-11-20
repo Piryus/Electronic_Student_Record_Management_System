@@ -9,6 +9,7 @@ import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
 import {FaUserEdit, FaLayerGroup, FaCog, FaGraduationCap} from 'react-icons/fa';
 import Button from "react-bootstrap/Button";
+import AppNavbar from "../navbar/navbar";
 
 export default class Officer extends React.Component {
 
@@ -27,10 +28,7 @@ export default class Officer extends React.Component {
     render() {
         return (
             <div className={styles.root}>
-                <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
-                    <Navbar.Brand>SE2</Navbar.Brand>
-                    <Button onClick={() => this.props.onLogout()} variant='danger' className="ml-2" role="button">Logout</Button>
-                </Navbar>
+                <AppNavbar type='classic' onLogout={() => this.props.onLogout()} />
                 <Container fluid>
                     <Row>
                         <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
