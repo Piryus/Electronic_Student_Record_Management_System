@@ -16,7 +16,7 @@ export default class Officer extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            userRequest: 'grades',
+            userRequest: 'accounts',
         };
         this.setUserRequest = this.setUserRequest.bind(this);
     }
