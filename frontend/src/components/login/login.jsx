@@ -68,10 +68,10 @@ class Login extends Component {
                         event.preventDefault();
                         this.handleLogin(this.state.username, this.state.password);
                     }}>
-                        <Form.Control value={this.state.username} type="email" placeholder="Email address"
-                                      onChange={(e) => this.setState({username: e.target.value})}/>
+                        <Form.Control value={this.state.username} type="email" name="username" placeholder="Email address"
+                                      onChange={(e) => this.setState({username: e.target.value})} required />
                         <Form.Control value={this.state.password} type="password" name="password" placeholder="Password"
-                                      onChange={(e) => this.setState({password: e.target.value})} required/>
+                                      onChange={(e) => this.setState({password: e.target.value})} required />
                         <Button disabled={!this.validateForm()} type="submit" block>Log in</Button>
                     </Form>
                 </div>
