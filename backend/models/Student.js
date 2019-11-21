@@ -6,9 +6,14 @@ const { Schema } = mongoose;
 const gradeSchema = new Schema({
     value: Number,
     subject: String,
-    date: {
-        type: Date,
-        default: Date.now
+    date: Date
+});
+
+const attendanceEventSchema = new Schema({
+    date: Date,
+    event: {
+        type: String,
+        enum: ['absence', 'late-entry', 'early-exit']
     }
 });
 
@@ -17,6 +22,7 @@ const studentSchema = new Schema({
     name: String,
     surname: String,
     classId: Schema.Types.ObjectId,
+    attendanceEvents: [attendanceEventSchema],
     grades: [gradeSchema]
 });
 
