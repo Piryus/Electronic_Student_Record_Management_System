@@ -5,6 +5,7 @@ const Boom = require('boom');
 const Utils = require('../../utils');
 
 const Lecture = require('../../models/Lecture');
+const SchoolClass = require('../../models/SchoolClass');
 const Teacher = require('../../models/Teacher');
 
 const getDailyLectureTopics = async function(teacherUId, weekhour) {
@@ -33,7 +34,18 @@ const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
     return { success: true };
 };
 
+const getAssignments = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+    const schoolClass = await SchoolClass.findOne({ _id: student.classId });
+    const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart());
+    return { assignments };
+};
+
 module.exports = {
     getDailyLectureTopics,
-    recordDailyLectureTopics
+    recordDailyLectureTopics,
+    getAssignments
 };

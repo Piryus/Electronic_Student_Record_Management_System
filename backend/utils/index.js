@@ -9,6 +9,10 @@ const day = 24 * hour;
 const startHour = 8, numHours = 6;
 const transporter = Nodemailer.createTransport(keys.email);
 
+Date.prototype.dayStart = function() {
+    this.setHours(0, 0, 0, 0);
+    return this;
+}
 Date.prototype.getNormalizedDay = function() {
     return this.getDay() === 0 ? 6 : this.getDay() - 1;
 }

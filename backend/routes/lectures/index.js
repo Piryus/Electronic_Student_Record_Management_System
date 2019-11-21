@@ -39,7 +39,23 @@ const routes = [
                 }
             }
         }
-    }
+    },
+    {
+        method: 'GET',
+        path: '/assignments/{studentId}',
+        handler: async (request, h) => lectures.getAssignments(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
 ];
 
 module.exports = routes;
