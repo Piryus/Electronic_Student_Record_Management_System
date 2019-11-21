@@ -51,12 +51,12 @@ suite('students', () => {
     
     test('addStudent', async () => {
         const data = [
-            { ssn: 'FCEEHG02B04N054D', name: 'Luca', surname: 'Longo' },
-            { ssn: 'JLMLBH00B07K064G', name: 'Alessio', surname: 'Mazzi' },
-            { ssn: 'MGOAAP05I08P020M', name: 'Enzo', surname: 'Cremonesi' },
-            { ssn: 'IFHMHK01L07L058D', name: 'Giacomo', surname: 'Lori' },
             { ssn: 'PBFNDJ01E04O002B', name: 'Anna', surname: 'Bianchi' },
-            { ssn: 'GPNCID08N09N089B', name: 'Riccardo', surname: 'Cocci' }
+            { ssn: 'GPNCID08N09N089B', name: 'Riccardo', surname: 'Cocci' },
+            { ssn: 'MGOAAP05I08P020M', name: 'Enzo', surname: 'Cremonesi' },
+            { ssn: 'FCEEHG02B04N054D', name: 'Luca', surname: 'Longo' },
+            { ssn: 'IFHMHK01L07L058D', name: 'Giacomo', surname: 'Lori' },
+            { ssn: 'JLMLBH00B07K064G', name: 'Alessio', surname: 'Mazzi' }
         ];
 
         const empty = await Student.find({});
@@ -65,7 +65,7 @@ suite('students', () => {
 
         expect(empty).to.have.length(0);
         expect(full).to.have.length(6);
-        data.forEach((s, i) => jexpect(full[i]).to.include(s));
+        data.forEach((s, i) => jexpect(full.sort((a, b) => a.surname - b.surname)[i]).to.include(s));
     });
 
     test('addSchoolClass', async () => {

@@ -12,6 +12,9 @@ const Utils = require('../utils');
 
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');
+const Student = require('../models/Student');
+const Parent = require('../models/Parent');
+const SchoolClass = require ('../models/SchoolClass');
 
 const lectures = require ('../routes/lectures/handlers');
 
@@ -95,6 +98,37 @@ suite('lectures', () => {
         jexpect(t9).to.include({ topics: 'New topics' });
 
         fakeClock.restore();
+    });
+    
+    test('getAssignments', async () => {
+        const data = [
+            { subject: 'Italian', description: 'Lorem ipsum dolor sit amet', assigned: new Date('2019-10-14T10:00:00.000Z'), due: new Date().addDays(1) },
+            { subject: 'Math', description: 'consectetur adipiscing elit', assigned: new Date('2019-11-05T12:00:00.000Z'), due: new Date().addDays(-2) },
+            { subject: 'English', description: 'sed do eiusmod tempor incididunt', assigned: new Date('2019-10-01T09:00:00.000Z'), due: new Date().addDays(0) },
+            { subject: 'Gym', description: 'ut labore et dolore magna aliqua', assigned: new Date('2019-11-19T11:00:00.000Z'), due: new Date().addDays(5) },
+            { subject: 'Art', description: 'Ut enim ad minim veniam', assigned: new Date('2019-11-15T08:00:00.000Z'), due: new Date().addDays(3) },
+            { subject: 'Physics', description: 'quis nostrud exercitation ullamco', assigned: new Date('2019-11-20T11:00:00.000Z'), due: new Date().addDays(-1) }
+        ];
+
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await SchoolClass.insertMany(testData.classes);
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { assignments: data });
+
+        // parent not found
+        const g1 = await lectures.getAssignments('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
+        // student not found
+        const g2 = await lectures.getAssignments('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const g3 = await lectures.getAssignments('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
+        // ok
+        const g4 = await lectures.getAssignments('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        expect(g1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g4.assignments).to.include(data.filter(a => a.due >= new Date().dayStart()));
     });
 
 });
