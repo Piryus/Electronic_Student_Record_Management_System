@@ -11,7 +11,7 @@ export default class News extends React.Component {
     }
 
     fetchNews() {
-        // TODO Fetch news from backend
+        // TODO Fetch articles from backend
     }
 
     render() {

@@ -1,26 +1,49 @@
 import React from 'react';
-import {Button, Form, Modal} from "react-bootstrap";
+import {Alert, Button, Form, Modal} from "react-bootstrap";
 
 export default class NewArticleModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             title: '',
-            content: ''
+            content: '',
+            errorSubmit: false
         };
     }
 
-    submitNewArticle() {
-        
+    async submitNewArticle() {
+        const url = 'http://localhost:3000/articles/post';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                title: this.state.title,
+                content: this.state.content
+            })
+        };
+        const response = await fetch(url, options);
+        const responseJson = await response.json();
+        if (responseJson.success === true) {
+            this.props.handleClose();
+        } else {
+            this.setState({errorSubmit: true});
+        }
     }
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.handleClose} size="lg" >
+            <Modal show={this.props.show} onHide={this.props.handleClose} size="lg">
                 <Modal.Header closeButton>
                     <Modal.Title>Write an article</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {this.state.errorSubmit &&(
+                        <Alert variant='danger'>Unable to submit the article.</Alert>
+                    )}
                     <Form>
                         <Form.Group controlId="formTitle">
                             <Form.Label>Title:</Form.Label>

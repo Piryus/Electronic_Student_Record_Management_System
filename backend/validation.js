@@ -12,6 +12,8 @@ const schema = {
     longText: Joi.string().min(1).max(4096),
     mail: Joi.string().email(),
     grade: Joi.string().regex(/[0-9]|10/) //FIX REGEX to match +,-,0.5 and 10 cum laude
+    articleTitle: Joi.string(),
+    articleContent: Joi.string()
 };
 
 module.exports = schema;
