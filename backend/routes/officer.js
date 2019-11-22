@@ -27,18 +27,12 @@ const addParent = async function (request, h) {
             return Boom.badRequest();
         } else {
             const password = getRandomPassword();
-            const newUser = new User({mail, password, scope: ['parent']});
+            const newUser = new User({ ssn: ssnParent, name: nameParent, surname: surnameParent, mail, password, scope: ['parent'] });
             await newUser.save();
-            const newParent = new Parent({
-                userId: newUser._id,
-                ssn: ssnParent,
-                name: nameParent,
-                surname: surnameParent,
-                children: [child._id]
-            });
+            const newParent = new Parent({ userId: newUser._id, children: [child._id] });
             await newParent.save();
             Utils.sendWelcomeEmail(mail, surnameParent + ' ' + nameParent, password);
-            return {success: true};
+            return { success: true };
         }
     } catch (err) {
         return Boom.badImplementation(err);
