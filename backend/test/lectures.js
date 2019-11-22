@@ -19,7 +19,8 @@ const SchoolClass = require ('../models/SchoolClass');
 const lectures = require ('../routes/lectures/handlers');
 
 const expect = Code.expect;
-const jexpect = (x) => expect(JSON.parse(JSON.stringify(x)));
+const j = (x) => JSON.parse(JSON.stringify(x));
+const jexpect = (x) => expect(j(x));
 const lab = exports.lab = Lab.script();
 const suite = lab.suite;
 const test = lab.test;
@@ -128,7 +129,7 @@ suite('lectures', () => {
         expect(g1.output.statusCode).to.equal(BAD_REQUEST);
         expect(g2.output.statusCode).to.equal(BAD_REQUEST);
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
-        expect(g4.assignments).to.include(data.filter(a => a.due >= new Date().dayStart()));
+        jexpect(g4.assignments).to.equal(j(data.filter(a => a.due >= new Date().dayStart())));
     });
 
 });

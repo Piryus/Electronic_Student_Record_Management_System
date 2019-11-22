@@ -33,23 +33,40 @@ const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
         return Boom.badRequest();
 
     await Lecture.findOneAndUpdate({ classId: teacher.timetable.find(t => t.weekhour === weekhour).classId, weekhour, date: datetime }, { topics }, { upsert: true });
+    
     return { success: true };
 };
 
 const getAssignments = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId });
+
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
-    const schoolClass = await SchoolClass.findOne({ _id: student.classId });
-    const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart()).map(a => {
-        return { subject: a.subject, description: a.description, assigned: a.assigned, due: a.due };
-    });
+
+    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 });
+    const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart());
+    
     return { assignments };
+};
+
+const recordAssignments = async function(teacherUId, subject, description, due) {
+    const weekhour = Utils.dateToWeekhour(due);
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || due < Date.now().addDays(1).dayStart())
+        return Boom.badRequest();
+        
+    const schoolClass = await SchoolClass.findOne({ _id: teacher.timetable.find(t => t.weekhour === weekhour).classId });
+    schoolClass.assignments.push({ subject, description, due });
+    await schoolClass.save();
+
+    return { success: true };
 };
 
 module.exports = {
     getDailyLectureTopics,
     recordDailyLectureTopics,
-    getAssignments
+    getAssignments,
+    recordAssignments
 };

@@ -6,7 +6,10 @@ const {Schema} = mongoose;
 const assignmentSchema = new Schema({
     subject: String,
     description: String,
-    assigned: Date,
+    assigned: {
+        type: Date,
+        default: Date.now
+    },
     due: Date
 });
 

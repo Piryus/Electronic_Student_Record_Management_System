@@ -24,7 +24,7 @@ const routes = [
         method: 'POST',
         path: '/lectures',
         handler: async (request, h) => {
-            const { weekhour, topics } = request.payload;    
+            const { weekhour, topics } = request.payload;
             return lectures.recordDailyLectureTopics(request.auth.credentials.id, weekhour, topics);
         },
         options: {
@@ -52,6 +52,27 @@ const routes = [
             validate: {
                 params: {
                     studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/assignments',
+        handler: async (request, h) => {
+            const { subject, description, due } = request.payload;
+            return lectures.recordAssignments(request.auth.credentials.id, subject, description, due);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    subject: Valid.subject.required(),
+                    description: Valid.longText.required(),
+                    due: Valid.date.required()
                 }
             }
         }
