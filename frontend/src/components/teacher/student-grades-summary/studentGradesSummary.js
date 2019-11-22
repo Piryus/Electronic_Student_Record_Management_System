@@ -96,6 +96,10 @@ export default class StudentGradesSummary extends React.Component{
         }
     }
 
+    async storeInDb(){
+        
+    }
+
     async saveGrade(){
         if(this.state.selectedStudent=== '' ){
             alert('Please select a student.');
@@ -106,7 +110,7 @@ export default class StudentGradesSummary extends React.Component{
             alert('Please select a subject');
         } else{
             //Ok I can save the grade into db
-
+            await this.storeInDb();
 
             //END
             alert('The grade has been recorded successfully!');
@@ -118,6 +122,7 @@ export default class StudentGradesSummary extends React.Component{
             window.location.reload(false);
         }
     }
+
 
     render(){
 
