@@ -9,7 +9,8 @@ export default class NewUserForm extends React.Component {
             email: '',
             name: '',
             surname: '',
-            ssn: ''
+            ssn: '',
+            role: ''
         };
     }
 
@@ -61,6 +62,16 @@ export default class NewUserForm extends React.Component {
                                           onChange={(e) => this.setState({ssn: e.target.value})}/>
                             <Form.Text className="text-muted">
                             </Form.Text>
+                        </Form.Group>
+                        <Form.Group controlId="formRole">
+                            <Form.Label>Role:</Form.Label>
+                            <Form.Control as="select"
+                                          type="string"
+                                          value={this.state.role}
+                                          onChange={(e) => this.setState({role: e.target.value})}>
+                                <option>Teacher</option>
+                                <option>Officer</option>
+                            </Form.Control>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
