@@ -1,68 +1,145 @@
 import React from 'react';
-import DropdownToggle from 'react-bootstrap/DropdownToggle';
-import DropdownMenu from 'react-bootstrap/DropdownMenu';
-import {Button, Dropdown, Card, Accordion} from 'react-bootstrap';
+import Select from 'react-select';
+import {Button, Dropdown, DropdownButton, Card, Accordion, Form} from 'react-bootstrap';
+import styles from './styles.module.css';
 
 
 
 export default class StudentGradesSummary extends React.Component{
 
+    grades = [
+        "0",
+        "0+",
+        "0.5",
+        "1-",
+        "1",
+        "1+",
+        "1.5",
+        "2-",
+        "2",
+        "2+",
+        "2.5",
+        "3-",
+        "3",
+        "3+",
+        "3.5",
+        "4-",
+        "4",
+        "4+",
+        "4.5",
+        "5-",
+        "5",
+        "5+",
+        "5.5",
+        "6-",
+        "6",
+        "6+",
+        "6.5",
+        "7-",
+        "7",
+        "7+",
+        "7.5",
+        "8-",
+        "8",
+        "8+",
+        "8.5",
+        "9-",
+        "9",
+        "9+",
+        "9.5",
+        "10-",
+        "10",
+        "10 cum laude"
+    ];
+
     constructor(props){
         super(props);
 
-        const selectedStudent = this.props.students[0];
 
         this.state = {
             wantAddAGrade: false,
-            studentSelected: '',
-            selectedSubject: '',
-            studentSelected: selectedStudent,
-            students: this.props.students
+            searchOptions: [],
+            selectedStudent: '',
+            selectedSubject: 'Select a subject', 
+            selectedGrade: 'Select a grade',
+            students: this.props.students,
+            subjects: this.props.subjects
         }
     }
 
-    selectStudent(e, s){
+    componentDidMount(){
+        this.computeSearchOptions();
+    }
+
+
+
+    computeSearchOptions() {
+        let options = [];
+        this.state.students.map((student) => {
+            let option = {
+                value: student,
+                label: student.name + ' ' + student.surname + ' <' + student.ssn + '>'
+            };
+            options.push(option);
+        });
         this.setState({
-            studentSelected: s
+            searchOptions: options
         });
     }
 
-    generateStudentItems(){
-        let studentNotSelected = [];
-        if (this.props.type === 'teacher-grades') {
-            this.state.students.map((student) => {
-                if (student._id !== this.state.studentSelected._id)
-                    studentNotSelected.push(
-                        <Dropdown.Item key={student._id} onClick={(e) => this.selectStudent(e, student)}>
-                            {[student.name, student.surname].join(' ')}
-                        </Dropdown.Item>);
-            });
+    showFormToAddAGrade(){
+        if(this.state.selectedStudent === ''){
+            alert('Please select a student first.');
         }
+        else{
+            this.setState({wantAddAGrade: true});
+        }
+    }
 
-        return studentNotSelected;
+    async saveGrade(){
+        if(this.state.selectedStudent=== '' ){
+            alert('Please select a student.');
+        }
+        else if(this.state.selectedGrade === 'Select a grade' || this.state.selectedGrade === ''){
+            alert('Please select a grade.');
+        } else if(this.state.selectedSubject === 'Select a subject' || this.state.selectedSubject === ''){
+            alert('Please select a subject');
+        } else{
+            //Ok I can save the grade into db
+
+
+            //END
+            alert('The grade has been recorded successfully!');
+            this.setState({
+                wantAddAGrade: false,
+                selectedSubject: 'Select a subject', 
+                selectedGrade: 'Select a grade',
+            });
+            window.location.reload(false);
+        }
     }
 
     render(){
-        let studentNotSelected = this.generateStudentItems();
 
         //Building of Grades and Subejects DOM
         let gradesSortedTopic = [];
         let gradesDOM = [];
-        if (this.state.studentSelected !== null) {
-            this.state.studentSelected.grades.map((grade) => {
+        if (this.state.selectedStudent !== '') {
+            this.state.selectedStudent.value.grades.map((grade) => {
                 if (gradesSortedTopic[grade.subject] == null) {
-                   gradesSortedTopic[grade.subject] = [];
-                }
-                let date = grade.date.split("T");
-                gradesSortedTopic[grade.subject].push(
-                    <Accordion.Collapse eventKey={grade.subject}>
-                        <Card.Body>Grade {gradesSortedTopic[grade.subject].length + 1}: {grade.value} Date
-                            : {date[0]}</Card.Body>
-                    </Accordion.Collapse>
-                );
+                    gradesSortedTopic[grade.subject] = [];
+                 }
+                 let date = grade.date.split("T");
+                 gradesSortedTopic[grade.subject].push(
+                     <Accordion.Collapse eventKey={grade.subject}>
+                         <Card.Body>Grade {gradesSortedTopic[grade.subject].length + 1}: {grade.value} Date
+                             : {date[0]}</Card.Body>
+                     </Accordion.Collapse>
+                 );
             });
             let index;
             for (index in gradesSortedTopic) {
+                if(index in this.state.subjects){
                 gradesDOM.push(
                     <Card>
                         <Card.Header>
@@ -75,32 +152,78 @@ export default class StudentGradesSummary extends React.Component{
                         })}
                     </Card>
                 );
+                    }
             }
         }
+        let renderDropDownItem = [];
+        for(let index in this.state.subjects){
+            renderDropDownItem.push(
+                <Dropdown.Item onClick={() => this.setState({selectedSubject: index})}>{index}</Dropdown.Item>
+            );
+        }
 
+        let renderGradesDropdownItems = [];
+        this.grades.forEach((grade) => {
+            renderGradesDropdownItems.push(
+                <Dropdown.Item onClick={() => this.setState({selectedGrade: grade})}>{grade}</Dropdown.Item>
+            );
+        });
 
         return(
             <div>
-                <Dropdown className={'ml-auto'}>
-                    <DropdownToggle>
-                        {this.state.studentSelected.name + ' ' + this.state.studentSelected.surname}
-                    </DropdownToggle>
-                        <DropdownMenu>
-                            {studentNotSelected.map((student) =>{
-                                return student;
-                            })}
-                        </DropdownMenu>
-                </Dropdown><br/>
+                <h2>Student Grades</h2><br></br>
+                <Form.Group>
+                        <Form.Label>Select a Student:</Form.Label>
+                        <Select
+                            value={this.state.selectedStudent}
+                            options={this.state.searchOptions}
+                            onChange={(value) => this.setState({selectedStudent: value})}
+                        />
+                    </Form.Group><br></br>
                 {this.state.wantAddAGrade === false &&(
                 <div>
-                    <h2>Grades</h2>
                     <Accordion defaultActiveKey="0">
+                        {gradesDOM.length === 0 && this.state.selectedStudent !== '' && (
+                            <p>There are not avaiable grades for this student.</p>
+                        )}
                         {gradesDOM.map((subject) => {
                             return subject;
                         })}
                     </Accordion><br></br>
-                    <Button variant="primary">Add a Grade</Button>
+                    <Button variant="primary" onClick={() => this.showFormToAddAGrade()}>Add a Grade</Button>
                 </div>
+                )}
+                {this.state.wantAddAGrade === true &&(
+                <Form>
+                    <Form.Group>
+                    <Form.Label>Subject: </Form.Label>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                            {this.state.selectedSubject}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu className={styles.dropdownMenu}>
+                            {renderDropDownItem.map((item) => {
+                                return item;
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown><br></br>
+                    </Form.Group>
+                    <Form.Group>
+                    <Form.Label>Grade: </Form.Label>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                            {this.state.selectedGrade}
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu className={styles.dropdownMenu}>
+                            {renderGradesDropdownItems.map((item) => {
+                                return item;
+                            })}
+                        </Dropdown.Menu>
+                    </Dropdown><br></br>
+                    </Form.Group>
+                    <Button variant="primary" onClick={() => this.saveGrade()}>Save</Button>
+                    </Form>
                 )}
             </div>
         );

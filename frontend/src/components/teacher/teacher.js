@@ -9,20 +9,27 @@ import AppNavbar from "../navbar/navbar";
 
 export default class Teacher extends React.Component {
 
+
+
     constructor(props) {
         super(props);
+
+        let subjects = [];
+        this.props.timetable.forEach((value) =>{
+            subjects[value.subject] = value.subject;
+        });
+
+
         this.state = {
             userRequest: 'lecture',
             students: [],
-            subjects: []
+            subjects: subjects,
         };
     }
 
     async componentDidMount(){
             //Load all students
             await this.getAllStudents();
-            //Load all subjects
-            await this.getSubjects();
     }
 
     async getAllStudents(){
@@ -41,15 +48,12 @@ export default class Teacher extends React.Component {
             this.setState({
                 students: json.students,
             });
-    }catch(e){
-        alert(e);
-    }
+        } catch(e){
+            alert(e);
+        }
     }
 
-    async getSubjects(){
-        //get subjects from Db here
-        
-    }
+
 
 
 
@@ -78,7 +82,7 @@ export default class Teacher extends React.Component {
                                 return obj;
                             }, {})}/>)}
                              {this.state.userRequest === 'grades' && (
-                                <StudentGradesSummary students={this.state.students} type='teacher-grades'/>
+                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} type='teacher-grades'/>
                             )}
                         </main>
                     </Row>
