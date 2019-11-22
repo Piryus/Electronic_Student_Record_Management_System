@@ -58,7 +58,7 @@ export default class ParentAccountEnabling extends React.Component {
     }
 
     async handleSubmitForm() {
-        const url = 'http://localhost:3000/parent/add';
+        const url = 'http://localhost:3000/parent';
         const mail = this.state.parentEmail;
         const name = this.state.parentName;
         const surname = this.state.parentSurname;
