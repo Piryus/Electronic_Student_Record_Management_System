@@ -26,6 +26,16 @@ Date.prototype.weekStart = function() {
     return ws;
 }
 
+const getRandomPassword = function () {
+    const chars = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOP1234567890';
+    let password = '';
+    for (let x = 0; x < 16; x++) {
+        let i = Math.floor(Math.random() * chars.length);
+        password += chars.charAt(i);
+    }
+    return password;
+};
+
 const weekhourToDate = function(wh) {
     let d = new Date().weekStart();
     const [weekdayIndex, hourIndex] = wh.split('_').map(x => parseInt(x));
@@ -57,6 +67,7 @@ module.exports = {
     hour,
     day,
     startHour,
+    getRandomPassword,
     weekhourToDate,
     dateToWeekhour,
     sendWelcomeEmail
