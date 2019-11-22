@@ -1,6 +1,6 @@
 'use strict';
 
-const Valid = require('../validation');
+const Valid = require('../../validation');
 const secretary = require('./handlers');
 
 const routes = [

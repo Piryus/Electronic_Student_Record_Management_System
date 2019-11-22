@@ -98,7 +98,27 @@ const routes = [
                 }
             }
         }
-    }
+    },
+    {
+        method: 'POST',
+        path: '/student/addGrade',
+        handler: async (request, h) => { 
+            const { id, subject, grade } = request.payload;
+            return students.addGradeToStudent(id, subject, grade)},
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    id: Valid.id.required(), //Student
+                    subject: Valid.subject.required(),
+                    grade: Valid.grade.required() 
+                }
+            }
+        }
+    },
 ];
 
 module.exports = routes;

@@ -43,11 +43,29 @@ const getAllClasses = async function() {
     return { classes };
 };
 
+const addGradeToStudent = async function (id, subject, grade) {
+    try {        
+        var student = await Student.findOne({ _id: id });
+        student.grades.push(
+            {
+                value: grade,
+                subject: subject,
+                date: Date.now().toString()
+            }
+        );
+        await student.save();
+        return {success: true};
+    } catch (err) {
+        return Boom.badImplementation(err);
+    }
+};
+
 module.exports = {
     getGrades,
     getAttendance,
     addStudent,
     addSchoolClass,
+    addGradeToStudent,
     getAllStudents,
     getAllClasses
 };
