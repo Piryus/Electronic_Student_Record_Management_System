@@ -72,7 +72,7 @@ class Classes extends React.Component{
         const url = 'http://localhost:3000/classes';
         const jsonToSend = JSON.stringify({
             name: this.state.classNameChosen,
-            students: this.state.studentsForNewClass
+            studentIds: this.state.studentsForNewClass
         });
         const options = {
             method: 'POST',
@@ -94,8 +94,8 @@ class Classes extends React.Component{
 
     async createClass(){
 
-        if(this.state.classNameChosen === ""){
-            alert('Please insert a class name.');
+        if(this.state.classNameChosen === "" || this.state.studentsForNewClass.length === 0){
+            alert('Please insert a class name and a student at least.');
         }
         else{
             //Send info to backend here
