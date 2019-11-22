@@ -97,7 +97,28 @@ export default class StudentGradesSummary extends React.Component{
     }
 
     async storeInDb(){
-        
+        const url = 'http://localhost:3000/student/addGrade';
+        const jsonToSend = JSON.stringify({
+            id: this.state.selectedStudent.value._id,
+            subject: this.state.selectedSubject,
+            grade: this.state.selectedGrade
+        });
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: jsonToSend 
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        if(json.error != null){
+            alert('Internal error occured while saving the grade. Please retry.');
+        } else{
+            alert('The grade has been recorded successfully!');
+        }
     }
 
     async saveGrade(){
@@ -113,7 +134,6 @@ export default class StudentGradesSummary extends React.Component{
             await this.storeInDb();
 
             //END
-            alert('The grade has been recorded successfully!');
             this.setState({
                 wantAddAGrade: false,
                 selectedSubject: 'Select a subject', 
