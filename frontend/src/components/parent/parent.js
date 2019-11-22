@@ -1,9 +1,10 @@
 import React from 'react';
 import styles from './styles.module.css';
-import {Container, Row, Nav, Button, Card, Accordion} from 'react-bootstrap';
+import {Container, Row, Nav} from 'react-bootstrap';
 import {FaGraduationCap, FaCog, FaRegNewspaper} from 'react-icons/fa';
 import AppNavbar from '../navbar/navbar';
 import Grades from "./grades/parent-grades";
+import News from "./news/parent-news";
 
 export default class Parent extends React.Component {
 
@@ -51,6 +52,9 @@ export default class Parent extends React.Component {
                                 className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className="col-md-9 ml-sm-auto col-lg-10 px-4 pt-5">
+                            {this.state.userRequest === 'news' && (
+                                <News />
+                            )}
                             {this.state.userRequest === 'grades' && (
                                 <Grades child={this.state.childSelected}/>
                             )}
