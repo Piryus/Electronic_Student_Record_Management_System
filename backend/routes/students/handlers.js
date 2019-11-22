@@ -6,10 +6,18 @@ const Student = require('../../models/Student');
 
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
-    const student = await Student.findOne({ _id: studentId });
+    const student = await Student.findOne({ _id: studentId }, { 'grades._id': 0 });
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
     return { grades: student.grades };
+};
+
+const getAttendance = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId }, { 'attendanceEvents._id': 0 });
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+    return { attendance: student.attendanceEvents };
 };
 
 const addStudent = async function(ssn, name, surname) {
@@ -26,7 +34,7 @@ const addSchoolClass = async function(name, students) {
 };
 
 const getAllStudents = async function() {
-    const students = await Student.find({});
+    const students = await Student.find({}, { 'grades._id': 0 });
     return { students };
 };
 
@@ -37,6 +45,7 @@ const getAllClasses = async function() {
 
 module.exports = {
     getGrades,
+    getAttendance,
     addStudent,
     addSchoolClass,
     getAllStudents,
