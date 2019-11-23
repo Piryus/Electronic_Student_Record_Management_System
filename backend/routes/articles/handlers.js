@@ -36,7 +36,7 @@ const getArticles = async function () {
             };
             articlesWithAuthor.push(newArticle);
         }
-        return articlesWithAuthor;
+        return articlesWithAuthor.reverse();
     } catch (e) {
         return Boom.badImplementation(e);
     }
