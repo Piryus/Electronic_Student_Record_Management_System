@@ -7,51 +7,6 @@ import styles from './styles.module.css';
 
 export default class StudentGradesSummary extends React.Component{
 
-    grades = [
-        "0",
-        "0+",
-        "0.5",
-        "1-",
-        "1",
-        "1+",
-        "1.5",
-        "2-",
-        "2",
-        "2+",
-        "2.5",
-        "3-",
-        "3",
-        "3+",
-        "3.5",
-        "4-",
-        "4",
-        "4+",
-        "4.5",
-        "5-",
-        "5",
-        "5+",
-        "5.5",
-        "6-",
-        "6",
-        "6+",
-        "6.5",
-        "7-",
-        "7",
-        "7+",
-        "7.5",
-        "8-",
-        "8",
-        "8+",
-        "8.5",
-        "9-",
-        "9",
-        "9+",
-        "9.5",
-        "10-",
-        "10",
-        "10 cum laude"
-    ];
-
     constructor(props){
         super(props);
 
@@ -125,21 +80,23 @@ export default class StudentGradesSummary extends React.Component{
             alert('Please select a student.');
         }
         else if(this.state.selectedGrade === 'Select a grade' || this.state.selectedGrade === ''){
-            alert('Please select a grade.');
+            alert('Please insert a grade.');
         } else if(this.state.selectedSubject === 'Select a subject' || this.state.selectedSubject === ''){
             alert('Please select a subject');
+        } else if(/^([0-9]\+|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude))$/.test(this.state.selectedGrade) === false){
+            alert('Grade format not valid. Please insert a correct grade.');
         } else{
-            //Ok I can save the grade into db
-            await this.storeInDb();
+                //Ok I can save the grade into db
+                await this.storeInDb();
 
-            //END
-            this.setState({
-                wantAddAGrade: false,
-                selectedSubject: 'Select a subject', 
-                selectedGrade: 'Select a grade',
-            });
-            window.location.reload(false);
-        }
+                //END
+                this.setState({
+                    wantAddAGrade: false,
+                    selectedSubject: 'Select a subject', 
+                    selectedGrade: 'Select a grade',
+                });
+                window.location.reload(false);
+            }
     }
 
 
@@ -186,13 +143,6 @@ export default class StudentGradesSummary extends React.Component{
             );
         }
 
-        let renderGradesDropdownItems = [];
-        this.grades.forEach((grade) => {
-            renderGradesDropdownItems.push(
-                <Dropdown.Item onClick={() => this.setState({selectedGrade: grade})}>{grade}</Dropdown.Item>
-            );
-        });
-
         return(
             <div>
                 <h2>Student Grades</h2><br></br>
@@ -233,7 +183,7 @@ export default class StudentGradesSummary extends React.Component{
                         </Dropdown.Menu>
                     </Dropdown><br></br>
                     </Form.Group>
-                    <Form.Group>
+                    {/* <Form.Group>
                     <Form.Label>Grade: </Form.Label>
                     <Dropdown>
                         <Dropdown.Toggle variant="primary" id="dropdown-basic">
@@ -245,6 +195,10 @@ export default class StudentGradesSummary extends React.Component{
                             })}
                         </Dropdown.Menu>
                     </Dropdown><br></br>
+                    </Form.Group> */}
+                    <Form.Group controlId="formBasicEmail">
+                        <Form.Label>Grade: </Form.Label>
+                        <Form.Control type="text" placeholder="Grade examples: 7.5, 9-, 8+, 10 cum laude" onChange={(e) => this.setState({selectedGrade: e.target.value})}/>
                     </Form.Group>
                     <Button variant="primary" onClick={() => this.saveGrade()}>Save</Button>
                     </Form>
