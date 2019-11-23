@@ -87,7 +87,10 @@ export default class Teacher extends React.Component {
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} type='teacher-grades'/>
                             )}
                             {this.state.userRequest === 'assignments' &&(
-                                <Assignments subjects={this.state.subjects}/>
+                                <Assignments subjects={this.state.subjects} timetable={this.props.timetable.reduce((obj, x) => {
+                                obj[x.weekhour] = { name: x.subject, active: lib.weekhourToDate(x.weekhour) < now };
+                                return obj;
+                            }, {})}/>
                             )}
                         </main>
                     </Row>
