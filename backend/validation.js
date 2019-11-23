@@ -11,7 +11,7 @@ const schema = {
     subject: Joi.string(),
     longText: Joi.string().min(1).max(4096),
     mail: Joi.string().email(),
-    grade: Joi.string().regex(/^([0-9]\+|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10L)$/),
+    grade: Joi.string().regex(/^([0-9]\+|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude))$/),
     articleTitle: Joi.string(),
     articleContent: Joi.string()
 };
