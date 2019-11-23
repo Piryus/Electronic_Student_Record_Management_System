@@ -6,6 +6,7 @@ const lectures = require('./lectures');
 const students = require('./students');
 const secretary = require('./secretary');
 const articles = require('./articles');
+const users = require('./users');
 
 module.exports = [
     ...admin,
@@ -13,5 +14,6 @@ module.exports = [
     ...lectures,
     ...students,
     ...articles,
-    ...secretary
+    ...secretary,
+    ...users
 ];

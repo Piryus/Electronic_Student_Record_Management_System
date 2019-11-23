@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Form, Modal} from "react-bootstrap";
+import {Alert, Button, Form, Modal} from "react-bootstrap";
 import Select from "react-select";
 
 export default class NewUserForm extends React.Component {
@@ -10,13 +10,35 @@ export default class NewUserForm extends React.Component {
             name: '',
             surname: '',
             ssn: '',
-            role: ''
+            role: 'teacher', // WARNING: This is a little hack, this value should be changed if the first option in the role dropdown is changed
+            error: false,
         };
     }
 
-    handleSubmitForm() {
-        // TODO Backend request to add the user
-        this.props.handleClose();
+    async handleSubmitForm() {
+        const url = 'http://localhost:3000/users/add';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                mail: this.state.email,
+                name: this.state.name,
+                surname: this.state.surname,
+                ssn: this.state.ssn,
+                scope: this.state.role
+            })
+        };
+        const response = await fetch(url, options);
+        const responseJson = await response.json();
+        if (responseJson.success) {
+            this.props.handleClose(true);
+        } else {
+            this.setState({error: true});
+        }
     };
 
     render() {
@@ -26,6 +48,9 @@ export default class NewUserForm extends React.Component {
                     <Modal.Title>Add a new user</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {this.state.error &&(
+                        <Alert variant='danger'>Unable to create this new user.</Alert>
+                    )}
                     <Form>
                         <Form.Group controlId="formEmail">
                             <Form.Label>Email:</Form.Label>
@@ -68,7 +93,7 @@ export default class NewUserForm extends React.Component {
                             <Form.Control as="select"
                                           type="string"
                                           value={this.state.role}
-                                          onChange={(e) => this.setState({role: e.target.value})}>
+                                          onChange={(e) => this.setState({role: e.target.value.toLowerCase()})}>
                                 <option>Teacher</option>
                                 <option>Officer</option>
                             </Form.Control>

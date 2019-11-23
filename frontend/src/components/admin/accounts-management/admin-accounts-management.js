@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Container, FormControl, InputGroup, Pagination, Row, Table} from 'react-bootstrap';
+import {Alert, Button, Container, FormControl, InputGroup, Modal, Pagination, Row, Table} from 'react-bootstrap';
 import {FaSistrix, FaPen, FaTrash} from 'react-icons/fa';
 import NewUserForm from "./new-user-form/new-user-form";
 import DeleteUserModal from "./delete-user-modal/delete-user-modal";
@@ -11,9 +11,10 @@ export default class AccountsManagement extends React.Component {
         this.state = {
             users: [],
             showNewUserForm: false,
+            hasAddedUser: false,
             showDeleteUserModal: false,
             showEditUserForm: false,
-            targetUser: {mail: 'emile@legendre.com', name: 'Emile', surname: 'Legendre'}
+            targetUser: {},
         }
     }
 
@@ -22,7 +23,20 @@ export default class AccountsManagement extends React.Component {
     }
 
     async fetchUsers() {
-        // Fetch users from backend
+        const url = 'http://localhost:3000/users/all';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+        const response = await fetch(url, options);
+        const responseJson = await response.json();
+        this.setState({
+            users: responseJson
+        });
     }
 
     popDeleteUserModal(user) {
@@ -39,6 +53,13 @@ export default class AccountsManagement extends React.Component {
         });
     }
 
+    handleCloseNewUserForm(hasAddedUser) {
+        this.setState({
+            showNewUserForm: false,
+            hasAddedUser
+        });
+    }
+
     render() {
         return (
             <Container fluid>
@@ -49,7 +70,7 @@ export default class AccountsManagement extends React.Component {
                 </Row>
                 <Row className="mb-2">
                     <Button onClick={() => this.setState({showNewUserForm: true})}>New user</Button>
-                    <NewUserForm show={this.state.showNewUserForm} handleClose={() => this.setState({showNewUserForm: false})} />
+                    <NewUserForm show={this.state.showNewUserForm} handleClose={(hasAddedUser) => this.handleCloseNewUserForm(hasAddedUser)} />
                     <InputGroup className={"ml-auto col-5 col-xl-3"}>
                         <InputGroup.Prepend>
                             <InputGroup.Text id="basic-addon1"><FaSistrix/></InputGroup.Text>
@@ -61,11 +82,14 @@ export default class AccountsManagement extends React.Component {
                         />
                     </InputGroup>
                 </Row>
+                {this.state.hasAddedUser &&(
+                    <Alert variant='success'>The user has been successfully created and will receive an email containing their credentials.</Alert>
+                )}
                 <Row>
                     <Table className="col" striped hover bordered>
                         <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>SSN</th>
                             <th>First name</th>
                             <th>Last name</th>
                             <th>Email</th>
@@ -74,17 +98,19 @@ export default class AccountsManagement extends React.Component {
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td className="align-middle">124959848484</td>
-                            <td className="align-middle">Emile</td>
-                            <td className="align-middle">Legendre</td>
-                            <td className="align-middle">emile@legendre.com</td>
-                            <td className="align-middle">Admin</td>
-                            <td>
-                                <Button className='mr-1' onClick={() => this.popUpdateUserForm({mail: 'emile@legendre.com', name: 'Emile', surname: 'Legendre'})}>Edit</Button>
-                                <Button onClick={() => this.popDeleteUserModal({mail: 'emile@legendre.com', name: 'Emile', surname: 'Legendre'})} variant={'danger'}>Delete</Button>
-                            </td>
-                        </tr>
+                        {this.state.users.map(user =>
+                            <tr key={user.ssn}>
+                                <td className="align-middle">{user.ssn}</td>
+                                <td className="align-middle">{user.name}</td>
+                                <td className="align-middle">{user.surname}</td>
+                                <td className="align-middle">{user.mail}</td>
+                                <td className="align-middle">{user.scope}</td>
+                                <td>
+                                    <Button className='mr-1' onClick={() => this.popUpdateUserForm(user)}>Edit</Button>
+                                    <Button onClick={() => this.popDeleteUserModal(user)} variant={'danger'}>Delete</Button>
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </Table>
                 </Row>
