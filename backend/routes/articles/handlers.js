@@ -25,18 +25,25 @@ const getArticles = async function () {
         const articles = await Article.find({});
         let articlesWithAuthor = [];
         for (const article of articles) {
+            // Author formatting
             let author = await User.findById(article.author);
-            let authorStr = [author.name, author.surname].join(' ');
+            let authorStr = 'Unknown author';
+            if (author !== null) {
+                authorStr = [author.name, author.surname].join(' ');
+            }
+            // Date formatting
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = article.date.toLocaleDateString("en-US", dateOptions);
             const newArticle = {
                 id: article._id,
                 title: article.title,
                 content: article.content,
-                date: article.date,
+                date: formattedDate,
                 author: authorStr
             };
             articlesWithAuthor.push(newArticle);
         }
-        return articlesWithAuthor;
+        return articlesWithAuthor.reverse();
     } catch (e) {
         return Boom.badImplementation(e);
     }
