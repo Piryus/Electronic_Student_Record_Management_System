@@ -209,7 +209,7 @@ export default class StudentGradesSummary extends React.Component{
                 <div>
                     <Accordion defaultActiveKey="0">
                         {gradesDOM.length === 0 && this.state.selectedStudent !== '' && (
-                            <p>There are not avaiable grades for this student.</p>
+                            <p>There are not available grades for this student.</p>
                         )}
                         {gradesDOM.map((subject) => {
                             return subject;

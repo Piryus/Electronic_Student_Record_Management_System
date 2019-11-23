@@ -1,9 +1,10 @@
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav, Navbar, Button} from 'react-bootstrap';
-import {FaGraduationCap, FaCog} from 'react-icons/fa'
+import {FaGraduationCap, FaCog, FaMedal, FaBook} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
+import Assignments from './assignments/assignments';
 import lib from '../../lib';
 import AppNavbar from "../navbar/navbar";
 
@@ -73,7 +74,8 @@ export default class Teacher extends React.Component {
                     <Row>
                         <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
                             <Nav.Link className={this.state.userRequest === 'lecture' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "lecture")}><FaGraduationCap/> Lecture Topics</Nav.Link>
-                            <Nav.Link className={this.state.userRequest === 'grades' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "grades")}><FaGraduationCap/> Student Grades</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'grades' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "grades")}><FaMedal/> Student Grades</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'assignments' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments </Nav.Link>
                             <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "settings")} ><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
@@ -83,6 +85,9 @@ export default class Teacher extends React.Component {
                             }, {})}/>)}
                              {this.state.userRequest === 'grades' && (
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} type='teacher-grades'/>
+                            )}
+                            {this.state.userRequest === 'assignments' &&(
+                                <Assignments />
                             )}
                         </main>
                     </Row>
