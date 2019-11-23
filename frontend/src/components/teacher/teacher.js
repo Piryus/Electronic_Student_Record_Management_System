@@ -87,7 +87,7 @@ export default class Teacher extends React.Component {
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} type='teacher-grades'/>
                             )}
                             {this.state.userRequest === 'assignments' &&(
-                                <Assignments />
+                                <Assignments subjects={this.state.subjects}/>
                             )}
                         </main>
                     </Row>
