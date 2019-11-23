@@ -82,9 +82,9 @@ const routes = [
     {
         method: 'POST',
         path: '/classes',
-        handler: async (request, h) => {
-            const { name, students } = request.payload;
-            return students.addSchoolClass(name, students);
+        handler: async (request, h) => { //Don't use same name "students" both for imported students.js and for parameter in payload. It will cause an error. (FIXED)
+            const { name, studentIds } = request.payload;
+            return students.addSchoolClass(name, studentIds);
         },
         options: {
             auth: {
@@ -94,7 +94,7 @@ const routes = [
             validate: {
                 payload: {
                     name: Valid.className.required(),
-                    students: Valid.array.items(Valid.id).required()
+                    studentIds: Valid.array.items(Valid.id).required()
                 }
             }
         }
