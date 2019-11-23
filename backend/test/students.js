@@ -48,6 +48,20 @@ suite('students', () => {
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
         jexpect(g4.grades).to.equal(testData.students.find(s => s._id === '5dca711c89bf46419cf5d489').grades);
     });
+
+    test('getStudents', async () => {
+        await Student.insertMany(testData.students);
+        const all = await students.getStudents();
+
+        jexpect(all.students).to.equal(testData.students);
+    });
+
+    test('getClasses', async () => {
+        await SchoolClass.insertMany(testData.classes);
+        const all = await students.getClasses();
+
+        jexpect(all.classes).to.equal(testData.classes);
+    });
     
     test('addStudent', async () => {
         const data = [
@@ -95,20 +109,6 @@ suite('students', () => {
         expect(c6.map(s => s.ssn)).to.only.include(['MDFGKO06L02F082G', 'CCJNJM09K01P046D', 'NAMAKH06I03P070A', 'AKFKCL03M05K075K', 'MGOAAP05I08P020M']);
         expect(c7).to.have.length(2);
         expect(c7.map(s => s.ssn)).to.only.include(['JPCOME07O02C034H', 'IFHMHK01L07L058D']);
-    });
-
-    test('getAllStudents', async () => {
-        await Student.insertMany(testData.students);
-        const all = await students.getAllStudents();
-
-        jexpect(all.students).to.equal(testData.students);
-    });
-
-    test('getAllClasses', async () => {
-        await SchoolClass.insertMany(testData.classes);
-        const all = await students.getAllClasses();
-
-        jexpect(all.classes).to.equal(testData.classes);
     });
 
 });

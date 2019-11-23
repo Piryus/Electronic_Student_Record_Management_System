@@ -9,6 +9,11 @@ const day = 24 * hour;
 const startHour = 8, numHours = 6;
 const transporter = Nodemailer.createTransport(keys.email);
 
+String.prototype.gradify = function() {
+    let n = this.replace('+', '.25').replace(/l|L| cum laude/, '').replace(/ 1\/2| and 1\/2/, '.5').replace(/(\d)\/(\d)/, '$1.75');
+    return n.indexOf('-') === -1 ? parseFloat(n) : parseFloat(n.replace('-', '')) - 0.25;
+}
+
 Date.prototype.addDays = function(d) {
     return new Date(this.getTime() + d * day);
 }

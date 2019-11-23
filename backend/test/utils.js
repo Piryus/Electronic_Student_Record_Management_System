@@ -12,6 +12,37 @@ const test = lab.test;
 
 suite('utils', () => {
     
+    test('String.gradify', async () => {
+        const g1 = '0.5'.gradify();
+        const g2 = '3+'.gradify();
+        const g3 = '6-'.gradify();
+        const g4 = '8/9'.gradify();
+        const g5 = '10L'.gradify();
+        const g6 = '4 and 1/2'.gradify();
+        const g7 = '10 cum laude'.gradify();
+        const g8 = '7-'.gradify();
+        const g9 = '9 1/2'.gradify();
+        const g10 = '10l'.gradify();
+        const g11 = '2/3'.gradify();
+        const g12 = '5.25'.gradify();
+        const g13 = '8.75'.gradify();
+        const g14 = '2'.gradify();
+        expect(g1).to.equal(0.5);
+        expect(g2).to.equal(3.25);
+        expect(g3).to.equal(5.75);
+        expect(g4).to.equal(8.75);
+        expect(g5).to.equal(10);
+        expect(g6).to.equal(4.5);
+        expect(g7).to.equal(10);
+        expect(g8).to.equal(6.75);
+        expect(g9).to.equal(9.5);
+        expect(g10).to.equal(10);
+        expect(g11).to.equal(2.75);
+        expect(g12).to.equal(5.25);
+        expect(g13).to.equal(8.75);
+        expect(g14).to.equal(2);
+    });
+    
     test('Date.getNormalizedDay', async () => {
         const nd1 = new Date('2019-01-04T16:00:00').getNormalizedDay();
         const nd2 = new Date('2019-02-11T12:00:00').getNormalizedDay();

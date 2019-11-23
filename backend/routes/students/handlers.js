@@ -46,7 +46,7 @@ const addGrade = async function(teacherUId, studentId, subject, grade) {
     if(teacher === null || student === null || teacher.timetable.some(t => (t.classId === student.classId && Utils.weekhourToDate(t.weekhour) < Date.now())))
         return Boom.badRequest();
 
-    student.grades.push({ value: grade, subject });
+    student.grades.push({ value: grade.toLowerCase(), subject });
     await student.save();
 
     return {success: true};
