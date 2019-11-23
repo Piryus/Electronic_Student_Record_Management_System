@@ -4,9 +4,12 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const gradeSchema = new Schema({
-    value: Number,
+    value: String,
     subject: String,
-    date: Date
+    date: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 const attendanceEventSchema = new Schema({

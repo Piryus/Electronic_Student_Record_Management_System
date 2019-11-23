@@ -97,9 +97,8 @@ export default class StudentGradesSummary extends React.Component{
     }
 
     async storeInDb(){
-        const url = 'http://localhost:3000/student/addGrade';
+        const url = 'http://localhost:3000/grades/' + this.state.selectedStudent.value._id;
         const jsonToSend = JSON.stringify({
-            id: this.state.selectedStudent.value._id,
             subject: this.state.selectedSubject,
             grade: this.state.selectedGrade
         });
