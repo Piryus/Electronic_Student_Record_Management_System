@@ -11,7 +11,8 @@ export default class Assignments extends React.Component{
         this.state = {
             wantAddAssignment: false,
             subjects: this.props.subjects,
-            selectedSubject: 'Select a Subject'
+            selectedSubject: 'Select a Subject',
+            description: 'Insert a description here'
         }
     }
 
@@ -55,6 +56,12 @@ export default class Assignments extends React.Component{
                                         })}
                                     </Dropdown.Menu>
                                 </Dropdown>
+                            </Form.Group>
+                            <Form.Group>
+                                <Form.Label>
+                                    Description:
+                                </Form.Label>
+                                <Form.Control placeholder="Insert a description here." as="textarea" rows="3" onChange={(e) => this.setState({description: e.target.value}) }/>
                             </Form.Group>
                         </Form>
                     </div>
