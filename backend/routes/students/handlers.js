@@ -7,6 +7,7 @@ const Utils = require('../../utils');
 const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
 const Student = require('../../models/Student');
+const Teacher = require('../../models/Teacher');
 
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });

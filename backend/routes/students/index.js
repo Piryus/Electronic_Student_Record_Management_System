@@ -39,7 +39,7 @@ const routes = [
     {
         method: 'GET',
         path: '/students/all',
-        handler: async (request, h) => students.getAllStudents(),
+        handler: async (request, h) => students.getStudents(),
         options: {
             auth: {
                 strategy: 'session',
