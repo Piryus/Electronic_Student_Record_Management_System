@@ -27,11 +27,14 @@ const getArticles = async function () {
         for (const article of articles) {
             let author = await User.findById(article.author);
             let authorStr = [author.name, author.surname].join(' ');
+            // Date formatting
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = article.date.toLocaleDateString("en-US", dateOptions);
             const newArticle = {
                 id: article._id,
                 title: article.title,
                 content: article.content,
-                date: article.date,
+                date: formattedDate,
                 author: authorStr
             };
             articlesWithAuthor.push(newArticle);
