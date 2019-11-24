@@ -52,6 +52,15 @@ const addGrade = async function(teacherUId, studentId, subject, grade) {
     return {success: true};
 };
 
+const recordAttendance = async function(teacherUId, attendanceInfo) {
+    const now = Utils.dateToWeekhour(new Date(Date.now()));
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    //if(teacher === null || now === null || now.split())
+
+    return {success: true};
+};
+
 const addStudent = async function(ssn, name, surname) {
     const newStudent = new Student({ ssn, name, surname });
     await newStudent.save();
@@ -73,6 +82,7 @@ module.exports = {
     getStudents,
     getClasses,
     addGrade,
+    recordAttendance,
     addStudent,
     addSchoolClass
 };

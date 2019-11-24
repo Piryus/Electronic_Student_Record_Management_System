@@ -60,6 +60,45 @@ const routes = [
     },
     {
         method: 'POST',
+        path: '/grades/{studentId}',
+        handler: async (request, h) => {
+            const { subject, grade } = request.payload;
+            return students.addGrade(request.auth.credentials.id, request.params.studentId, subject, grade);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                },
+                payload: {
+                    subject: Valid.subject.required(),
+                    grade: Valid.grade.required() 
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/attendance',
+        handler: async (request, h) => students.recordAttendance(request.auth.credentials.id, request.payload.events),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    info: Valid.array.items(Valid.attendanceInfo).required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
         path: '/students',
         handler: async (request, h) => {
             const { ssn, name, surname } = request.payload;
@@ -98,30 +137,7 @@ const routes = [
                 }
             }
         }
-    },
-    {
-        method: 'POST',
-        path: '/grades/{studentId}',
-        handler: async (request, h) => {
-            const { subject, grade } = request.payload;
-            return students.addGrade(request.auth.credentials.id, request.params.studentId, subject, grade);
-        },
-        options: {
-            auth: {
-                strategy: 'session',
-                scope: 'teacher'
-            },
-            validate: {
-                params: {
-                    studentId: Valid.id.required()
-                },
-                payload: {
-                    subject: Valid.subject.required(),
-                    grade: Valid.grade.required() 
-                }
-            }
-        }
-    },
+    }
 ];
 
 module.exports = routes;

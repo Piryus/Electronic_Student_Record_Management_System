@@ -14,7 +14,8 @@ const SchoolClass = require ('../models/SchoolClass');
 const students = require ('../routes/students/handlers');
 
 const expect = Code.expect;
-const jexpect = (x) => expect(JSON.parse(JSON.stringify(x)));
+const j = (x) => JSON.parse(JSON.stringify(x));
+const jexpect = (x) => expect(j(x));
 const lab = exports.lab = Lab.script();
 const suite = lab.suite;
 const test = lab.test;
@@ -47,6 +48,37 @@ suite('students', () => {
         expect(g2.output.statusCode).to.equal(BAD_REQUEST);
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
         jexpect(g4.grades).to.equal(testData.students.find(s => s._id === '5dca711c89bf46419cf5d489').grades);
+    });
+    
+    test('getAttendance', async () => {
+        const data = [
+            { event: 'absence', date: new Date('2019-09-06T08:30:00') },
+            { event: 'late-entry', date: new Date('2019-09-15T09:20:00') },
+            { event: 'absence', date: new Date('2019-09-18T08:30:00') },
+            { event: 'absence', date: new Date('2019-09-27T08:30:00') },
+            { event: 'early-exit', date: new Date('2019-10-04T11:50:00') },
+            { event: 'absence', date: new Date('2019-10-08T08:30:00') },
+            { event: 'late-entry', date: new Date('2019-10-15T09:10:00') },
+            { event: 'absence', date: new Date('2019-10-21T08:30:00') }
+        ];
+
+        await Parent.insertMany(testData.parents);
+        await Student.insertMany(testData.students);
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d489' }, { attendanceEvents: data });
+
+        // parent not found
+        const a1 = await students.getAttendance('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
+        // student not found
+        const a2 = await students.getAttendance('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const a3 = await students.getAttendance('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
+        // ok
+        const a4 = await students.getAttendance('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+
+        expect(a1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(a2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(a3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(a4.attendance).to.equal(j(data));
     });
 
     test('getStudents', async () => {
