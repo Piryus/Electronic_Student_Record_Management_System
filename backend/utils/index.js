@@ -18,7 +18,8 @@ Date.prototype.addDays = function(d) {
     return new Date(this.getTime() + d * day);
 }
 Date.prototype.dayStart = function() {
-    this.setHours(0, 0, 0, 0);
+    this.setMinutes(0, 0, 0);
+    this.setTime(this.getTime() - this.getHours() * hour);
     return this;
 }
 Date.prototype.getNormalizedDay = function() {

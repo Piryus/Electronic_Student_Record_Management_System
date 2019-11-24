@@ -54,7 +54,7 @@ const recordAssignments = async function(teacherUId, subject, description, due) 
     const weekhour = Utils.dateToWeekhour(due);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
-    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || due < Date.now().addDays(1).dayStart())
+    if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)) || due < new Date(Date.now()).addDays(1).dayStart())
         return Boom.badRequest();
         
     const schoolClass = await SchoolClass.findOne({ _id: teacher.timetable.find(t => t.weekhour === weekhour).classId });
