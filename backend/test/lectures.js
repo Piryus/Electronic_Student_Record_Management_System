@@ -73,13 +73,13 @@ suite('lectures', () => {
         // teacher has no lecture on that weekhour
         const t2 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '1_1', 'Topics');
         // future weekhour
-        fakeClock.returns(new Date('2019-11-20T15:00:00'));
+        fakeClock.returns(new Date('2019-11-20T15:00:00').getTime());
         const t3 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'Topics');
 
         const t4 = await Lecture.findOne({ date: Utils.weekhourToDate('0_2') });
         const t5 = await Lecture.findOne({ date: Utils.weekhourToDate('4_5') });
 
-        fakeClock.returns(new Date('2019-11-23T21:00:00'));
+        fakeClock.returns(new Date('2019-11-23T21:00:00').getTime());
         // ok 1 (lecture topics already entered)
         const t6 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '0_2', 'Updated topics');
         // ok 2 (no lecture topics were entered)

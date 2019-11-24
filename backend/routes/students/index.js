@@ -60,23 +60,17 @@ const routes = [
     },
     {
         method: 'POST',
-        path: '/grades/{studentId}',
-        handler: async (request, h) => {
-            const { subject, grade } = request.payload;
-            return students.addGrade(request.auth.credentials.id, request.params.studentId, subject, grade);
-        },
+        path: '/grades',
+        handler: async (request, h) => students.recordGrades(request.auth.credentials.id, request.payload.subject, request.payload.grades),
         options: {
             auth: {
                 strategy: 'session',
                 scope: 'teacher'
             },
             validate: {
-                params: {
-                    studentId: Valid.id.required()
-                },
                 payload: {
                     subject: Valid.subject.required(),
-                    grade: Valid.grade.required() 
+                    grades: Valid.array.items(Valid.gradeInfo).required() 
                 }
             }
         }
