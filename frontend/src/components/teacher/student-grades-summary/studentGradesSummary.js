@@ -85,7 +85,7 @@ export default class StudentGradesSummary extends React.Component{
             alert('Please insert a grade.');
         } else if(this.state.selectedSubject === 'Select a subject' || this.state.selectedSubject === ''){
             alert('Please select a subject');
-        } else if(/^([0-9]\+|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude))$/.test(this.state.selectedGrade) === false){
+        } else if(/^([0-9]\+?|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude)?)$/.test(this.state.selectedGrade) === false){
             alert('Grade format not valid. Please insert a correct grade.');
         } else{
                 //Ok I can save the grade into db
