@@ -94,16 +94,22 @@ export default class Assignments extends React.Component{
                 this.props.timetable.forEach((t) =>{
                     if(t.subject === this.state.selectedSubject && hour === ''){
                         toSplit = t.weekhour.split('_');
-                        hour = toSplit[1];
+                        if(day.toString() === toSplit[0].toString()){
+                            hour = toSplit[1];
+                        }
                     }
                 });
-                await this.saveAssignmentIntoDb(day, hour);
-                this.setState({
-                    wantAddAssignment: false,
-                    selectedSubject: 'Select a Subject',
-                    description: '',
-                    selectedWeekhour: null,
-                });
+                if(hour === ''){
+                    alert('Your subject is not scheduled for this day. Please select a valid day.');
+                } else{
+                    await this.saveAssignmentIntoDb(day, hour);
+                    this.setState({
+                        wantAddAssignment: false,
+                        selectedSubject: 'Select a Subject',
+                        description: '',
+                        selectedWeekhour: null,
+                    });
+                }
             }
         }
     }
