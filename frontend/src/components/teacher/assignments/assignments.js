@@ -43,7 +43,7 @@ export default class Assignments extends React.Component{
         let effectiveHour = this.hourTable[hour];
         try{
             const url = 'http://localhost:3000/assignments';
-            const date = new Date(this.state.selectedDate + 'T' + effectiveHour + ':00:00.000Z'); //Funziona
+            const date = new Date(this.state.selectedDate + 'T' + effectiveHour + ':00:00'); //Funziona
             const jsonToSend = JSON.stringify({
                 subject: this.state.selectedSubject,
                 description: this.state.description,
