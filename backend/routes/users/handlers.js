@@ -6,12 +6,12 @@ const Utils = require('../../utils');
 
 const User = require('../../models/User');
 
-const addUser = async function(mail, name, surname, ssn, scope) {
+const addUser = async function (mail, name, surname, ssn, scope) {
     const user = await User.findOne({mail});
 
-    if(user !== null)
+    if (user !== null)
         return Boom.badRequest();
-        
+
     const password = Utils.getRandomPassword();
 
     const newUser = new User({ssn, name, surname, mail, password, scope});
@@ -22,9 +22,9 @@ const addUser = async function(mail, name, surname, ssn, scope) {
     return {success: true};
 };
 
-const getUsers = async function() {
-    const users = await User.find({}, { _id: 0 });
-    return { users };
+const getUsers = async function () {
+    const users = await User.find({}, {_id: 0}, {password: 0});
+    return {users};
 };
 
 module.exports = {

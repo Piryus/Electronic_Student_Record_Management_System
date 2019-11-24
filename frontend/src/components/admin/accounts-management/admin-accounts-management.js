@@ -35,7 +35,7 @@ export default class AccountsManagement extends React.Component {
         const response = await fetch(url, options);
         const responseJson = await response.json();
         this.setState({
-            users: responseJson
+            users: responseJson.users
         });
     }
 
