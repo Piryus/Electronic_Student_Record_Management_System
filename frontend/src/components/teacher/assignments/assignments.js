@@ -29,6 +29,7 @@ export default class Assignments extends React.Component{
             description: '',
             selectedWeekhour: null,
         }
+
     }
 
     showFormToAddAssignment(){
@@ -36,32 +37,39 @@ export default class Assignments extends React.Component{
     }
 
     async saveAssignmentIntoDb(){
-        const url = 'http://localhost:3000/assignments';
-        const jsonToSend = JSON.stringify({
-            subject: this.state.selectedSubject,
-            description: this.state.description,
-            due: this.state.selectedDate
-        });
-        const options = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: jsonToSend 
-        };
-        let response = await fetch(url, options);
-        const json = await response.json();
-        if(json.error != null){
-            alert('Error! Please insert a class Name');
-        } else{
-            alert('The Assignment has been successfully recorded.');
+        try{
+            const url = 'http://localhost:3000/assignments';
+            const date = new Date(this.state.selectedDate + 'T08:00:00.000Z'); //Funziona
+            const jsonToSend = JSON.stringify({
+                subject: this.state.selectedSubject,
+                description: this.state.description,
+                due: date
+            });
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: jsonToSend 
+            };
+            let response = await fetch(url, options);
+            const json = await response.json();
+            if(json.error != null){
+                alert('Ops! Internal error. Please retry!');
+            } else{
+                alert('The Assignment has been successfully recorded.');
+            }
+        } catch(err){
+            alert(err);
         }
+     
     }
 
 
-    async saveChanges(){
+    async saveChanges(event){
+        event.preventDefault();
         if(this.state.selectedSubject === 'Select a Subject'){
             alert('Please select a subject.');
         } else if(this.state.description === ''){
@@ -82,7 +90,7 @@ export default class Assignments extends React.Component{
                     selectedSubject: 'Select a Subject',
                     description: '',
                     selectedWeekhour: null,
-                })
+                });
             }
         }
     }
@@ -144,7 +152,7 @@ export default class Assignments extends React.Component{
                                 </Form.Label>
                                 <Form.Control placeholder="Insert a description here." as="textarea" rows="3" onChange={(e) => this.setState({description: e.target.value}) }/>
                             </Form.Group>
-                            <Button  onClick={() => this.saveChanges()}  type="primary">Save</Button>
+                            <Button  onClick={(e) => this.saveChanges(e)}  type="primary">Save</Button>
                         </Form>
                     </div>
                 )}
