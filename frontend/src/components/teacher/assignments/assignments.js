@@ -32,14 +32,18 @@ export default class Assignments extends React.Component{
 
     }
 
+    hourTable = ["08", "09", "10", "11", "12", "13"];
+
+
     showFormToAddAssignment(){
         this.setState({wantAddAssignment: true});
     }
 
-    async saveAssignmentIntoDb(){
+    async saveAssignmentIntoDb(day, hour){
+        let effectiveHour = this.hourTable[hour];
         try{
             const url = 'http://localhost:3000/assignments';
-            const date = new Date(this.state.selectedDate + 'T08:00:00.000Z'); //Funziona
+            const date = new Date(this.state.selectedDate + 'T' + effectiveHour + ':00:00.000Z'); //Funziona
             const jsonToSend = JSON.stringify({
                 subject: this.state.selectedSubject,
                 description: this.state.description,
@@ -84,7 +88,16 @@ export default class Assignments extends React.Component{
             } else if(chosenDay[2] <= currentDay[2]){
                 alert('Please select a date starting tomorrow.');
             } else{
-                await this.saveAssignmentIntoDb();
+                let day = new Date(this.state.selectedDate).getDay() -1;
+                let toSplit;
+                let hour = '';
+                this.props.timetable.forEach((t) =>{
+                    if(t.subject === this.state.selectedSubject && hour === ''){
+                        toSplit = t.weekhour.split('_');
+                        hour = toSplit[1];
+                    }
+                });
+                await this.saveAssignmentIntoDb(day, hour);
                 this.setState({
                     wantAddAssignment: false,
                     selectedSubject: 'Select a Subject',
