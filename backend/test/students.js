@@ -2,6 +2,7 @@
 
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
+const Sinon = require('sinon');
 
 const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
@@ -9,6 +10,7 @@ const testData = require('../test-lib/testData');
 
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
+const Teacher = require('../models/Teacher');
 const SchoolClass = require ('../models/SchoolClass');
 
 const students = require ('../routes/students/handlers');
@@ -93,6 +95,82 @@ suite('students', () => {
         const all = await students.getClasses();
 
         jexpect(all.classes).to.equal(testData.classes);
+    });
+
+    test('recordGrades', async () => {
+        const data1 = [
+            { studentId: '5dca711c89bf46419cf5d48a', grade: '5 and 1/2' },
+            { studentId: '5dca711c89bf46419cf5d490', grade: '8+' },
+            { studentId: '5dca711c89bf46419cf5d48c', grade: '10-' },
+            { studentId: '5dca711c89bf46419cf5d487', grade: '6/7' }
+        ];
+        const data2 = [
+            { studentId: '5dca711c89bf46419cf5d48f', grade: '7.75' }
+        ];
+
+        await Student.insertMany(testData.students);
+        await Teacher.insertMany(testData.teachers);
+        await students.addSchoolClass('2A', ['5dca711c89bf46419cf5d489']);
+
+        // teacher not found
+        const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', data1);
+        // no student found
+        const g2 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+            { studentId: 'aaaaaaaaaaaaaaaaaaaaaaaa', grade: '5+' },
+            { studentId: 'bbbbbbbbbbbbbbbbbbbbbbbb', grade: '8.5' },
+            { studentId: 'cccccccccccccccccccccccc', grade: '6 1/2' }
+        ]);
+        // only some students found
+        const g3 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+            { studentId: 'aaaaaaaaaaaaaaaaaaaaaaaa', grade: '3.5' },
+            { studentId: '5dca711c89bf46419cf5d489', grade: '9' },
+            { studentId: 'bbbbbbbbbbbbbbbbbbbbbbbb', grade: '6+' },
+            { studentId: '5dca711c89bf46419cf5d48f', grade: '10L' }
+        ]);
+        // students belong to multiple classes
+        const g4 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+            { studentId: '5dca711c89bf46419cf5d485', grade: '3.5' },
+            { studentId: '5dca711c89bf46419cf5d489', grade: '9' },
+            { studentId: '5dca711c89bf46419cf5d483', grade: '6+' }
+        ]);
+        // teacher does not teach to class
+        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [{ studentId: '5dca711c89bf46419cf5d489', grade: '7' }]);
+        // teacher does not teach subject
+        const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', data1);
+
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-18T09:00:00').getTime());
+        // attempt to record grades for future lecture
+        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data1);
+
+        const s1 = await Student.find({});
+
+        fakeClock.returns(new Date('2019-11-21T09:00:00').getTime());
+        // ok 1
+        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data1);
+        
+        const s2 = await Student.find({});
+
+        fakeClock.returns(new Date('2019-11-22T11:00:00').getTime());
+        // ok 2
+        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data2);
+        fakeClock.restore();
+        
+        const s3 = await Student.find({});
+        
+        expect(g1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g5.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g6.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g7.output.statusCode).to.equal(BAD_REQUEST);
+        data1.forEach((gr, i) => expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
+        data2.forEach((gr, i) => expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
+        expect(g8.success).to.be.true();
+        data1.forEach((gr, i) => expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.true());
+        data2.forEach((gr, i) => expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
+        expect(g9.success).to.be.true();
+        data2.forEach((gr, i) => expect(s3.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.true());
     });
     
     test('addStudent', async () => {
