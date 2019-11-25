@@ -5,10 +5,11 @@ import {Accordion, Card} from "react-bootstrap";
 class Assignment extends Component {
 
 
- 
-
-  state = {
-    childAssignment: [],
+  constructor(props) {
+    super(props);
+    this.state = {
+      childAssignment: [],
+    }
   }
 
   tmp = [
@@ -106,6 +107,8 @@ class Assignment extends Component {
         let d2= new Date(b1);
 
         return (d1.getTime() - d2.getTime())
+        //return (a.getTime() - b.getTime()) for db data
+
       });
       output= (
       <Accordion>
