@@ -2,6 +2,7 @@ import React from 'react';
 import {Button, Container} from "react-bootstrap";
 import {FaCalendar} from 'react-icons/fa';
 import NewArticleModal from "./new-article-modal/new-article-modal";
+import SectionHeader from "../../common-components/section-header";
 
 export default class News extends React.Component {
     constructor(props) {
@@ -36,8 +37,7 @@ export default class News extends React.Component {
     render() {
         return (
             <Container fluid className="mt-2">
-                <h2>News</h2>
-                <hr/>
+                <SectionHeader>News</SectionHeader>
                 <Button onClick={() => this.setState({showNewArticleModal: true})} className="mb-2">Write an
                     article</Button>
                 <NewArticleModal show={this.state.showNewArticleModal}

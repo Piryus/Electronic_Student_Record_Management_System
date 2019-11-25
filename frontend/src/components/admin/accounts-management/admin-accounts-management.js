@@ -4,6 +4,7 @@ import {FaSistrix, FaPen, FaTrash} from 'react-icons/fa';
 import NewUserForm from "./new-user-form/new-user-form";
 import DeleteUserModal from "./delete-user-modal/delete-user-modal";
 import EditUserForm from "./edit-user-form/edit-user-form";
+import SectionHeader from "../../common-components/section-header";
 
 export default class AccountsManagement extends React.Component {
     constructor(props) {
@@ -65,9 +66,7 @@ export default class AccountsManagement extends React.Component {
             <Container fluid>
                 <DeleteUserModal user={this.state.targetUser} show={this.state.showDeleteUserModal} handleClose={() => this.setState({showDeleteUserModal: false})} />
                 <EditUserForm user={this.state.targetUser} show={this.state.showEditUserForm} handleClose={() => this.setState({showEditUserForm: false})} />
-                <Row>
-                    <h1 className="mb-4">Accounts management</h1>
-                </Row>
+                <SectionHeader>Users</SectionHeader>
                 <Row className="mb-2">
                     <Button onClick={() => this.setState({showNewUserForm: true})}>New user</Button>
                     <NewUserForm show={this.state.showNewUserForm} handleClose={(hasAddedUser) => this.handleCloseNewUserForm(hasAddedUser)} />
@@ -106,8 +105,8 @@ export default class AccountsManagement extends React.Component {
                                 <td className="align-middle">{user.mail}</td>
                                 <td className="align-middle">{user.scope}</td>
                                 <td>
-                                    <Button className='mr-1' onClick={() => this.popUpdateUserForm(user)}>Edit</Button>
-                                    <Button onClick={() => this.popDeleteUserModal(user)} variant={'danger'}>Delete</Button>
+                                    <Button size="sm" className='mr-1' onClick={() => this.popUpdateUserForm(user)}>Edit</Button>
+                                    <Button size="sm" onClick={() => this.popDeleteUserModal(user)} variant={'danger'}>Delete</Button>
                                 </td>
                             </tr>
                         )}

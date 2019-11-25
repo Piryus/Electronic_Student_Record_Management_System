@@ -1,16 +1,16 @@
 import React from 'react';
-import {Button, Form, Dropdown} from 'react-bootstrap';
+import {Button, Form, Dropdown, Container} from 'react-bootstrap';
 import 'moment/locale/it.js';
-import { DatePicker, DatePickerInput } from 'rc-datepicker';
+import {DatePickerInput} from 'rc-datepicker';
 import 'rc-datepicker/lib/style.css';
 import styles from '../student-grades-summary/styles.module.css';
+import SectionHeader from "../../common-components/section-header";
 
 
+export default class Assignments extends React.Component {
 
-export default class Assignments extends React.Component{
 
-
-    constructor(props){
+    constructor(props) {
         super(props);
 
         var today = new Date();
@@ -35,13 +35,13 @@ export default class Assignments extends React.Component{
     hourTable = ["08", "09", "10", "11", "12", "13"];
 
 
-    showFormToAddAssignment(){
+    showFormToAddAssignment() {
         this.setState({wantAddAssignment: true});
     }
 
-    async saveAssignmentIntoDb(day, hour){
+    async saveAssignmentIntoDb(day, hour) {
         let effectiveHour = this.hourTable[hour];
-        try{
+        try {
             const url = 'http://localhost:3000/assignments';
             const date = new Date(this.state.selectedDate + 'T' + effectiveHour + ':00:00'); //Funziona
             const jsonToSend = JSON.stringify({
@@ -56,52 +56,52 @@ export default class Assignments extends React.Component{
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: jsonToSend 
+                body: jsonToSend
             };
             let response = await fetch(url, options);
             const json = await response.json();
-            if(json.error != null){
+            if (json.error != null) {
                 alert('Ops! Internal error. Please retry!');
-            } else{
+            } else {
                 alert('The Assignment has been successfully recorded.');
             }
-        } catch(err){
+        } catch (err) {
             alert(err);
         }
-     
+
     }
 
 
-    async saveChanges(event){
+    async saveChanges(event) {
         event.preventDefault();
-        if(this.state.selectedSubject === 'Select a Subject'){
+        if (this.state.selectedSubject === 'Select a Subject') {
             alert('Please select a subject.');
-        } else if(this.state.description === ''){
+        } else if (this.state.description === '') {
             alert('Please enter a description');
         } else {
             let currentDay = this.state.currentDay.split('-');
             let chosenDay = this.state.selectedDate.split('-');
-            if(chosenDay[0] < currentDay[0] ) {
+            if (chosenDay[0] < currentDay[0]) {
                 alert('Please select a date starting tomorrow.');
-            } else if(chosenDay[1] < currentDay[1]){
+            } else if (chosenDay[1] < currentDay[1]) {
                 alert('Please select a date starting tomorrow.');
-            } else if(chosenDay[2] <= currentDay[2]){
+            } else if (chosenDay[2] <= currentDay[2]) {
                 alert('Please select a date starting tomorrow.');
-            } else{
-                let day = new Date(this.state.selectedDate).getDay() -1;
+            } else {
+                let day = new Date(this.state.selectedDate).getDay() - 1;
                 let toSplit;
                 let hour = '';
-                this.props.timetable.forEach((t) =>{
-                    if(t.subject === this.state.selectedSubject && hour === ''){
+                this.props.timetable.forEach((t) => {
+                    if (t.subject === this.state.selectedSubject && hour === '') {
                         toSplit = t.weekhour.split('_');
-                        if(day.toString() === toSplit[0].toString()){
+                        if (day.toString() === toSplit[0].toString()) {
                             hour = toSplit[1];
                         }
                     }
                 });
-                if(hour === ''){
+                if (hour === '') {
                     alert('Your subject is not scheduled for this day. Please select a valid day.');
-                } else{
+                } else {
                     await this.saveAssignmentIntoDb(day, hour);
                     this.setState({
                         wantAddAssignment: false,
@@ -119,25 +119,25 @@ export default class Assignments extends React.Component{
         this.setState({selectedDate: date[0]});
     }
 
-    render(){
+    render() {
 
         let renderDropDownItem = [];
-        for(let index in this.state.subjects){
+        for (let index in this.state.subjects) {
             renderDropDownItem.push(
                 <Dropdown.Item onClick={() => this.setState({selectedSubject: index})}>{index}</Dropdown.Item>
             );
         }
 
         return (
-            <div>
-                <h1>Assignments</h1>
-                {this.state.wantAddAssignment === false &&(
+            <Container fluid>
+                <SectionHeader>Assignments</SectionHeader>
+                {this.state.wantAddAssignment === false && (
                     <div>
                         <p>In this section you can manage your Assignments</p><br></br>
                         <Button variant="primary" onClick={() => this.showFormToAddAssignment()}>Add an Assignment</Button>
                     </div>
                 )}
-                {this.state.wantAddAssignment === true &&(
+                {this.state.wantAddAssignment === true && (
                     <div>
                         <p>Complete the form below to add an Assignment</p><br></br>
                         <Form>
@@ -168,13 +168,14 @@ export default class Assignments extends React.Component{
                                 <Form.Label>
                                     Description:
                                 </Form.Label>
-                                <Form.Control placeholder="Insert a description here." as="textarea" rows="3" onChange={(e) => this.setState({description: e.target.value}) }/>
+                                <Form.Control placeholder="Insert a description here." as="textarea" rows="3"
+                                              onChange={(e) => this.setState({description: e.target.value})}/>
                             </Form.Group>
-                            <Button  onClick={(e) => this.saveChanges(e)}  type="primary">Save</Button>
+                            <Button onClick={(e) => this.saveChanges(e)} type="primary">Save</Button>
                         </Form>
                     </div>
                 )}
-            </div>
+            </Container>
         );
     }
 }

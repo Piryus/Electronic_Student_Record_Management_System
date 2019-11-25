@@ -1,6 +1,7 @@
 import React from 'react';
 import {Container, Card, Button, Accordion} from "react-bootstrap";
 import NewClassModal from "./new-class-modal/new-class-modal";
+import SectionHeader from "../../common-components/section-header";
 
 class Classes extends React.Component {
 
@@ -55,8 +56,7 @@ class Classes extends React.Component {
     render() {
         return (
             <Container fluid>
-                <h2 className="mt-2">Classes</h2>
-                <hr/>
+                <SectionHeader>Classes</SectionHeader>
                 <Button onClick={() => this.setState({showNewClassModal: true})} className="mb-2">Create a
                     class</Button>
                 <NewClassModal show={this.state.showNewClassModal}

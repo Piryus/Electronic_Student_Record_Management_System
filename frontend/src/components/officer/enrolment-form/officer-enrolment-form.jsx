@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Table from 'react-bootstrap/table';
 import Form from 'react-bootstrap/form';
+import SectionHeader from "../../common-components/section-header";
 
 
 
@@ -99,7 +100,7 @@ class EnrolmentForm extends Component {
     return (
       <div>
         {this.state.wantEnroll === false && (<div>
-        <h1>Enrolled Students</h1>
+                <SectionHeader>Enroll students</SectionHeader>
         <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.setState({wantEnroll: true})} role="button">Enroll a Student</p>
         <Table striped bordered hover size="sm">
           <thead>

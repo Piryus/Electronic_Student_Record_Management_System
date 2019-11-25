@@ -1,6 +1,7 @@
 import React from 'react';
 import {Container} from "react-bootstrap";
 import {FaCalendar} from 'react-icons/fa';
+import SectionHeader from "../../common-components/section-header";
 
 export default class News extends React.Component {
     constructor(props) {
@@ -16,9 +17,8 @@ export default class News extends React.Component {
 
     render() {
         return (
-            <Container fluid className="mt-2">
-                <h2>News</h2>
-                <hr/>
+            <Container fluid>
+                <SectionHeader>Classes</SectionHeader>
                 <div className="mb-4">
                     <h5>Lorem ipsum</h5>
                     <span className="font-italic"><FaCalendar size={14} className="align-baseline mr-2"/>Nov. 22, 2019 11:09 - by Emile Legendre</span>

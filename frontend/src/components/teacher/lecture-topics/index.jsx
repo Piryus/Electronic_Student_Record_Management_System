@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import './style.sass';
-
 import Timetable from '../../utils/timetable';
+import SectionHeader from "../../common-components/section-header";
+import {Container, Button, Form} from "react-bootstrap";
 
 class LectureTopics extends Component {
 
@@ -68,15 +67,13 @@ class LectureTopics extends Component {
 
   render() {
     return (
-      <div>
-        <h2>Lecture Topics</h2>
-        <div className="container">
+      <Container fluid>
+        <SectionHeader>Classes</SectionHeader>
           <Timetable selectable data={this.props.timetable} selected={this.state.selectedWeekhour} onClick={(wh) => this.hourSelected(wh)} />
           <span className="topics-label">Topics</span>
           <Form.Control as="textarea" rows="5" onChange={(e) => this.setState({ newTopicsString: e.target.value})} disabled={this.state.selectedWeekhour === null} value={this.state.newTopicsString || ''} />
           <Button className="submit-button" onClick={() => this.saveChanges()} disabled={this.state.selectedWeekhour === null || (this.state.topicsString === this.state.newTopicsString)} type="submit">Save changes</Button>
-        </div>
-      </div>
+      </Container>
     )
   }
 }

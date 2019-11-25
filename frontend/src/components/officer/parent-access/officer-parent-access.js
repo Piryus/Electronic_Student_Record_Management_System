@@ -3,6 +3,7 @@ import {Button, Form, FormControl, InputGroup} from 'react-bootstrap';
 import Select from 'react-select';
 import styles from './styles.module.css';
 import Alert from "react-bootstrap/Alert";
+import SectionHeader from "../../common-components/section-header";
 
 export default class ParentAccountEnabling extends React.Component {
 
@@ -93,7 +94,7 @@ export default class ParentAccountEnabling extends React.Component {
     render() {
         return (
             <div>
-                <h1>Create a parent account</h1>
+                <SectionHeader>Create a parent account</SectionHeader>
                 {this.state.alertDom}
                 <Form
                     className={styles.formContainer}

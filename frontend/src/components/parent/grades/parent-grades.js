@@ -1,5 +1,6 @@
 import React from 'react';
 import {Accordion, Button, Card, Container} from "react-bootstrap";
+import SectionHeader from "../../common-components/section-header";
 
 export default class Grades extends React.Component {
     constructor(props) {
@@ -70,8 +71,8 @@ export default class Grades extends React.Component {
         }
 
         return (
-            <Container fluid className="mt-2">
-                <h2>Grades</h2>
+            <Container fluid>
+                <SectionHeader>Classes</SectionHeader>
                 <Accordion className="mt-3" defaultActiveKey="0">
                     {gradesDOM.map((subject) => {
                         return subject;

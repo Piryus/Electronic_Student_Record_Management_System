@@ -6,7 +6,7 @@ import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
 import lib from '../../lib';
-import AppNavbar from "../navbar/navbar";
+import AppNavbar from "../common-components/navbar/navbar";
 
 export default class Teacher extends React.Component {
 
@@ -78,7 +78,7 @@ export default class Teacher extends React.Component {
                             <Nav.Link className={this.state.userRequest === 'assignments' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments </Nav.Link>
                             <Nav.Link className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "settings")} ><FaCog/> Settings</Nav.Link>
                         </Nav>
-                        <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
+                        <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && (<LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
                                 obj[x.weekhour] = { name: x.subject, active: lib.weekhourToDate(x.weekhour) < now };
                                 return obj;

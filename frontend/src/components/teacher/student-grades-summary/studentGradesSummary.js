@@ -1,7 +1,8 @@
 import React from 'react';
 import Select from 'react-select';
-import {Button, Dropdown, DropdownButton, Card, Accordion, Form} from 'react-bootstrap';
+import {Button, Dropdown, DropdownButton, Card, Accordion, Form, Container} from 'react-bootstrap';
 import styles from './styles.module.css';
+import SectionHeader from "../../common-components/section-header";
 
 
 
@@ -146,8 +147,8 @@ export default class StudentGradesSummary extends React.Component{
         }
 
         return(
-            <div>
-                <h2>Student Grades</h2><br></br>
+            <Container fluid>
+                <SectionHeader>Students grades</SectionHeader>
                 <Form.Group>
                         <Form.Label>Select a Student:</Form.Label>
                         <Select
@@ -205,7 +206,7 @@ export default class StudentGradesSummary extends React.Component{
                     <Button variant="primary" onClick={() => this.saveGrade()}>Save</Button>
                     </Form>
                 )}
-            </div>
+            </Container>
         );
     }
 }
