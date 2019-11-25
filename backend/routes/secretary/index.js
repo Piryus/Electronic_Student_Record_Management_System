@@ -5,6 +5,37 @@ const secretary = require('./handlers');
 
 const routes = [
     {
+        method: 'GET',
+        path: '/articles',
+        handler: async (request, h) => secretary.getArticles(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/articles',
+        handler: async (request, h) => {
+            const {title, content} = request.payload;
+            return secretary.addArticle(request.auth.credentials.id, title, content);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    title: Valid.articleTitle.required(),
+                    content: Valid.articleContent.required()
+                }
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/parent',
         handler: async (request, h) => {

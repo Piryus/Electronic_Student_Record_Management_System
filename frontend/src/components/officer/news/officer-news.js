@@ -17,7 +17,7 @@ export default class News extends React.Component {
     }
 
     async fetchArticles() {
-        const url = 'http://localhost:3000/articles/all';
+        const url = 'http://localhost:3000/articles';
         const options = {
             method: 'GET',
             headers: {

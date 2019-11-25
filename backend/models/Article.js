@@ -5,8 +5,11 @@ const mongoose = require('mongoose');
 const articleSchema = new mongoose.Schema({
     title: String,
     content: String,
-    author: mongoose.Types.ObjectId,
-    date: Date,
+    authorId: mongoose.Types.ObjectId,
+    date: {
+        type: Date,
+        default: Date.now
+    },
 });
 
 module.exports = mongoose.model('Article', articleSchema);

@@ -12,7 +12,7 @@ export default class NewArticleModal extends React.Component {
     }
 
     async submitNewArticle() {
-        const url = 'http://localhost:3000/articles/post';
+        const url = 'http://localhost:3000/articles';
         const options = {
             method: 'POST',
             headers: {
