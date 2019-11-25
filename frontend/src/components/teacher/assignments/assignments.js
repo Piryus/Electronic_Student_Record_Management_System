@@ -132,9 +132,8 @@ export default class Assignments extends React.Component{
             <div>
                 <h1>Assignments</h1>
                 {this.state.wantAddAssignment === false &&(
-                    //We should display here already recorded assignments
                     <div>
-                        <p>Display Assignments here grouped by subject</p><br></br>
+                        <p>In this section you can manage your Assignments</p><br></br>
                         <Button variant="primary" onClick={() => this.showFormToAddAssignment()}>Add an Assignment</Button>
                     </div>
                 )}
