@@ -24,7 +24,7 @@ export default class AccountsManagement extends React.Component {
     }
 
     async fetchUsers() {
-        const url = 'http://localhost:3000/users/all';
+        const url = 'http://localhost:3000/users';
         const options = {
             method: 'GET',
             headers: {

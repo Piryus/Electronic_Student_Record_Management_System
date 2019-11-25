@@ -28,7 +28,7 @@ export default class ParentAccountEnabling extends React.Component {
 
     async getStudents() {
         // Query children list
-        const url = 'http://localhost:3000/students/all';
+        const url = 'http://localhost:3000/students';
         const options = {
             method: 'GET',
             headers: {

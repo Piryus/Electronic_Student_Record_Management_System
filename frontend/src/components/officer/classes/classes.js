@@ -24,7 +24,7 @@ class Classes extends React.Component {
     }
 
     async getClasses() {
-        const url = 'http://localhost:3000/classes/all';
+        const url = 'http://localhost:3000/classes';
         const options = {
             method: 'GET',
             headers: {
@@ -39,7 +39,7 @@ class Classes extends React.Component {
     };
 
     async getAllStudents() {
-        const url = 'http://localhost:3000/students/all';
+        const url = 'http://localhost:3000/students';
         const options = {
             method: 'GET',
             headers: {

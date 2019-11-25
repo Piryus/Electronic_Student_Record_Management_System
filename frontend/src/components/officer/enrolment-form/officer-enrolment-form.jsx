@@ -24,7 +24,7 @@ class EnrolmentForm extends Component {
   }
 
   async getAllStudents(){
-    const url = 'http://localhost:3000/students/all';
+    const url = 'http://localhost:3000/students';
     const options = {
         method: 'GET',
         headers: {
