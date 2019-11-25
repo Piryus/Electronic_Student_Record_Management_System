@@ -10,6 +10,7 @@ const testData = require('../test-lib/testData');
 
 const Utils = require('../utils');
 
+const Article = require('../models/Article');
 const Parent = require('../models/Parent');
 const Student = require('../models/Student');
 const User = require('../models/User');
@@ -34,6 +35,50 @@ after(async () => await db.closeDatabase());
 
 
 suite('secretary', () => {
+    
+    test('getArticles', async () => {
+        await User.insertMany(testData.users);
+
+        const a1 = await secretary.getArticles();
+
+        await Article.insertMany(testData.articles);
+        
+        const a2 = await secretary.getArticles();
+        
+        expect(a1.articles).to.have.length(0);
+        expect(a2.articles).to.have.length(6);
+        jexpect(a2.articles).to.equal(j(testData.articles.map(a => Object.assign({}, {
+            _id: a._id,
+            title: a.title,
+            content: a.content,
+            authorId: testData.users.some(u => u._id === a.authorId) ? {
+                _id: a.authorId,
+                name: testData.users.find(u => u._id === a.authorId).name,
+                surname: testData.users.find(u => u._id === a.authorId).surname
+            } : null,
+            date: a.date,
+            __v: a.__v
+        }))));
+    });
+    
+    test('addArticle', async () => {
+        const data = [
+            { authorId: '5dca7e2b461dc52d681804f4', title: 'Example title', content: 'Some very important information here.' },
+            { authorId: '5dca7e2b461dc52d681804f9', title: 'Communications', content: 'Everything is going to be fine.' },
+            { authorId: '5dca7e2b461dc52d681804fe', title: 'News feed', content: 'School will be closed for Christmas holidays.' },
+            { authorId: '5dca7e2b461dc52d681804f3', title: 'Warning!', content: 'Check local media.' },
+            { authorId: '5dca7e2b461dc52d681804f0', title: 'Read this carefully', content: 'Some more information here.' },
+            { authorId: '5dca7e2b461dc52d681804f6', title: 'Not a title', content: 'This is a test.' },
+        ];
+
+        const empty = await Article.find({});
+        await Promise.all(data.map(s => secretary.addArticle(s.authorId, s.title, s.content)));
+        const full = await Article.find({});
+
+        expect(empty).to.have.length(0);
+        expect(full).to.have.length(6);
+        data.forEach((s, i) => jexpect(full.sort((a, b) => a.officerUId - b.officerUId)[i]).to.include(s));
+    });
     
     test('addParent', async () => {
         const getRandomPassword = Sinon.stub(Utils, 'getRandomPassword').returns('q34!.7tv4t78R%329n,w90w');

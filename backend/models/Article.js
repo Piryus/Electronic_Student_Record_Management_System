@@ -5,7 +5,10 @@ const mongoose = require('mongoose');
 const articleSchema = new mongoose.Schema({
     title: String,
     content: String,
-    authorId: mongoose.Types.ObjectId,
+    authorId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User'
+    },
     date: {
         type: Date,
         default: Date.now

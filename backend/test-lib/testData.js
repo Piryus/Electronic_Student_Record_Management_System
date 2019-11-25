@@ -51,12 +51,22 @@ const users = [
     {"_id":"5dca7e2b461dc52d681804fc","ssn":"GCOLGO03C09K019O","name":"Fabio","surname":"Cremonesi","scope":["parent"],"mail":"fabio.cremonesi@parent.com","password":"parentB_2","__v":"0"},
     {"_id":"5dca7e2b461dc52d681804fd","ssn":"BCOAEN01B09O049L","name":"Lucia","surname":"Monge","scope":["parent"],"mail":"lucia.monge@parent.com","password":"parentC_1","__v":"0"},
     {"_id":"5dca7e2b461dc52d681804fe","ssn":"GELOEN01E09P064N","name":"Corrado","surname":"Bianchi","scope":["parent"],"mail":"corrado.bianchi@parent.com","password":"parentC_2","__v":"0"},
-    {"_id":"5dcc0bb71c9d440000330d8d","scope":["officer"],"mail":"officer1@officer.com","password":"officerofficer","__v":"0"}
+    {"_id":"5dcc0bb71c9d440000330d8d","ssn":"BUNDJF54I96E295F","name":"Oreste","surname":"Filippi","scope":["officer"],"mail":"officer1@officer.com","password":"officerofficer","__v":"0"},
+    {"_id":"5dcc0bb71c9d440000330d0e","ssn":"DCMGUR58F13C593P","name":"Alessia","surname":"Genzi","scope":["officer"],"mail":"officer2@officer.com","password":"officerofficer","__v":"0"},
+    {"_id":"5dcc0bb71c9d440000330d45","ssn":"XYEIBL20D49T545W","name":"Massimo","surname":"Corsi","scope":["officer"],"mail":"officer3@officer.com","password":"officerofficer","__v":"0"},
 ];
 const classes = [
     {"_id":"5dc9c3112d698031f441e1c9","assignments":[],"name":"1A","__v":0},
     {"_id":"5dc9cb36ee91b7384cbd7fd7","assignments":[],"name":"1B","__v":0},
     {"_id":"5dc9cb4b797f6936680521b9","assignments":[],"name":"1C","__v":0}
+];
+const articles = [
+    {"_id":"5ddbd4a7881cbd1a30645ceb","title":"Example title","content":"Some very important information here.","authorId":"5dcc0bb71c9d440000330d8d","date":"2019-11-14T11:24:17.000Z","__v":0},
+    {"_id":"5ddbd4a7881cbd1a30645cec","title":"Communications","content":"Everything is going to be fine.","authorId":"5dcc0bb71c9d440000330d0e","date":"2019-11-20T18:45:38.000Z","__v":0},
+    {"_id":"5ddbd4a7881cbd1a30645ced","title":"News feed","content":"School will be closed for Christmas holidays.","authorId":"5dcc0bb71c9d440000330d45","date":"2019-10-19T16:10:31.000Z","__v":0},
+    {"_id":"5ddbd4a7881cbd1a30645cee","title":"Warning!","content":"Check local media.","authorId":"5dcc0bb71c9d440000330d45","date":"2019-11-05T08:58:17.000Z","__v":0},
+    {"_id":"5ddbd4a7881cbd1a30645cef","title":"Read this carefully","content":"Some more information here.","authorId":"5dcc0bb71c9d4400003fffff","date":"2019-10-10T09:32:42.000Z","__v":0},
+    {"_id":"5ddbd4a7881cbd1a30645cf0","title":"Not a title","content":"This is a test.","authorId":"5dcc0bb71c9d440000330d45","date":"2019-11-24T12:51:58.000Z","__v":0}
 ];
     
 module.exports = {
@@ -64,5 +74,6 @@ module.exports = {
     parents,
     teachers,
     users,
-    classes
+    classes,
+    articles
 };

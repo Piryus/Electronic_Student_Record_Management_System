@@ -29,7 +29,7 @@ export default class News extends React.Component {
         const response = await fetch(url, options);
         const responseJson = await response.json();
         this.setState({
-            articles: responseJson,
+            articles: responseJson.articles,
         });
     }
 
@@ -47,7 +47,9 @@ export default class News extends React.Component {
                         <div className="mb-4" key={article.id}>
                             <h5>{article.title}</h5>
                             <span className="font-italic"><FaCalendar size={14}
-                                                                      className="align-baseline mr-2"/>{article.date} - by {article.author}</span>
+                                className="align-baseline mr-2"/>{new Date(article.date).longString()} - by&nbsp;
+                                {article.authorId ? [article.authorId.name, article.authorId.surname].join(' ') : 'Administrative Office'}
+                            </span>
                             <p className="text-justify">{article.content}</p>
                         </div>)
                 })}

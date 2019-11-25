@@ -60,7 +60,7 @@ suite('lectures', () => {
     });
     
     test('recordDailyLectureTopics', async () => {
-        const fakeClock = Sinon.stub(Date, 'now');
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-20T15:00:00').getTime());
 
         await Teacher.insertMany(testData.teachers);
         await Lecture.insertMany([
@@ -73,7 +73,6 @@ suite('lectures', () => {
         // teacher has no lecture on that weekhour
         const t2 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '1_1', 'Topics');
         // future weekhour
-        fakeClock.returns(new Date('2019-11-20T15:00:00').getTime());
         const t3 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'Topics');
 
         const t4 = await Lecture.findOne({ date: Utils.weekhourToDate('0_2') });
@@ -88,6 +87,8 @@ suite('lectures', () => {
         const t8 = await Lecture.findOne({ date: Utils.weekhourToDate('0_2') });
         const t9 = await Lecture.findOne({ date: Utils.weekhourToDate('4_5') });
         
+        fakeClock.restore();
+        
         expect(t1.output.statusCode).to.equal(BAD_REQUEST);
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
         expect(t3.output.statusCode).to.equal(BAD_REQUEST);
@@ -97,8 +98,6 @@ suite('lectures', () => {
         expect(t7.success).to.be.true();
         jexpect(t8).to.include({ topics: 'Updated topics' });
         jexpect(t9).to.include({ topics: 'New topics' });
-
-        fakeClock.restore();
     });
     
     test('getAssignments', async () => {

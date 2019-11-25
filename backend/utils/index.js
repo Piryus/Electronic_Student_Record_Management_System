@@ -43,7 +43,7 @@ const getRandomPassword = function () {
 };
 
 const weekhourToDate = function(wh) {
-    let d = new Date().weekStart();
+    let d = new Date(Date.now()).weekStart();
     const [weekdayIndex, hourIndex] = wh.split('_').map(x => parseInt(x));
 
     d.setTime(d.getTime() + weekdayIndex * day + (hourIndex + startHour) * hour);

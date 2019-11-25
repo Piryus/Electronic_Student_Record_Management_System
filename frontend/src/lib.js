@@ -6,6 +6,9 @@ const startHour = 8, numHours = 6;
 Date.prototype.shortString = function() {
     return this.getDate() + '/' + this.getMonth();
 }
+Date.prototype.longString = function() {
+    return this.toLocaleDateString() + ' ' + this.toLocaleTimeString();
+}
 Date.prototype.addDays = function(d) {
     return new Date(this.getTime() + d * day);
 }

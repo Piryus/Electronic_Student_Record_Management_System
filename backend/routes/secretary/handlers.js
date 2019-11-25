@@ -10,35 +10,19 @@ const Student = require('../../models/Student');
 const User = require('../../models/User');
 
 const getArticles = async function() {
-    const articles = await Article.find({});
-    let articlesWithAuthor = [];
-    for (const article of articles) {
-        // Author formatting
-        let author = await User.findById(article.author);
-        let authorStr = 'Unknown author';
-        if (author !== null) {
-            authorStr = [author.name, author.surname].join(' ');
-        }
-        // Date formatting
-        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-        const formattedDate = article.date.toLocaleDateString("en-US", dateOptions);
-        const newArticle = {
-            id: article._id,
-            title: article.title,
-            content: article.content,
-            date: formattedDate,
-            author: authorStr
-        };
-        articlesWithAuthor.push(newArticle);
-    }
-    return articlesWithAuthor.reverse();
+    const articles = await Article.find({}).populate({
+        path: 'authorId',
+        select: 'name surname'
+    });
+
+    return { articles: articles.sort((a, b) => b.date - a.date) };
 };
 
 const addArticle = async function(officerUId, title, content) {
     const article = new Article({ title, content, authorId: officerUId });
     await article.save();
 
-    return {success: true};
+    return { success: true };
 };
 
 const addParent = async function(ssn, name, surname, mail, childSsn) {
