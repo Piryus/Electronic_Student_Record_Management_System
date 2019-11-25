@@ -56,9 +56,9 @@ suite('secretary', () => {
                 name: testData.users.find(u => u._id === a.authorId).name,
                 surname: testData.users.find(u => u._id === a.authorId).surname
             } : null,
-            date: a.date,
+            date: new Date(a.date),
             __v: a.__v
-        }))));
+        })).sort((a, b) => b.date - a.date)));
     });
     
     test('addArticle', async () => {
@@ -77,7 +77,7 @@ suite('secretary', () => {
 
         expect(empty).to.have.length(0);
         expect(full).to.have.length(6);
-        data.forEach((s, i) => jexpect(full.sort((a, b) => a.officerUId - b.officerUId)[i]).to.include(s));
+        data.forEach((s, i) => jexpect(full.sort((a, b) => a.authorId - b.authorId)[i]).to.include(s));
     });
     
     test('addParent', async () => {
