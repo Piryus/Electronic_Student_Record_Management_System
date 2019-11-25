@@ -38,7 +38,7 @@ const routes = [
     },
     {
         method: 'GET',
-        path: '/students/all',
+        path: '/students',
         handler: async (request, h) => students.getStudents(),
         options: {
             auth: {
@@ -49,7 +49,7 @@ const routes = [
     },
     {
         method: 'GET',
-        path: '/classes/all',
+        path: '/classes',
         handler: async (request, h) => students.getClasses(),
         options: {
             auth: {

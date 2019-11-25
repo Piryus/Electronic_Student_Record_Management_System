@@ -16,7 +16,7 @@ export default class NewUserForm extends React.Component {
     }
 
     async handleSubmitForm() {
-        const url = 'http://localhost:3000/users/add';
+        const url = 'http://localhost:3000/users';
         const options = {
             method: 'POST',
             headers: {

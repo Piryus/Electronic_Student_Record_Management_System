@@ -8,7 +8,7 @@ const routes = [
     // Route to add a user into the database
     {
         method: 'POST',
-        path: '/users/add',
+        path: '/users',
         handler: async (request, h) => {
             const {mail, name, surname, ssn, scope} = request.payload;
             return handlers.addUser(mail, name, surname, ssn, scope);
@@ -32,7 +32,7 @@ const routes = [
     // Route to get users in database
     {
         method: 'GET',
-        path: '/users/all',
+        path: '/users',
         handler: async (request, h) => handlers.getUsers(),
         options: {
             auth: {
