@@ -4,6 +4,7 @@ const Boom = require('boom');
 
 const Utils = require('../../utils');
 
+const Article = require('../../models/Article');
 const Parent = require('../../models/Parent');
 const Student = require('../../models/Student');
 const User = require('../../models/User');
