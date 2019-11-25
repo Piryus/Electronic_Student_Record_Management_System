@@ -1,10 +1,10 @@
 import React from 'react';
 import styles from './styles.module.css';
-import {Container, Row, Nav} from 'react-bootstrap';
+import {Button, Container, Nav, Row} from 'react-bootstrap';
 import ParentAccountEnabling from './parent-access/officer-parent-access';
 import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
-import {FaUserEdit, FaLayerGroup, FaCog, FaGraduationCap, FaRegNewspaper} from 'react-icons/fa';
+import {FaCog, FaGraduationCap, FaLayerGroup, FaRegNewspaper, FaUserEdit} from 'react-icons/fa';
 import AppNavbar from "../common-components/navbar/navbar";
 import News from "./news/officer-news";
 
@@ -14,6 +14,7 @@ export default class Officer extends React.Component {
         super(props);
         this.state = {
             userRequest: 'news',
+            sidebarOpen: false,
         };
     }
 
@@ -24,10 +25,10 @@ export default class Officer extends React.Component {
     render() {
         return (
             <div className={styles.root}>
-                <AppNavbar type='classic' onLogout={() => this.props.onLogout()}/>
+                <AppNavbar type='classic' onLogout={() => this.props.onLogout()} onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>
                 <Container fluid>
                     <Row>
-                        <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
+                        <Nav className={[this.state.sidebarOpen ? 'bg-light col-5':'d-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
                             <Nav.Link
                                 className={this.state.userRequest === 'news' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "news")}><FaRegNewspaper/> News</Nav.Link>
@@ -43,7 +44,7 @@ export default class Officer extends React.Component {
                             <Nav.Link
                                 className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
-                        <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
+                        <main className={"col-md-10 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'accounts' && (
                                 <ParentAccountEnabling/>
                             )}
@@ -54,7 +55,7 @@ export default class Officer extends React.Component {
                                 <EnrolmentForm/>
                             )}
                             {this.state.userRequest === 'news' && (
-                                <News />
+                                <News/>
                             )}
                         </main>
                     </Row>

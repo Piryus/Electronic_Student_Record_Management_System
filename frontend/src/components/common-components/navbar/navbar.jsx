@@ -3,7 +3,7 @@ import styles from "./navbar.module.css";
 import Navbar from "react-bootstrap/Navbar";
 import Dropdown from "react-bootstrap/Dropdown";
 import PropTypes from 'prop-types';
-import {Button} from "react-bootstrap";
+import {Button, Row} from "react-bootstrap";
 
 export default class AppNavbar extends React.Component {
     constructor(props) {
@@ -25,6 +25,9 @@ export default class AppNavbar extends React.Component {
 
         return (
             <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
+                <div className="d-md-none mr-1">
+                    <Button variant='primary' onClick={() => this.props.onHamburgerMenu()}>Test</Button>
+                </div>
                 <Navbar.Brand>SE2</Navbar.Brand>
                 {this.props.type === 'parent' &&
                 <Dropdown className={'ml-auto'}>
