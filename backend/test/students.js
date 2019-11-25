@@ -84,10 +84,15 @@ suite('students', () => {
     });
 
     test('getStudents', async () => {
-        await Student.insertMany(testData.students);
-        const all = await students.getStudents();
+        const s1 = await students.getStudents(null);
 
-        jexpect(all.students).to.equal(testData.students);
+        await Student.insertMany(testData.students);
+
+        const s2 = await students.getStudents(null);
+
+        expect(s1.students).to.have.length(0);
+        expect(s2.students).to.have.length(15);
+        jexpect(s2.students).to.equal(testData.students);
     });
 
     test('getClasses', async () => {
