@@ -2,7 +2,10 @@ import React from 'react';
 import {Accordion, Button, Card, Container} from "react-bootstrap";
 import SectionHeader from "../../common-components/section-header";
 
+
 export default class Grades extends React.Component {
+
+
     constructor(props) {
         super(props);
         this.state = {
@@ -36,34 +39,79 @@ export default class Grades extends React.Component {
         });
     }
 
+    computeRealGrade(gradeAsString){
+        let grade = 0;
+        let splitted;
+
+        if(isNaN(gradeAsString)){
+            if(gradeAsString.includes('10')){
+                grade = 10.0;
+            } else{
+                grade = parseFloat(gradeAsString.charAt(0));
+                if(gradeAsString.includes('+')){
+                    grade += 0.25;
+                } else if(gradeAsString.includes('-')){
+                    grade -= 0.25;
+                } else if(gradeAsString.includes('.5')){
+                    grade += 0.50;
+                }
+            }
+        }
+        else{
+            grade = gradeAsString;
+        }
+        return parseFloat(grade);
+    }
+
     render() {
         //Building of Grades and Subejects DOM
         let gradesSortedTopic = [];
         let gradesDOM = [];
         if (this.state.childGrades !== null) {
             this.state.childGrades.map((grade) => {
+                let realGrade = this.computeRealGrade(grade.value);
                 if (gradesSortedTopic[grade.subject] == null) {
                     gradesSortedTopic[grade.subject] = [];
                 }
                 let date = grade.date.split("T");
                 gradesSortedTopic[grade.subject].push(
-                    <Accordion.Collapse eventKey={grade.subject}>
-                        <Card.Body>Grade {gradesSortedTopic[grade.subject].length + 1}: {grade.value} Date
+                {
+                    htmlElement : <Accordion.Collapse eventKey={grade.subject}>
+                        <Card.Body>Grade : {grade.value} Date
                             : {date[0]}</Card.Body>
-                    </Accordion.Collapse>
-                );
+                    </Accordion.Collapse>,
+                    date: date[0],
+                    grade: parseFloat(realGrade)
+                });
             });
             let index;
+            let average;
+            let sum;
             for (index in gradesSortedTopic) {
+                //First compute the average
+                average = 0;
+                sum = 0;
+                for(var i = 0 ; i < gradesSortedTopic[index].length ; i++){
+                    sum += gradesSortedTopic[index][i].grade;
+                }
+                average = sum / gradesSortedTopic[index].length;
+
+                average = Math.round(average * 100) / 100;
+
+                //Sort by reversed chronological order
+                gradesSortedTopic[index].sort(function(a, b){
+                    return new Date(b.date) - new Date(a.date);
+                });
+
                 gradesDOM.push(
                     <Card>
                         <Card.Header>
                             <Accordion.Toggle as={Button} variant="link" eventKey={index}>
-                                {index}
+                                {index + ' ' + average}
                             </Accordion.Toggle>
                         </Card.Header>
                         {gradesSortedTopic[index].map((grade) => {
-                            return grade;
+                            return grade.htmlElement;
                         })}
                     </Card>
                 );
