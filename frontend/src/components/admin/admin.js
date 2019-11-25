@@ -11,7 +11,8 @@ class Admin extends React.Component{
     constructor(props) {
         super(props);
         this.state = {
-            userRequest: 'accounts'
+            userRequest: 'accounts',
+            sidebarOpen: false,
         };
     }
 
@@ -22,13 +23,13 @@ class Admin extends React.Component{
     render(){
         return (
             <div>
-                <AppNavbar type='classic' onLogout={() => this.props.onLogout()} />
+                <AppNavbar type='classic' onLogout={() => this.props.onLogout()} onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>
                 <Container fluid>
                     <Row>
-                        <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
+                        <Nav className={[this.state.sidebarOpen ? 'bg-light col-5':'d-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
                             <Nav.Link className={this.state.userRequest === 'accounts' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Users management</Nav.Link>
                         </Nav>
-                        <main className={[styles.mainContainer, "col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"]}>
+                        <main className={"col-md-10 ml-sm-auto px-4 pt-5"}>
                             {this.state.userRequest === 'accounts' &&(
                                 <AccountsManagement/>
                             )}
