@@ -1,10 +1,9 @@
 import React from 'react';
 import {Accordion, Button, Card, Container} from "react-bootstrap";
 import SectionHeader from "../../common-components/section-header";
-
+import lib from '../../../lib';
 
 export default class Grades extends React.Component {
-
 
     constructor(props) {
         super(props);
@@ -39,37 +38,13 @@ export default class Grades extends React.Component {
         });
     }
 
-    computeRealGrade(gradeAsString){
-        let grade = 0;
-        let splitted;
-
-        if(isNaN(gradeAsString)){
-            if(gradeAsString.includes('10')){
-                grade = 10.0;
-            } else{
-                grade = parseFloat(gradeAsString.charAt(0));
-                if(gradeAsString.includes('+')){
-                    grade += 0.25;
-                } else if(gradeAsString.includes('-')){
-                    grade -= 0.25;
-                } else if(gradeAsString.includes('.5')){
-                    grade += 0.50;
-                }
-            }
-        }
-        else{
-            grade = gradeAsString;
-        }
-        return parseFloat(grade);
-    }
-
     render() {
         //Building of Grades and Subejects DOM
         let gradesSortedTopic = [];
         let gradesDOM = [];
         if (this.state.childGrades !== null) {
             this.state.childGrades.map((grade) => {
-                let realGrade = this.computeRealGrade(grade.value);
+                let realGrade = grade.value.gradify();
                 if (gradesSortedTopic[grade.subject] == null) {
                     gradesSortedTopic[grade.subject] = [];
                 }
