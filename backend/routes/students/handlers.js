@@ -29,8 +29,9 @@ const getAttendance = async function(parentUId, studentId) {
     return { attendance: student.attendanceEvents };
 };
 
-const getStudents = async function() {
-    const students = await Student.find({}, { 'grades._id': 0 });
+const getStudents = async function(classId) {
+    const filter = classId !== null ? { classId } : {};
+    const students = await Student.find(filter, { 'grades._id': 0 });
     return { students };
 };
 

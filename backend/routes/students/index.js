@@ -39,11 +39,16 @@ const routes = [
     {
         method: 'GET',
         path: '/students',
-        handler: async (request, h) => students.getStudents(),
+        handler: async (request, h) => students.getStudents(request.query.classId || null),
         options: {
             auth: {
                 strategy: 'session',
                 scope: ['officer', 'teacher']
+            },
+            validate: {
+                query: {
+                    classId: Valid.id
+                }
             }
         }
     },
