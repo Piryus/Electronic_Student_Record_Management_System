@@ -14,6 +14,9 @@ String.prototype.gradify = function() {
     return n.indexOf('-') === -1 ? parseFloat(n) : parseFloat(n.replace('-', '')) - 0.25;
 }
 
+Date.prototype.isSameDayOf = function(d) {
+    return this.getFullYear() === d.getFullYear() && this.getMonth() === d.getMonth() && this.getDate() === d.getDate();
+}
 Date.prototype.addDays = function(d) {
     return new Date(this.getTime() + d * day);
 }

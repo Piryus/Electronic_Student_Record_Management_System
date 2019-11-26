@@ -25,18 +25,6 @@ const getDailyLectureTopics = async function(teacherUId, weekhour) {
     return { topics: lecture ? lecture.topics : null };
 };
 
-const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
-    const datetime = Utils.weekhourToDate(weekhour);
-    const teacher = await Teacher.findOne({ userId: teacherUId });
-
-    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || datetime > Date.now())
-        return Boom.badRequest();
-
-    await Lecture.findOneAndUpdate({ classId: teacher.timetable.find(t => t.weekhour === weekhour).classId, weekhour, date: datetime }, { topics }, { upsert: true });
-    
-    return { success: true };
-};
-
 const getAssignments = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId });
@@ -48,6 +36,37 @@ const getAssignments = async function(parentUId, studentId) {
     const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart());
     
     return { assignments };
+};
+
+const getAttendance = async function(teacherUId) {
+    const now = Utils.dateToWeekhour(new Date(Date.now()));
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    if(teacher === null || now === null)
+        return Boom.badRequest();
+
+    const classId = teacher.timetable.find(t => t.weekhour === now);
+
+    if(classId === null)
+        return Boom.badRequest();
+
+    const students = await Student.find({ classId });
+
+    return { classAttendance: students.map(s => {
+        return { id: s._id, status: s.attendanceEvents.find(ae => ae.date.isSameDayOf(new Date(Date.now()))) || 'present' };
+    }) };
+};
+
+const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
+    const datetime = Utils.weekhourToDate(weekhour);
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || datetime > Date.now())
+        return Boom.badRequest();
+
+    await Lecture.findOneAndUpdate({ classId: teacher.timetable.find(t => t.weekhour === weekhour).classId, weekhour, date: datetime }, { topics }, { upsert: true });
+    
+    return { success: true };
 };
 
 const recordAssignments = async function(teacherUId, subject, description, due) {
@@ -66,7 +85,8 @@ const recordAssignments = async function(teacherUId, subject, description, due) 
 
 module.exports = {
     getDailyLectureTopics,
-    recordDailyLectureTopics,
     getAssignments,
+    getAttendance,
+    recordDailyLectureTopics,
     recordAssignments
 };

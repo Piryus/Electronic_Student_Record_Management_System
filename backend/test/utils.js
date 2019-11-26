@@ -43,6 +43,29 @@ suite('utils', () => {
         expect(g14).to.equal(2);
     });
     
+    test('Date.isSameDayOf', async () => {
+        const i1 = new Date('2019-01-04T16:54:00').isSameDayOf(new Date('2019-01-04T13:11:59'));
+        const i2 = new Date('2019-05-13T08:30:24').isSameDayOf(new Date('2019-05-13T01:53:17'));
+        const i3 = new Date('2019-11-18T15:37:59').isSameDayOf(new Date('2018-11-07T14:34:51'));
+        const i4 = new Date('2019-08-01T12:10:17').isSameDayOf(new Date('2019-08-01T23:40:35'));
+        const i5 = new Date('2019-12-26T17:39:28').isSameDayOf(new Date('2019-11-06T18:44:23'));
+        const i6 = new Date('2019-08-30T06:48:47').isSameDayOf(new Date('2019-08-30T04:17:49'));
+        const i7 = new Date('2019-03-04T11:51:31').isSameDayOf(new Date('2019-03-19T16:40:50'));
+        const i8 = new Date('2019-07-09T07:19:28').isSameDayOf(new Date('2019-07-09T17:46:02'));
+        const i9 = new Date('2019-05-21T02:50:53').isSameDayOf(new Date('2019-05-11T08:18:52'));
+        const i10 = new Date('2019-11-13T19:32:40').isSameDayOf(new Date('2019-10-17T12:40:32'));
+        expect(i1).to.be.true();
+        expect(i2).to.be.true();
+        expect(i3).to.be.false();
+        expect(i4).to.be.true();
+        expect(i5).to.be.false();
+        expect(i6).to.be.true();
+        expect(i7).to.be.false();
+        expect(i8).to.be.true();
+        expect(i9).to.be.false();
+        expect(i10).to.be.false();
+    });
+    
     test('Date.getNormalizedDay', async () => {
         const nd1 = new Date('2019-01-04T16:00:00').getNormalizedDay();
         const nd2 = new Date('2019-02-11T12:00:00').getNormalizedDay();

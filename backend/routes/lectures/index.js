@@ -21,6 +21,33 @@ const routes = [
         }
     },
     {
+        method: 'GET',
+        path: '/assignments/{studentId}',
+        handler: async (request, h) => lectures.getAssignments(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/attendance',
+        handler: async (request, h) => lectures.getAttendance(request.auth.credentials.id),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/lectures',
         handler: async (request, h) => {
@@ -36,22 +63,6 @@ const routes = [
                 payload: {
                     weekhour: Valid.weekhour.required(),
                     topics: Valid.longText.required()
-                }
-            }
-        }
-    },
-    {
-        method: 'GET',
-        path: '/assignments/{studentId}',
-        handler: async (request, h) => lectures.getAssignments(request.auth.credentials.id, request.params.studentId),
-        options: {
-            auth: {
-                strategy: 'session',
-                scope: 'parent'
-            },
-            validate: {
-                params: {
-                    studentId: Valid.id.required()
                 }
             }
         }
