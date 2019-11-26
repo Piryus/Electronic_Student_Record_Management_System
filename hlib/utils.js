@@ -34,6 +34,12 @@ Date.prototype.weekStart = function() {
     ws.setTime(ws.getTime() - ws.getNormalizedDay() * day - ws.getHours() * hour);
     return ws;
 };
+Date.prototype.isSchoolDay = function(calendar) {
+    if(this < calendar.firstDay || this > calendar.lastDay || [0, 6].includes(this.getDay()))
+        return false;
+
+    return !calendar.holidays.some(h => this.isSameDayOf(h.start) || (this > h.start && this < h.end) || (h.end !== null && this.isSameDayOf(h.end)));
+};
 
 const getRandomPassword = function () {
     const chars = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOP1234567890';
