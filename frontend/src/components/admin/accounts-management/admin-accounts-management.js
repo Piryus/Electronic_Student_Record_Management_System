@@ -70,7 +70,7 @@ export default class AccountsManagement extends React.Component {
                 <Row className="mb-2">
                     <Button onClick={() => this.setState({showNewUserForm: true})}>New user</Button>
                     <NewUserForm show={this.state.showNewUserForm} handleClose={(hasAddedUser) => this.handleCloseNewUserForm(hasAddedUser)} />
-                    <InputGroup className={"ml-auto col-5 col-xl-3"}>
+                    <InputGroup className={"ml-auto col-8 col-md-5 col-lg-4 col-xl-3"}>
                         <InputGroup.Prepend>
                             <InputGroup.Text id="basic-addon1"><FaSistrix/></InputGroup.Text>
                         </InputGroup.Prepend>
@@ -85,7 +85,7 @@ export default class AccountsManagement extends React.Component {
                     <Alert variant='success'>The user has been successfully created and will receive an email containing their credentials.</Alert>
                 )}
                 <Row>
-                    <Table className="col" striped hover bordered>
+                    <Table className="col" striped hover bordered responsive >
                         <thead>
                         <tr>
                             <th>SSN</th>

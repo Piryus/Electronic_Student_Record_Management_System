@@ -27,7 +27,7 @@ class Admin extends React.Component{
                 <Container fluid>
                     <Row>
                         <Nav className={[this.state.sidebarOpen ? 'bg-light col-5':'d-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
-                            <Nav.Link className={this.state.userRequest === 'accounts' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Users management</Nav.Link>
+                            <Nav.Link className={this.state.userRequest === 'accounts' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Users</Nav.Link>
                         </Nav>
                         <main className={"col-md-10 ml-sm-auto px-4 pt-5"}>
                             {this.state.userRequest === 'accounts' &&(
