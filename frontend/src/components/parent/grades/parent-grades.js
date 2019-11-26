@@ -96,7 +96,7 @@ export default class Grades extends React.Component {
 
         return (
             <Container fluid>
-                <SectionHeader>Classes</SectionHeader>
+                <SectionHeader>Grades</SectionHeader>
                 <Accordion className="mt-3" defaultActiveKey="0">
                     {gradesDOM.map((subject) => {
                         return subject;

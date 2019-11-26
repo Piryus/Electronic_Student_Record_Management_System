@@ -1,9 +1,8 @@
 import React from 'react';
 import styles from "./navbar.module.css";
-import Navbar from "react-bootstrap/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
 import PropTypes from 'prop-types';
-import {Button} from "react-bootstrap";
+import {Button, Dropdown, Navbar} from "react-bootstrap";
+import {TiThMenu} from 'react-icons/ti';
 
 export default class AppNavbar extends React.Component {
     constructor(props) {
@@ -25,6 +24,9 @@ export default class AppNavbar extends React.Component {
 
         return (
             <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
+                <div className="d-md-none mr-1">
+                    <Button className="mr-1" variant='primary' onClick={() => this.props.onHamburgerMenu()}><TiThMenu style={{verticalAlign: 'middle'}}/></Button>
+                </div>
                 <Navbar.Brand>SE2</Navbar.Brand>
                 {this.props.type === 'parent' &&
                 <Dropdown className={'ml-auto'}>

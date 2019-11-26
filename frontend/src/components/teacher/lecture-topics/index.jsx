@@ -68,7 +68,7 @@ class LectureTopics extends Component {
   render() {
     return (
       <Container fluid>
-        <SectionHeader>Classes</SectionHeader>
+        <SectionHeader>Lectures</SectionHeader>
           <Timetable selectable data={this.props.timetable} selected={this.state.selectedWeekhour} onClick={(wh) => this.hourSelected(wh)} />
           <span className="topics-label">Topics</span>
           <Form.Control as="textarea" rows="5" onChange={(e) => this.setState({ newTopicsString: e.target.value})} disabled={this.state.selectedWeekhour === null} value={this.state.newTopicsString || ''} />

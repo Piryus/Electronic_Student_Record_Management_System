@@ -24,7 +24,8 @@ export default class Parent extends React.Component {
     selectChild(child) {
         this.setState({
             childSelected: child,
-            userRequest: 'grades'
+            userRequest: 'grades',
+            sidebarOpen: false,
         });
     };
 
@@ -39,10 +40,11 @@ export default class Parent extends React.Component {
                            children={this.state.children}
                            selectedChild={this.state.childSelected}
                            childSelection={(child) => this.selectChild(child)}
-                           onLogout={() => this.props.onLogout()}/>
+                           onLogout={() => this.props.onLogout()}
+                           onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>
                 <Container fluid>
                     <Row>
-                        <Nav className={["flex-column bg-light col-md-2 d-none d-md-block", styles.sidebar]}>
+                        <Nav className={[this.state.sidebarOpen ? 'bg-light col-5':'d-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
                             <Nav.Link
                                 className={this.state.userRequest === 'news' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "news")}><FaRegNewspaper/> News</Nav.Link>
@@ -55,7 +57,7 @@ export default class Parent extends React.Component {
                             <Nav.Link
                                 className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
-                        <main className="col-md-9 ml-sm-auto col-lg-10 px-4 pt-5">
+                        <main className="col-md-10 ml-sm-auto col-lg-10 px-4 pt-5">
                             {this.state.userRequest === 'news' && (
                                 <News />
                             )}

@@ -102,7 +102,7 @@ class EnrolmentForm extends Component {
         {this.state.wantEnroll === false && (<div>
                 <SectionHeader>Enroll students</SectionHeader>
         <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.setState({wantEnroll: true})} role="button">Enroll a Student</p>
-        <Table striped bordered hover size="sm">
+        <Table striped bordered hover responsive size="sm">
           <thead>
             <tr>
               <th>#</th>

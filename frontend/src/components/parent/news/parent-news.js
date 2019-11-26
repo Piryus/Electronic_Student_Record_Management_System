@@ -18,7 +18,7 @@ export default class News extends React.Component {
     render() {
         return (
             <Container fluid>
-                <SectionHeader>Classes</SectionHeader>
+                <SectionHeader>News</SectionHeader>
                 <div className="mb-4">
                     <h5>Lorem ipsum</h5>
                     <span className="font-italic"><FaCalendar size={14} className="align-baseline mr-2"/>Nov. 22, 2019 11:09 - by Emile Legendre</span>
