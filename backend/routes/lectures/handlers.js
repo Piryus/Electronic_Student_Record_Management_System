@@ -33,7 +33,6 @@ const getAssignments = async function(parentUId, studentId) {
 
     const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 });
     const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart());
-    console.log('ens');
     return { assignments };
 };
 
