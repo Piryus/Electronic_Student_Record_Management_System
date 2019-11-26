@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './styles.module.css';
-import {Container, Row, Nav, Navbar, Button} from 'react-bootstrap';
-import {FaGraduationCap, FaCog, FaMedal, FaBook, FaCalendarCheck} from 'react-icons/fa'
+import {Container, Row, Nav} from 'react-bootstrap';
+import {FaGraduationCap, FaMedal, FaBook, FaCalendarCheck} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
@@ -144,7 +144,7 @@ export default class Teacher extends React.Component {
                                     return obj;
                                 }, {})}/>)}
                             {this.state.userRequest === 'grades' && (
-                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects}
+                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} timetable={this.props.timetable}
                                                       type='teacher-grades'/>
                             )}
                             {this.state.userRequest === 'assignments' && (
