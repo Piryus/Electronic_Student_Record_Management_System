@@ -17,7 +17,10 @@ export default class Teacher extends React.Component {
 
         let subjects = [];
         this.props.timetable.forEach((value) =>{
-            subjects[value.subject] = value.subject;
+            subjects[value.subject] = {
+                subject: value.subject,
+                class: value.classId.toString()
+            };
         });
 
 
@@ -56,9 +59,6 @@ export default class Teacher extends React.Component {
 
 
 
-
-
-
     setUserRequest(e, choice) {
         this.setState({userRequest: choice});
     }
@@ -84,7 +84,7 @@ export default class Teacher extends React.Component {
                                 return obj;
                             }, {})}/>)}
                              {this.state.userRequest === 'grades' && (
-                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} type='teacher-grades'/>
+                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} timetable={this.props.timetable} type='teacher-grades'/>
                             )}
                             {this.state.userRequest === 'assignments' &&(
                                 <Assignments subjects={this.state.subjects} timetable={this.props.timetable}/>
