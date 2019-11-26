@@ -98,7 +98,23 @@ suite('utils', () => {
         expect(ws5).to.equal(new Date('2019-03-18T00:00:00'));
         expect(ws6).to.equal(new Date('2019-05-13T00:00:00'));
         expect(ws7).to.equal(new Date('2019-12-16T00:00:00'));
-        
+    });
+
+    test('utils.getAY', async () => {
+        const ay1 = Utils.getAY(new Date('2017-02-21T21:56:55'));
+        const ay2 = Utils.getAY(new Date('2019-08-26T22:03:24'));
+        const ay3 = Utils.getAY(new Date('2019-05-07T15:23:50'));
+        const ay4 = Utils.getAY(new Date('2017-07-27T23:17:35'));
+        const ay5 = Utils.getAY(new Date('2019-09-20T04:43:13'));
+        const ay6 = Utils.getAY(new Date('2018-01-31T15:25:03'));
+        const ay7 = Utils.getAY(new Date('2016-06-05T21:05:14'));
+        expect(ay1).to.equal('2016/17');
+        expect(ay2).to.be.null();
+        expect(ay3).to.equal('2018/19');
+        expect(ay4).to.be.null();
+        expect(ay5).to.equal('2019/20');
+        expect(ay6).to.equal('2017/18');
+        expect(ay7).to.equal('2015/16');
     });
 
     test('utils.weekhourToDate', async () => {

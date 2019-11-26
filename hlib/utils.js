@@ -45,6 +45,13 @@ const getRandomPassword = function () {
     return password;
 };
 
+const getAY = function(d) {
+    if([6, 7].includes(d.getMonth())) // july or august
+        return null;
+    const y = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1;
+    return y + '/' + (y + 1).toString().slice(-2);
+};
+
 const weekhourToDate = function(wh) {
     let d = new Date(Date.now()).weekStart();
     const [weekdayIndex, hourIndex] = wh.split('_').map(x => parseInt(x));
@@ -68,6 +75,7 @@ module.exports = {
     day,
     startHour,
     getRandomPassword,
+    getAY,
     weekhourToDate,
     dateToWeekhour
 };
