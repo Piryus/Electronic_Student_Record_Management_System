@@ -89,10 +89,18 @@ suite('students', () => {
         await Student.insertMany(testData.students);
 
         const s2 = await students.getStudents(null);
+        const s3 = await students.getStudents('5dc9c3112d698031f441e1c9');
+        const s4 = await students.getStudents('5dc9cb36ee91b7384cbd7fd7');
+        const s5 = await students.getStudents('5dc9cb4b797f6936680521b9');
 
         expect(s1.students).to.have.length(0);
         expect(s2.students).to.have.length(15);
         jexpect(s2.students).to.equal(testData.students);
+        expect(s3.students).to.have.length(11);
+        jexpect(s3.students).to.equal(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9'));
+        expect(s4.students).to.have.length(0);
+        expect(s5.students).to.have.length(4);
+        jexpect(s5.students).to.equal(testData.students.filter(s => s.classId === '5dc9cb4b797f6936680521b9'));
     });
 
     test('getClasses', async () => {
@@ -104,8 +112,8 @@ suite('students', () => {
 
     test('recordGrades', async () => {
         const data1 = [
-            { studentId: '5dca711c89bf46419cf5d48a', grade: '5 and 1/2' },
-            { studentId: '5dca711c89bf46419cf5d490', grade: '8+' },
+            { studentId: '5dca711c89bf46419cf5d48e', grade: '5 and 1/2' },
+            { studentId: '5dca711c89bf46419cf5d485', grade: '8+' },
             { studentId: '5dca711c89bf46419cf5d48c', grade: '10-' },
             { studentId: '5dca711c89bf46419cf5d487', grade: '6/7' }
         ];
@@ -115,7 +123,6 @@ suite('students', () => {
 
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
-        await students.addSchoolClass('2A', ['5dca711c89bf46419cf5d489']);
 
         // teacher not found
         const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', data1);
@@ -135,11 +142,11 @@ suite('students', () => {
         // students belong to multiple classes
         const g4 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
             { studentId: '5dca711c89bf46419cf5d485', grade: '3.5' },
-            { studentId: '5dca711c89bf46419cf5d489', grade: '9' },
+            { studentId: '5dca711c89bf46419cf5d490', grade: '9' },
             { studentId: '5dca711c89bf46419cf5d483', grade: '6+' }
         ]);
         // teacher does not teach to class
-        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [{ studentId: '5dca711c89bf46419cf5d489', grade: '7' }]);
+        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [{ studentId: '5dca711c89bf46419cf5d490', grade: '7' }]);
         // teacher does not teach subject
         const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', data1);
 
@@ -204,20 +211,23 @@ suite('students', () => {
         const c1 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' });
         const c2 = await Student.find({ classId: '5dc9cb36ee91b7384cbd7fd7' });
         const c3 = await Student.find({ classId: '5dc9cb4b797f6936680521b9' });
+        const sc1 = await SchoolClass.findOne({ name: '2B' });
         await students.addSchoolClass('2B', ['5dca711c89bf46419cf5d488', '5dca711c89bf46419cf5d48d', '5dca711c89bf46419cf5d490', '5dca711c89bf46419cf5d484']);
         await students.addSchoolClass('1A', ['5dca711c89bf46419cf5d486', '5dca711c89bf46419cf5d48b', '5dca711c89bf46419cf5d491', '5dca711c89bf46419cf5d48e', '5dca711c89bf46419cf5d48d']);
         const c4 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' });
-        const sc = await SchoolClass.findOne({ name: '2B' });
+        const sc2 = await SchoolClass.findOne({ name: '2B' });
         await students.addSchoolClass('1C', ['5dca711c89bf46419cf5d483', '5dca711c89bf46419cf5d487', '5dca711c89bf46419cf5d48a', '5dca711c89bf46419cf5d48f', '5dca711c89bf46419cf5d489']);
-        const c5 = await Student.find({ classId: sc._id });
+        const c5 = await Student.find({ classId: sc2._id });
         const c6 = await Student.find({ classId: '5dc9cb4b797f6936680521b9' });
         const c7 = await Student.find({ classId: undefined });
 
-        expect(c1).to.have.length(15);
+        expect(c1).to.have.length(11);
         expect(c2).to.have.length(0);
-        expect(c3).to.have.length(0);
+        expect(c3).to.have.length(4);
+        expect(sc1).to.be.null();
         expect(c4).to.have.length(5);
         expect(c4.map(s => s.ssn)).to.only.include(['JLMLBH00B07K064G', 'OJCHFE07F05M064L', 'EOANEJ00J04K037K', 'PBFNDJ01E04O002B', 'KDKNJL01L05F034A']);
+        expect(sc2.name).to.equal('2B');
         expect(c5).to.have.length(3);
         expect(c5.map(s => s.ssn)).to.only.include(['LMNNML01B05F051C', 'GPNCID08N09N089B', 'FCEEHG02B04N054D']);
         expect(c6).to.have.length(5);
