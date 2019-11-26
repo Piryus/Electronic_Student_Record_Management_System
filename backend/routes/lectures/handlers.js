@@ -28,13 +28,12 @@ const getDailyLectureTopics = async function(teacherUId, weekhour) {
 const getAssignments = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId });
-
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
 
     const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 });
     const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart());
-    
+    console.log('ens');
     return { assignments };
 };
 

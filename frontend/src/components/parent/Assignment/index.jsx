@@ -51,11 +51,8 @@ class Assignment extends Component {
 
 
   async getChildAssignment() {
-    this.setState({
-      childAssignment: this.tmp//to be removed, for static display purpose
-    });
     // Query child's assignments
-    const url = 'http://localhost:3000/assignment/';// + this.props.child._id;
+    const url = 'http://localhost:3000/assignments/' + this.props.child._id;
     const options = {
         method: 'GET',
         headers: {
@@ -67,7 +64,7 @@ class Assignment extends Component {
     let response = await fetch(url, options);
     const json = await response.json();
     this.setState({
-       childAssignment: this.json.assignments
+       childAssignment: json.assignments
     });
   }
 

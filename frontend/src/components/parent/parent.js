@@ -1,10 +1,11 @@
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';
-import {FaGraduationCap, FaCog, FaRegNewspaper} from 'react-icons/fa';
+import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook} from 'react-icons/fa';
 import AppNavbar from '../common-components/navbar/navbar';
 import Grades from "./grades/parent-grades";
 import News from "./news/parent-news";
+import Assignment from './Assignment';
 
 export default class Parent extends React.Component {
 
@@ -49,6 +50,9 @@ export default class Parent extends React.Component {
                                 className={this.state.userRequest === 'grades' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "grades")}><FaGraduationCap/> Grades</Nav.Link>
                             <Nav.Link
+                                className={this.state.userRequest === 'assignments' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments</Nav.Link>
+                            <Nav.Link
                                 className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className="col-md-9 ml-sm-auto col-lg-10 px-4 pt-5">
@@ -57,6 +61,9 @@ export default class Parent extends React.Component {
                             )}
                             {this.state.userRequest === 'grades' && (
                                 <Grades child={this.state.childSelected}/>
+                            )}
+                            {this.state.userRequest === 'assignments' && (
+                                <Assignment child={this.state.childSelected}/>
                             )}
                         </main>
                     </Row>
