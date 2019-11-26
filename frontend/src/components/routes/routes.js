@@ -46,9 +46,7 @@ export default class Routes extends React.Component {
             credentials: 'include'
         };
         await fetch(url, options);
-        this.setState({
-            redirect: true
-        });
+        this.state.setAppProps(false, this.props.appProps.role, this.props.appProps.extra, this.props.appProps.setAppProps);
     }
 
     render() {
@@ -57,7 +55,7 @@ export default class Routes extends React.Component {
         return (
             <Router>
                 <Switch>
-                    {(this.state.redirect || !this.state.authenticated) && (
+                    {!this.state.authenticated && (
                         <div>
                             <Route exact path='/login'>
                                 <Login setAppProps={this.state.setAppProps} />
