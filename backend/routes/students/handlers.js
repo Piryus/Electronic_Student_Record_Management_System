@@ -63,8 +63,25 @@ const recordGrades = async function(teacherUId, subject, grades) {
 const recordAttendance = async function(teacherUId, attendanceInfo) {
     const now = Utils.dateToWeekhour(new Date(Date.now()));
     const teacher = await Teacher.findOne({ userId: teacherUId });
+    const students = await Student.find({ _id: { $in: attendanceInfo.map(a => a.studentId) }});
+    const schoolClassesIds = students.reduce((arr, x) => {
+        if(!arr.some(i => i.equals(x.classId))) arr.push(x.classId);
+        return arr;
+    }, []);
+    
+    if(teacher === null || now === null || students.length != attendanceInfo.length || schoolClassesIds.length !== 1 ||
+        !teacher.timetable.some(t => t.classId.equals(schoolClassesIds[0]) && t.weekhour === now))
+        return Boom.badRequest();
 
-    //if(teacher === null || now === null || now.split())
+    const absentees = attendanceInfo.filter(a => a.attendanceEvent === 'absent');
+
+    if(absentees.length && now.split('_')[1] !== 0)
+        return Boom.badRequest();
+
+    students.filter(s => attendanceInfo.map(a => a.studentId).includes(s._id)).forEach(s => 
+        s.attendanceEvents.push({ event: 'absence' })
+    );
+    await Promise.all(students.map(s => s.save()));
 
     return {success: true};
 };

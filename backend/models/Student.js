@@ -13,7 +13,10 @@ const gradeSchema = new Schema({
 });
 
 const attendanceEventSchema = new Schema({
-    date: Date,
+    date: {
+        type: Date,
+        default: Date.now
+    },
     event: {
         type: String,
         enum: ['absence', 'late-entry', 'early-exit']
