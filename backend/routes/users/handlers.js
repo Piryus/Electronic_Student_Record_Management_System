@@ -6,7 +6,13 @@ const Utils = require('../../utils');
 
 const User = require('../../models/User');
 
-const addUser = async function (mail, name, surname, ssn, scope) {
+const getUsers = async function () {
+    const users = await User.find({}, { _id: 0, password: 0 });
+
+    return { users };
+};
+
+const addUser = async function(mail, name, surname, ssn, scope) {
     const user = await User.findOne({mail});
 
     if (user !== null)
@@ -22,12 +28,21 @@ const addUser = async function (mail, name, surname, ssn, scope) {
     return {success: true};
 };
 
-const getUsers = async function () {
-    const users = await User.find({}, {_id: 0}, {password: 0});
-    return {users};
+const updateUser = async function(userId, mail, name, surname, ssn, scope) {
+    await User.updateOne({ _id: userId }, { ssn, name, surname, mail, password, scope });
+
+    return {success: true};
+};
+
+const deleteUser = async function(userId) {
+    await User.deleteOne({ _id: userId });
+
+    return {success: true};
 };
 
 module.exports = {
+    getUsers,
     addUser,
-    getUsers
+    updateUser,
+    deleteUser
 };
