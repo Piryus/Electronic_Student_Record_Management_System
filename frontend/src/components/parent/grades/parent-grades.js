@@ -1,7 +1,8 @@
 import React from 'react';
 import {Accordion, Button, Card, Container} from "react-bootstrap";
 import SectionHeader from "../../common-components/section-header";
-import lib from '../../../lib';
+
+import utils from '../../../../../hlib/utils';
 
 export default class Grades extends React.Component {
 

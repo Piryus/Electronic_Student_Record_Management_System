@@ -5,8 +5,9 @@ import {FaGraduationCap, FaCog, FaMedal, FaBook} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
-import lib from '../../lib';
 import AppNavbar from "../common-components/navbar/navbar";
+
+import utils from '../../../../../hlib/utils';
 
 export default class Teacher extends React.Component {
 
