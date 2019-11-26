@@ -1,8 +1,7 @@
 'use strict';
 
 const Boom = require('boom');
-
-const Utils = require('../../utils');
+const HLib = require('hlib');
 
 const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
@@ -51,7 +50,7 @@ const recordGrades = async function(teacherUId, subject, grades) {
     if(teacher === null || students.length != grades.length || schoolClassesIds.length !== 1)
         return Boom.badRequest();
 
-    if(!teacher.timetable.some(t => (t.classId.equals(schoolClassesIds[0]) && t.subject === subject && Utils.weekhourToDate(t.weekhour) < Date.now())))
+    if(!teacher.timetable.some(t => (t.classId.equals(schoolClassesIds[0]) && t.subject === subject && HLib.weekhourToDate(t.weekhour) < Date.now())))
         return Boom.badRequest();
 
     students.forEach(s => s.grades.push({ value: grades.find(g => g.studentId === s._id.toString()).grade, subject }));
@@ -61,7 +60,7 @@ const recordGrades = async function(teacherUId, subject, grades) {
 };
 
 const recordAttendance = async function(teacherUId, attendanceInfo) {
-    const now = Utils.dateToWeekhour(new Date(Date.now()));
+    const now = HLib.dateToWeekhour(new Date(Date.now()));
     const teacher = await Teacher.findOne({ userId: teacherUId });
     const students = await Student.find({ _id: { $in: attendanceInfo.map(a => a.studentId) }});
     const schoolClassesIds = students.reduce((arr, x) => {

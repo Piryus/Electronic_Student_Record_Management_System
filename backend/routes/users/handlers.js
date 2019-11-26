@@ -1,6 +1,7 @@
 'use strict';
 
 const Boom = require('boom')
+const HLib = require('hlib');
 
 const Utils = require('../../utils');
 
@@ -18,7 +19,7 @@ const addUser = async function(mail, name, surname, ssn, scope) {
     if (user !== null)
         return Boom.badRequest();
 
-    const password = Utils.getRandomPassword();
+    const password = HLib.getRandomPassword();
 
     const newUser = new User({ssn, name, surname, mail, password, scope});
     await newUser.save();

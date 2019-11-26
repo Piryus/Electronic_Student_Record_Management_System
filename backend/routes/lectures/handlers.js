@@ -1,8 +1,7 @@
 'use strict';
 
 const Boom = require('boom');
-
-const Utils = require('../../utils');
+const HLib = require('hlib');
 
 const Lecture = require('../../models/Lecture');
 const SchoolClass = require('../../models/SchoolClass');
@@ -11,7 +10,7 @@ const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
 
 const getDailyLectureTopics = async function(teacherUId, weekhour) {
-    const datetime = Utils.weekhourToDate(weekhour);
+    const datetime = HLib.weekhourToDate(weekhour);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour))
@@ -37,7 +36,7 @@ const getAssignments = async function(parentUId, studentId) {
 };
 
 const getAttendance = async function(teacherUId) {
-    const now = Utils.dateToWeekhour(new Date(Date.now()));
+    const now = HLib.dateToWeekhour(new Date(Date.now()));
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null || now === null)
@@ -56,7 +55,7 @@ const getAttendance = async function(teacherUId) {
 };
 
 const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
-    const datetime = Utils.weekhourToDate(weekhour);
+    const datetime = HLib.weekhourToDate(weekhour);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || datetime > Date.now())
@@ -68,7 +67,7 @@ const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
 };
 
 const recordAssignments = async function(teacherUId, subject, description, due) {
-    const weekhour = Utils.dateToWeekhour(due);
+    const weekhour = HLib.dateToWeekhour(due);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)) || due < new Date(Date.now()).addDays(1).dayStart())

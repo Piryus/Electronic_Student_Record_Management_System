@@ -1,6 +1,7 @@
 'use strict';
 
 const Boom = require('boom');
+const HLib = require('hlib');
 
 const Utils = require('../../utils');
 
@@ -32,7 +33,7 @@ const addParent = async function(ssn, name, surname, mail, childSsn) {
     if(existingUser !== null || student === null)
         return Boom.badRequest();
     
-    const password = Utils.getRandomPassword();
+    const password = HLib.getRandomPassword();
 
     const user = new User({ ssn, name, surname, mail, password, scope: ['parent'] });
     await user.save();

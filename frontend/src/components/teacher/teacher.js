@@ -1,3 +1,4 @@
+import HLib from 'hlib';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';
@@ -6,10 +7,7 @@ import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
 import Attendances from './attendances/attendances';
-import utils from '../../../../../hlib/utils';
 import AppNavbar from "../common-components/navbar/navbar";
-
-import utils from '../../../../../hlib/utils';
 
 export default class Teacher extends React.Component {
 
@@ -137,15 +135,13 @@ export default class Teacher extends React.Component {
                                 onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments </Nav.Link>
                             <Nav.Link className={this.state.userRequest === 'attendances' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "attendances")}><FaCalendarCheck/> Attendances </Nav.Link>
                         </Nav>
-                        <main className={"col-md-10 ml-sm-auto col-lg-10 px-4 pt-5"}>
-                            {this.state.userRequest === 'lecture' && (
-                                <LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
-                                    obj[x.weekhour] = {name: x.subject, active: lib.weekhourToDate(x.weekhour) < now};
-                                    return obj;
-                                }, {})}/>)}
-                            {this.state.userRequest === 'grades' && (
-                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} timetable={this.props.timetable}
-                                                      type='teacher-grades'/>
+                        <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
+                            {this.state.userRequest === 'lecture' && (<LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
+                                obj[x.weekhour] = { name: x.subject, active: HLib.weekhourToDate(x.weekhour) < now };
+                                return obj;
+                            }, {})}/>)}
+                             {this.state.userRequest === 'grades' && (
+                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} timetable={this.props.timetable} type='teacher-grades'/>
                             )}
                             {this.state.userRequest === 'assignments' && (
                                 <Assignments subjects={this.state.subjects} timetable={this.props.timetable}/>

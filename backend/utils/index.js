@@ -1,7 +1,5 @@
 const Nodemailer = require('nodemailer');
 
-const hUtils = require('../../hlib/utils');
-
 const keys = require('../config/keys');
 const welcomeEmail = require('./welcomeEmail');
 
@@ -16,6 +14,6 @@ const sendWelcomeEmail = function(to, fullname, password) {
     });
 };
 
-module.exports = Object.assign({}, hUtils, {
+module.exports = {
     sendWelcomeEmail
-});
+};

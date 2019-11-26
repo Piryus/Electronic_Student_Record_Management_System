@@ -1,0 +1,18 @@
+{
+  "name": "hlib",
+  "version": "1.0.0",
+  "description": "Group H Library",
+  "main": "index.js",
+  "scripts": {
+    "test": "lab -c -m 15000"
+  },
+  "author": "Group H",
+  "license": "MIT",
+  "dependencies": {
+    "@hapi/code": "7.0.x"
+  },
+  "devDependencies": {
+    "@hapi/lab": "21.x.x",
+    "sinon": "7.5.x"
+  }
+}

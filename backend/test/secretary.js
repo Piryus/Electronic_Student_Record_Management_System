@@ -8,6 +8,8 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
+const HLib = require('hlib');
+
 const Utils = require('../utils');
 
 const Article = require('../models/Article');
@@ -81,7 +83,7 @@ suite('secretary', () => {
     });
     
     test('addParent', async () => {
-        const getRandomPassword = Sinon.stub(Utils, 'getRandomPassword').returns('q34!.7tv4t78R%329n,w90w');
+        const getRandomPassword = Sinon.stub(HLib, 'getRandomPassword').returns('q34!.7tv4t78R%329n,w90w');
         const sendWelcomeEmail = Sinon.stub(Utils, 'sendWelcomeEmail');
 
         await Parent.insertMany(testData.parents);

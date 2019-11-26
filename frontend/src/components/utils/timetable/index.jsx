@@ -1,7 +1,7 @@
+import 'hlib';
 import React, { Component } from 'react';
 import styles from './style.css';
 
-import '../../../lib';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 

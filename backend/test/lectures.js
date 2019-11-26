@@ -8,7 +8,7 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
-const Utils = require('../utils');
+const HLib = require('hlib');
 
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');
@@ -40,8 +40,8 @@ suite('lectures', () => {
     test('getDailyLectureTopics', async () => {
         await Teacher.insertMany(testData.teachers);
         await Lecture.insertMany([
-            { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_3', date: Utils.weekhourToDate('0_3'), topics: 'Test topics' },
-            { classId: '5dc9c3112d698031f441e1c9', weekhour: '2_4', date: Utils.weekhourToDate('2_4'), topics: 'Other topics' }
+            { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_3', date: HLib.weekhourToDate('0_3'), topics: 'Test topics' },
+            { classId: '5dc9c3112d698031f441e1c9', weekhour: '2_4', date: HLib.weekhourToDate('2_4'), topics: 'Other topics' }
         ]);
 
         // teacher not found
@@ -64,8 +64,8 @@ suite('lectures', () => {
 
         await Teacher.insertMany(testData.teachers);
         await Lecture.insertMany([
-            { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_2', date: Utils.weekhourToDate('0_2'), topics: 'Test topics' },
-            { classId: '5dc9c3112d698031f441e1c9', weekhour: '4_4', date: Utils.weekhourToDate('4_4'), topics: 'Other topics' }
+            { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_2', date: HLib.weekhourToDate('0_2'), topics: 'Test topics' },
+            { classId: '5dc9c3112d698031f441e1c9', weekhour: '4_4', date: HLib.weekhourToDate('4_4'), topics: 'Other topics' }
         ]);
 
         // teacher not found
@@ -75,8 +75,8 @@ suite('lectures', () => {
         // future weekhour
         const t3 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'Topics');
 
-        const t4 = await Lecture.findOne({ date: Utils.weekhourToDate('0_2') });
-        const t5 = await Lecture.findOne({ date: Utils.weekhourToDate('4_5') });
+        const t4 = await Lecture.findOne({ date: HLib.weekhourToDate('0_2') });
+        const t5 = await Lecture.findOne({ date: HLib.weekhourToDate('4_5') });
 
         fakeClock.returns(new Date('2019-11-23T21:00:00').getTime());
         // ok 1 (lecture topics already entered)
@@ -84,8 +84,8 @@ suite('lectures', () => {
         // ok 2 (no lecture topics were entered)
         const t7 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'New topics');
         
-        const t8 = await Lecture.findOne({ date: Utils.weekhourToDate('0_2') });
-        const t9 = await Lecture.findOne({ date: Utils.weekhourToDate('4_5') });
+        const t8 = await Lecture.findOne({ date: HLib.weekhourToDate('0_2') });
+        const t9 = await Lecture.findOne({ date: HLib.weekhourToDate('4_5') });
         
         fakeClock.restore();
         
@@ -132,21 +132,21 @@ suite('lectures', () => {
     });
     
     test('recordAssignments', async () => {
-        const daysDelta = (new Date().addDays(14).weekStart().getTime() - new Date().weekStart().getTime()) / Utils.day;
+        const daysDelta = (new Date().addDays(14).weekStart().getTime() - new Date().weekStart().getTime()) / HLib.day;
         
         await Teacher.insertMany(testData.teachers);
         await SchoolClass.insertMany(testData.classes);
         
         // teacher not found
-        const a1 = await lectures.recordAssignments('ffffffffffffffffffffffff', 'English', 'Assignments description here', Utils.weekhourToDate('3_3').addDays(daysDelta));
+        const a1 = await lectures.recordAssignments('ffffffffffffffffffffffff', 'English', 'Assignments description here', HLib.weekhourToDate('3_3').addDays(daysDelta));
         // null weekhour
         const a2 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', new Date('2019-11-24T10:00:00'));
         // no lecture on weekhour
-        const a3 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', Utils.weekhourToDate('3_3').addDays(daysDelta));
+        const a3 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', HLib.weekhourToDate('3_3').addDays(daysDelta));
         // wrong subject
-        const a4 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'Latin', 'Assignments description here', Utils.weekhourToDate('1_2').addDays(daysDelta));
+        const a4 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'Latin', 'Assignments description here', HLib.weekhourToDate('1_2').addDays(daysDelta));
         // due date in the past
-        const a5 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', Utils.weekhourToDate('1_2').addDays(-7));
+        const a5 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', HLib.weekhourToDate('1_2').addDays(-7));
 
         const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-26T08:00:00').getTime());
         // due date is today
@@ -156,7 +156,7 @@ suite('lectures', () => {
         const sc1 = await SchoolClass.findOne({ _id: '5dc9c3112d698031f441e1c9' });
 
         // ok
-        const a7 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'New assignments!', Utils.weekhourToDate('1_2').addDays(daysDelta));
+        const a7 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'New assignments!', HLib.weekhourToDate('1_2').addDays(daysDelta));
 
         const sc2 = await SchoolClass.findOne({ _id: '5dc9c3112d698031f441e1c9' });
 
@@ -169,7 +169,7 @@ suite('lectures', () => {
         expect(sc1.assignments).to.have.length(0);
         expect(a7.success).to.be.true();
         expect(sc2.assignments).to.have.length(1);
-        jexpect(sc2.assignments[0]).to.include(j({ subject: 'English', description: 'New assignments!', due: Utils.weekhourToDate('1_2').addDays(daysDelta) }));
+        jexpect(sc2.assignments[0]).to.include(j({ subject: 'English', description: 'New assignments!', due: HLib.weekhourToDate('1_2').addDays(daysDelta) }));
     });
 
 });

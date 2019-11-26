@@ -3,14 +3,14 @@
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
 
-const Utils = require('../utils');
+const HLib = require('../index');
 
 const expect = Code.expect;
 const lab = exports.lab = Lab.script();
 const suite = lab.suite;
 const test = lab.test;
 
-suite('utils', () => {
+suite('HLib', () => {
     
     test('String.gradify', async () => {
         const g1 = '0.5'.gradify();
@@ -100,14 +100,14 @@ suite('utils', () => {
         expect(ws7).to.equal(new Date('2019-12-16T00:00:00'));
     });
 
-    test('utils.getAY', async () => {
-        const ay1 = Utils.getAY(new Date('2017-02-21T21:56:55'));
-        const ay2 = Utils.getAY(new Date('2019-08-26T22:03:24'));
-        const ay3 = Utils.getAY(new Date('2019-05-07T15:23:50'));
-        const ay4 = Utils.getAY(new Date('2017-07-27T23:17:35'));
-        const ay5 = Utils.getAY(new Date('2019-09-20T04:43:13'));
-        const ay6 = Utils.getAY(new Date('2018-01-31T15:25:03'));
-        const ay7 = Utils.getAY(new Date('2016-06-05T21:05:14'));
+    test('getAY', async () => {
+        const ay1 = HLib.getAY(new Date('2017-02-21T21:56:55'));
+        const ay2 = HLib.getAY(new Date('2019-08-26T22:03:24'));
+        const ay3 = HLib.getAY(new Date('2019-05-07T15:23:50'));
+        const ay4 = HLib.getAY(new Date('2017-07-27T23:17:35'));
+        const ay5 = HLib.getAY(new Date('2019-09-20T04:43:13'));
+        const ay6 = HLib.getAY(new Date('2018-01-31T15:25:03'));
+        const ay7 = HLib.getAY(new Date('2016-06-05T21:05:14'));
         expect(ay1).to.equal('2016/17');
         expect(ay2).to.be.null();
         expect(ay3).to.equal('2018/19');
@@ -117,42 +117,42 @@ suite('utils', () => {
         expect(ay7).to.equal('2015/16');
     });
 
-    test('utils.weekhourToDate', async () => {
+    test('weekhourToDate', async () => {
         const ws = new Date().weekStart();
-        const d1 = Utils.weekhourToDate('0_4');
-        const d2 = Utils.weekhourToDate('1_1');
-        const d3 = Utils.weekhourToDate('3_2');
-        const d4 = Utils.weekhourToDate('1_4');
-        const d5 = Utils.weekhourToDate('4_4');
-        const d6 = Utils.weekhourToDate('2_0');
-        const d7 = Utils.weekhourToDate('3_1');
-        const d8 = Utils.weekhourToDate('5_5');
-        const d9 = Utils.weekhourToDate('6_0');
-        const d10 = Utils.weekhourToDate('7_3');
-        expect(d1).to.equal(new Date(ws.getTime() + (Utils.startHour + 4) * Utils.hour));
-        expect(d2).to.equal(new Date(ws.getTime() + 1 * Utils.day + (Utils.startHour + 1) * Utils.hour));
-        expect(d3).to.equal(new Date(ws.getTime() + 3 * Utils.day + (Utils.startHour + 2) * Utils.hour));
-        expect(d4).to.equal(new Date(ws.getTime() + 1 * Utils.day + (Utils.startHour + 4) * Utils.hour));
-        expect(d5).to.equal(new Date(ws.getTime() + 4 * Utils.day + (Utils.startHour + 4) * Utils.hour));
-        expect(d6).to.equal(new Date(ws.getTime() + 2 * Utils.day + (Utils.startHour + 0) * Utils.hour));
-        expect(d7).to.equal(new Date(ws.getTime() + 3 * Utils.day + (Utils.startHour + 1) * Utils.hour));
-        expect(d8).to.equal(new Date(ws.getTime() + 5 * Utils.day + (Utils.startHour + 5) * Utils.hour));
-        expect(d9).to.equal(new Date(ws.getTime() + 6 * Utils.day + (Utils.startHour + 0) * Utils.hour));
-        expect(d10).to.equal(new Date(ws.getTime() + 7 * Utils.day + (Utils.startHour + 3) * Utils.hour));
+        const d1 = HLib.weekhourToDate('0_4');
+        const d2 = HLib.weekhourToDate('1_1');
+        const d3 = HLib.weekhourToDate('3_2');
+        const d4 = HLib.weekhourToDate('1_4');
+        const d5 = HLib.weekhourToDate('4_4');
+        const d6 = HLib.weekhourToDate('2_0');
+        const d7 = HLib.weekhourToDate('3_1');
+        const d8 = HLib.weekhourToDate('5_5');
+        const d9 = HLib.weekhourToDate('6_0');
+        const d10 = HLib.weekhourToDate('7_3');
+        expect(d1).to.equal(new Date(ws.getTime() + (HLib.startHour + 4) * HLib.hour));
+        expect(d2).to.equal(new Date(ws.getTime() + 1 * HLib.day + (HLib.startHour + 1) * HLib.hour));
+        expect(d3).to.equal(new Date(ws.getTime() + 3 * HLib.day + (HLib.startHour + 2) * HLib.hour));
+        expect(d4).to.equal(new Date(ws.getTime() + 1 * HLib.day + (HLib.startHour + 4) * HLib.hour));
+        expect(d5).to.equal(new Date(ws.getTime() + 4 * HLib.day + (HLib.startHour + 4) * HLib.hour));
+        expect(d6).to.equal(new Date(ws.getTime() + 2 * HLib.day + (HLib.startHour + 0) * HLib.hour));
+        expect(d7).to.equal(new Date(ws.getTime() + 3 * HLib.day + (HLib.startHour + 1) * HLib.hour));
+        expect(d8).to.equal(new Date(ws.getTime() + 5 * HLib.day + (HLib.startHour + 5) * HLib.hour));
+        expect(d9).to.equal(new Date(ws.getTime() + 6 * HLib.day + (HLib.startHour + 0) * HLib.hour));
+        expect(d10).to.equal(new Date(ws.getTime() + 7 * HLib.day + (HLib.startHour + 3) * HLib.hour));
     });
 
-    test('utils.dateToWeekhour', async () => {
-        const wh1 = Utils.dateToWeekhour(new Date('2019-01-04T16:10:00'));
-        const wh2 = Utils.dateToWeekhour(new Date('2019-02-11T12:26:00'));
-        const wh3 = Utils.dateToWeekhour(new Date('2019-06-04T10:06:00'));
-        const wh4 = Utils.dateToWeekhour(new Date('2019-10-31T14:24:00'));
-        const wh5 = Utils.dateToWeekhour(new Date('2019-03-23T08:45:00'));
-        const wh6 = Utils.dateToWeekhour(new Date('2019-05-15T09:03:00'));
-        const wh7 = Utils.dateToWeekhour(new Date('2019-12-29T11:19:00'));
-        const wh8 = Utils.dateToWeekhour(new Date('2019-07-19T13:50:00'));
-        const wh9 = Utils.dateToWeekhour(new Date('2019-04-11T18:27:00'));
-        const wh10 = Utils.dateToWeekhour(new Date('2019-11-14T08:40:00'));
-        const wh11 = Utils.dateToWeekhour(new Date('2019-09-26T06:12:00'));
+    test('dateToWeekhour', async () => {
+        const wh1 = HLib.dateToWeekhour(new Date('2019-01-04T16:10:00'));
+        const wh2 = HLib.dateToWeekhour(new Date('2019-02-11T12:26:00'));
+        const wh3 = HLib.dateToWeekhour(new Date('2019-06-04T10:06:00'));
+        const wh4 = HLib.dateToWeekhour(new Date('2019-10-31T14:24:00'));
+        const wh5 = HLib.dateToWeekhour(new Date('2019-03-23T08:45:00'));
+        const wh6 = HLib.dateToWeekhour(new Date('2019-05-15T09:03:00'));
+        const wh7 = HLib.dateToWeekhour(new Date('2019-12-29T11:19:00'));
+        const wh8 = HLib.dateToWeekhour(new Date('2019-07-19T13:50:00'));
+        const wh9 = HLib.dateToWeekhour(new Date('2019-04-11T18:27:00'));
+        const wh10 = HLib.dateToWeekhour(new Date('2019-11-14T08:40:00'));
+        const wh11 = HLib.dateToWeekhour(new Date('2019-09-26T06:12:00'));
         expect(wh1).to.equal(null);
         expect(wh2).to.equal('0_4');
         expect(wh3).to.equal('1_2');
