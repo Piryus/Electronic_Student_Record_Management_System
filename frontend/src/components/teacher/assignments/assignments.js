@@ -81,11 +81,11 @@ export default class Assignments extends React.Component {
         } else {
             let currentDay = this.state.currentDay.split('-');
             let chosenDay = this.state.selectedDate.split('-');
-            if (chosenDay[0] < currentDay[0]) {
+            if (parseInt(chosenDay[0]) < parseInt(currentDay[0])) {
                 alert('Please select a date starting tomorrow.');
-            } else if (chosenDay[1] < currentDay[1]) {
+            } else if (parseInt(chosenDay[1]) < parseInt(currentDay[1])) {
                 alert('Please select a date starting tomorrow.');
-            } else if (chosenDay[2] <= currentDay[2]) {
+            } else if (parseInt(chosenDay[2]) <= parseInt(currentDay[2]) && parseInt(chosenDay[1]) === parseInt(currentDay[1])) {
                 alert('Please select a date starting tomorrow.');
             } else {
                 let day = new Date(this.state.selectedDate).getDay() - 1;
