@@ -1,5 +1,5 @@
 {
-  "name": "hlib",
+  "name": "@emarkk/hlib",
   "version": "1.0.0",
   "description": "Group H Library",
   "main": "index.js",

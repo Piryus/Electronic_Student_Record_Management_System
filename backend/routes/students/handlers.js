@@ -1,7 +1,7 @@
 'use strict';
 
 const Boom = require('boom');
-const HLib = require('hlib');
+const HLib = require('@emarkk/hlib');
 
 const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');

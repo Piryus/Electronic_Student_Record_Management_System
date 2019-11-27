@@ -1,4 +1,4 @@
-import 'hlib';
+import '@emarkk/hlib';
 import React, { Component } from 'react';
 import styles from './style.css';
 

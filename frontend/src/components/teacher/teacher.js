@@ -1,4 +1,4 @@
-import HLib from 'hlib';
+import HLib from '@emarkk/hlib';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';

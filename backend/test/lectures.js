@@ -8,7 +8,7 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
-const HLib = require('hlib');
+const HLib = require('@emarkk/hlib');
 
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');

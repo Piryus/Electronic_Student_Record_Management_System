@@ -6,4 +6,4 @@
 /backend/config/keys.js
 
 # Lib
-/hlib/node_modules
+/@emarkk/hlib/node_modules

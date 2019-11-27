@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emarkk/hlib": "^1.0.0",
     "bootstrap": "^4.3.1",
-    "hlib": "file:../hlib",
     "jsx": "^0.9.89",
     "prop-types": "^15.7.2",
     "rc-datepicker": "^5.0.14",
