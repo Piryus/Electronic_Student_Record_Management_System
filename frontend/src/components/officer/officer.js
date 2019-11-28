@@ -5,7 +5,7 @@ import ParentAccountEnabling from './parent-access/officer-parent-access';
 import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
 import {FaCog, FaGraduationCap, FaLayerGroup, FaRegNewspaper, FaUserEdit} from 'react-icons/fa';
-import AppNavbar from "../common-components/navbar/navbar";
+import AppNavbar from "../utils/navbar/navbar";
 import News from "./news/officer-news";
 
 export default class Officer extends React.Component {

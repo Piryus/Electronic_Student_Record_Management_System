@@ -1,7 +1,7 @@
 import React from 'react';
 import {Container, Card, Button, Accordion} from "react-bootstrap";
 import NewClassModal from "./new-class-modal/new-class-modal";
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 class Classes extends React.Component {
 

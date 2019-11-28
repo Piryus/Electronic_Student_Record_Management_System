@@ -7,7 +7,7 @@ import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
 import Attendances from './attendances/attendances';
-import AppNavbar from "../common-components/navbar/navbar";
+import AppNavbar from "../utils/navbar/navbar";
 
 export default class Teacher extends React.Component {
 

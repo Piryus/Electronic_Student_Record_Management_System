@@ -2,7 +2,7 @@ import React from 'react';
 import {Button, Container} from "react-bootstrap";
 import {FaCalendar} from 'react-icons/fa';
 import NewArticleModal from "./new-article-modal/new-article-modal";
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 export default class News extends React.Component {
     constructor(props) {

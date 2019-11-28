@@ -4,7 +4,7 @@ import 'moment/locale/it.js';
 import {DatePickerInput} from 'rc-datepicker';
 import 'rc-datepicker/lib/style.css';
 import styles from '../student-grades-summary/styles.module.css';
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 
 export default class Assignments extends React.Component {

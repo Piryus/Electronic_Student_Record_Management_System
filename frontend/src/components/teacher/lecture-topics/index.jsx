@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './style.sass';
 import Timetable from '../../utils/timetable';
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 import {Container, Button, Form} from "react-bootstrap";
 
 class LectureTopics extends Component {

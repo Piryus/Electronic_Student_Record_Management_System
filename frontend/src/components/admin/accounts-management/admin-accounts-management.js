@@ -4,7 +4,7 @@ import {FaSistrix, FaPen, FaTrash} from 'react-icons/fa';
 import NewUserForm from "./new-user-form/new-user-form";
 import DeleteUserModal from "./delete-user-modal/delete-user-modal";
 import EditUserForm from "./edit-user-form/edit-user-form";
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 export default class AccountsManagement extends React.Component {
     constructor(props) {

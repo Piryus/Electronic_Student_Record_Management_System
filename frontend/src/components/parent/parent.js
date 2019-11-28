@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';
 import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook} from 'react-icons/fa';
-import AppNavbar from '../common-components/navbar/navbar';
+import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
 import News from "./news/parent-news";
 import Assignment from './Assignment';
