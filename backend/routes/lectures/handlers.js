@@ -36,13 +36,13 @@ const getAssignments = async function(parentUId, studentId) {
 };
 
 const getAttendance = async function(teacherUId) {
-    const now = HLib.dateToWeekhour(new Date(Date.now()));
+    const nd = new Date(Date.now()).getNormalizedDay();
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
-    if(teacher === null || now === null)
+    if(teacher === null)
         return Boom.badRequest();
 
-    const classId = teacher.timetable.find(t => t.weekhour === now);
+    const classId = (teacher.timetable.find(t => t.weekhour === nd + '_0') || {}).classId;
 
     if(classId === null)
         return Boom.badRequest();
@@ -50,7 +50,7 @@ const getAttendance = async function(teacherUId) {
     const students = await Student.find({ classId });
 
     return { classAttendance: students.map(s => {
-        return { id: s._id, status: s.attendanceEvents.find(ae => ae.date.isSameDayOf(new Date(Date.now()))) || 'present' };
+        return { id: s._id, events: s.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date(Date.now()))) };
     }) };
 };
 
