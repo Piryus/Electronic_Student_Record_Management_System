@@ -229,7 +229,7 @@ suite('lectures', () => {
     });
     
     test('rollCall', async () => {
-        const data = [
+        const data1 = [
             { studentId: '5dca711c89bf46419cf5d483', present: true },
             { studentId: '5dca711c89bf46419cf5d484', present: false },
             { studentId: '5dca711c89bf46419cf5d485', present: true },
@@ -242,6 +242,19 @@ suite('lectures', () => {
             { studentId: '5dca711c89bf46419cf5d48f', present: false },
             { studentId: '5dca711c89bf46419cf5d491', present: false }
         ];
+        const data2 = [
+            { studentId: '5dca711c89bf46419cf5d483', present: true },
+            { studentId: '5dca711c89bf46419cf5d484', present: true },
+            { studentId: '5dca711c89bf46419cf5d485', present: false },
+            { studentId: '5dca711c89bf46419cf5d487', present: true },
+            { studentId: '5dca711c89bf46419cf5d488', present: true },
+            { studentId: '5dca711c89bf46419cf5d489', present: true },
+            { studentId: '5dca711c89bf46419cf5d48b', present: true },
+            { studentId: '5dca711c89bf46419cf5d48c', present: false },
+            { studentId: '5dca711c89bf46419cf5d48e', present: false },
+            { studentId: '5dca711c89bf46419cf5d48f', present: true },
+            { studentId: '5dca711c89bf46419cf5d491', present: true }
+        ];
 
         const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-26T16:00:00').getTime());
         
@@ -249,9 +262,9 @@ suite('lectures', () => {
         await Teacher.insertMany(testData.teachers);
 
         // teacher not found
-        const rc1 = await lectures.rollCall('ffffffffffffffffffffffff', data);
+        const rc1 = await lectures.rollCall('ffffffffffffffffffffffff', data1);
         // teacher has no lecture on first hour today
-        const rc2 = await lectures.rollCall('5dca7e2b461dc52d681804f6', data);
+        const rc2 = await lectures.rollCall('5dca7e2b461dc52d681804f6', data1);
         // students list not complete
         const rc3 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
             { studentId: '5dca711c89bf46419cf5d485', present: true },
@@ -273,9 +286,12 @@ suite('lectures', () => {
             { studentId: '5dca711c89bf46419cf5d491', present: true },
         ]);
         // ok
-        const rc5 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data);
+        const rc5 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data1);
+        const st1 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' }, { 'attendanceEvents._id': 0 });
+        // ok (change)
+        const rc6 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data2);
+        const st2 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' }, { 'attendanceEvents._id': 0 });
 
-        const st = await Student.find({ classId: '5dc9c3112d698031f441e1c9' }, { 'attendanceEvents._id': 0 });
 
         fakeClock.restore();
 
@@ -284,7 +300,11 @@ suite('lectures', () => {
         expect(rc3.output.statusCode).to.equal(BAD_REQUEST);
         expect(rc4.output.statusCode).to.equal(BAD_REQUEST);
         expect(rc5.success).to.be.true();
-        data.forEach(i => jexpect(st.find(s => s._id.toString() === i.studentId).attendanceEvents).to.equal(j(i.present ? [] : [
+        data1.forEach(i => jexpect(st1.find(s => s._id.toString() === i.studentId).attendanceEvents).to.equal(j(i.present ? [] : [
+            { date: new Date('2019-11-26T08:00:00'), event: 'absence' }
+        ])));
+        expect(rc6.success).to.be.true();
+        data2.forEach(i => jexpect(st2.find(s => s._id.toString() === i.studentId).attendanceEvents).to.equal(j(i.present ? [] : [
             { date: new Date('2019-11-26T08:00:00'), event: 'absence' }
         ])));
     });

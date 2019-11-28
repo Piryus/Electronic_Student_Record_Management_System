@@ -97,9 +97,12 @@ const rollCall = async function(teacherUId, info) {
     if(students.length !== info.length || !students.map(s => s._id.toString()).every(s => info.map(i => i.studentId).includes(s)))
         return Boom.badRequest();
 
-    students.filter(s => info.find(i => i.studentId === s._id.toString()).present === false).forEach(s => 
-        s.attendanceEvents.push({ date: HLib.weekhourToDate(nd + '_0'), event: 'absence' })
-    );
+    students.forEach(s => {
+        if(info.find(i => i.studentId === s._id.toString()).present)
+            s.attendanceEvents = s.attendanceEvents.filter(ae => ae.event !== 'absence' || !ae.date.isSameDayOf(new Date(Date.now())));
+        else if(!s.attendanceEvents.some(ae => ae.event === 'absence' && ae.date.isSameDayOf(new Date(Date.now()))))
+            s.attendanceEvents.push({ date: HLib.weekhourToDate(nd + '_0'), event: 'absence' });
+    });
     await Promise.all(students.map(s => s.save()));
 
     return { success: true };
