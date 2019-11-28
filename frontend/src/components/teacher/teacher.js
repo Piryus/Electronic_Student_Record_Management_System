@@ -40,6 +40,13 @@ export default class Teacher extends React.Component {
             workingHour: workingHour,
             classAttendance: []
         };
+        this.updateClassAttendanceHandler = this.updateClassAttendanceHandler.bind(this);
+    }
+
+    async updateClassAttendanceHandler(){
+        if(this.state.classId !== ''){
+            await this.getStudentAttendances();
+        }
     }
 
     async componentDidMount(){
@@ -132,7 +139,7 @@ export default class Teacher extends React.Component {
                                 <Assignments subjects={this.state.subjects} timetable={this.props.timetable}/>
                             )}
                             {this.state.userRequest === 'rollcall' &&(
-                                <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour}/>
+                                <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour} updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
                             )}
                         </main>
                     </Row>

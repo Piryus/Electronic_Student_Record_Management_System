@@ -14,9 +14,11 @@ export default class Rollcall extends React.Component{
         this.props.classAttendance.forEach((s) => {
             let absent = false;
             if(s.events.length !== 0){
-                if(s.events.includes('absence')){
-                    absent = true;
-                }
+                s.events.forEach(e => {
+                    if(e.event === 'absence'){
+                        absent = true;
+                    }
+                });
             }
             studentStates[i] = {
                 studentId: s.id,
@@ -87,6 +89,7 @@ export default class Rollcall extends React.Component{
         let renderStudentRows = [];
         let index = 0;
         if(this.state.classStudents.length !== 0){
+
                 renderStudentRows = this.state.classStudents.map( (s) => {
 
                     for( ; index < this.state.studentAbsenceStates.length; index++){
@@ -150,6 +153,7 @@ export default class Rollcall extends React.Component{
                 wantEditCheckboxes: false,
                 studentAbsenceStates: unsetModificationFlags
             });
+            this.props.updateClassAttendanceOnParent();
         }
     }
 
