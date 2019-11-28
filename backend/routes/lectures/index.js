@@ -99,7 +99,7 @@ const routes = [
             },
             validate: {
                 payload: {
-                    info: Valid.rollCall
+                    info: Valid.rollCall.required()
                 }
             }
         }
