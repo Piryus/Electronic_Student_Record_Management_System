@@ -8,7 +8,7 @@ const Utils = require('../../utils');
 const User = require('../../models/User');
 
 const getUsers = async function () {
-    const users = await User.find({}, {password: 0 });
+    const users = await User.find({scope: { $nin: 'parent'} }, { password: 0 });
 
     return { users };
 };
