@@ -1,7 +1,6 @@
 import React from 'react';
 import {Table, Button, Form} from 'react-bootstrap';
 import styles from './styles.module.css';
-import SectionHeader from "../../common-components/section-header";
 
 
 
@@ -195,7 +194,7 @@ export default class Rollcall extends React.Component{
 
         return(
             <div>
-                <SectionHeader>Attendances</SectionHeader>
+                <h1>Attendances</h1>
                 {this.state.wantEditCheckboxes === false && (<Button variant="primary" onClick={() => this.setEditCheckboxes()}>Edit</Button>)}
                 {this.state.wantEditCheckboxes === true && (
                 <div>
