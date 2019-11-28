@@ -54,6 +54,8 @@ suite('HLib', () => {
         const i8 = new Date('2019-07-09T07:19:28').isSameDayOf(new Date('2019-07-09T17:46:02'));
         const i9 = new Date('2019-05-21T02:50:53').isSameDayOf(new Date('2019-05-11T08:18:52'));
         const i10 = new Date('2019-11-13T19:32:40').isSameDayOf(new Date('2019-10-17T12:40:32'));
+        const i11 = new Date('2019-10-05T00:00:10').isSameDayOf(new Date('2019-10-05T01:00:20'));
+        const i12 = new Date('2019-12-10T00:02:46').isSameDayOf(new Date('2019-12-09T23:40:32'));
         expect(i1).to.be.true();
         expect(i2).to.be.true();
         expect(i3).to.be.false();
@@ -64,6 +66,8 @@ suite('HLib', () => {
         expect(i8).to.be.true();
         expect(i9).to.be.false();
         expect(i10).to.be.false();
+        expect(i11).to.be.true();
+        expect(i12).to.be.false();
     });
     
     test('Date.getNormalizedDay', async () => {
@@ -98,6 +102,50 @@ suite('HLib', () => {
         expect(ws5).to.equal(new Date('2019-03-18T00:00:00'));
         expect(ws6).to.equal(new Date('2019-05-13T00:00:00'));
         expect(ws7).to.equal(new Date('2019-12-16T00:00:00'));
+    });
+
+    test('Date.isSchoolDay', async () => {
+        const calendar = {
+            academicYear: "2019/20",
+            firstDay: new Date('2019-09-09T00:00:00'),
+            lastDay: new Date('2020-06-10T00:00:00'),
+            holidays:[
+                { start: new Date('2019-11-01T00:00:00'), end: null },
+                { start: new Date('2019-12-23T00:00:00'), end: new Date('2020-01-04T00:00:00') },
+                { start: new Date('2020-02-22T00:00:00'), end: new Date('2020-02-26T00:00:00') },
+                { start: new Date('2020-04-09T00:00:00'), end: new Date('2020-04-14T00:00:00') },
+                { start: new Date('2019-05-02T00:00:00'), end: null },
+                { start: new Date('2019-06-01T00:00:00'), end: null },
+            ]
+        };
+        const isd1 = new Date('2019-11-14T08:14:00').isSchoolDay(calendar);
+        const isd2 = new Date('2019-11-23T17:51:00').isSchoolDay(calendar);
+        const isd3 = new Date('2019-12-15T11:39:00').isSchoolDay(calendar);
+        const isd4 = new Date('2019-12-20T09:26:00').isSchoolDay(calendar);
+        const isd5 = new Date('2020-01-08T13:45:00').isSchoolDay(calendar);
+        const isd6 = new Date('2019-12-27T19:03:00').isSchoolDay(calendar);
+        const isd7 = new Date('2020-01-03T14:38:00').isSchoolDay(calendar);
+        const isd8 = new Date('2020-02-11T09:13:00').isSchoolDay(calendar);
+        const isd9 = new Date('2019-12-23T13:55:00').isSchoolDay(calendar);
+        const isd10 = new Date('2020-02-26T07:41:00').isSchoolDay(calendar);
+        const isd11 = new Date('2020-04-08T13:20:00').isSchoolDay(calendar);
+        const isd12 = new Date('2020-05-02T16:37:00').isSchoolDay(calendar);
+        const isd13 = new Date('2020-06-15T14:05:00').isSchoolDay(calendar);
+        const isd14 = new Date('2019-09-05T06:11:00').isSchoolDay(calendar);
+        expect(isd1).to.be.true();
+        expect(isd2).to.be.false();
+        expect(isd3).to.be.false();
+        expect(isd4).to.be.true();
+        expect(isd5).to.be.true();
+        expect(isd6).to.be.false();
+        expect(isd7).to.be.false();
+        expect(isd8).to.be.true();
+        expect(isd9).to.be.false();
+        expect(isd10).to.be.false();
+        expect(isd11).to.be.true();
+        expect(isd12).to.be.false();
+        expect(isd13).to.be.false();
+        expect(isd14).to.be.false();
     });
 
     test('getAY', async () => {
