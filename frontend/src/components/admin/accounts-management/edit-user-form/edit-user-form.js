@@ -5,6 +5,7 @@ export default class EditUserForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            id: '',
             email: '',
             name: '',
             surname: '',
@@ -14,8 +15,9 @@ export default class EditUserForm extends React.Component {
     }
 
     static getDerivedStateFromProps(nextProps, prevState) {
-        if(nextProps.user.mail !== prevState.email){
+        if(nextProps.user._id !== prevState.id){
             return {
+                id: nextProps.user._id,
                 email: nextProps.user.mail,
                 name: nextProps.user.name,
                 surname: nextProps.user.surname,
@@ -28,7 +30,7 @@ export default class EditUserForm extends React.Component {
 
     async handleSubmitForm() {
         try {
-            const url = 'http://localhost:3000/users/' + this.props.user._id;
+            const url = 'http://localhost:3000/users/' + this.state.id;
             const options = {
                 method: 'PATCH',
                 headers: {
