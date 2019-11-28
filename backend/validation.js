@@ -6,6 +6,7 @@ let schema = {
     ssn: Joi.string(),
     name: Joi.string(),
     date: Joi.date(),
+    boolean: Joi.bool(),
     weekhour: Joi.string().regex(/^[0-4]_[0-5]$/),
     className: Joi.string().regex(/^[1-5][a-zA-Z]$/),
     subject: Joi.string(),
@@ -23,6 +24,10 @@ schema.gradeInfo = {
     studentId: schema.id,
     grade: schema.grade
 };
+schema.rollCall = schema.array.items({
+    studentId: schema.id,
+    present: schema.boolean
+})
 schema.attendanceInfo = {
     studentId: schema.id,
     attendanceEvent: schema.attendanceEvent

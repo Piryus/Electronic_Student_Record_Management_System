@@ -80,10 +80,36 @@ const recordAssignments = async function(teacherUId, subject, description, due) 
     return { success: true };
 };
 
+const rollCall = async function(teacherUId, info) {
+    const nd = new Date(Date.now()).getNormalizedDay();
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    if(teacher === null)
+        return Boom.badRequest();
+
+    const classId = (teacher.timetable.find(t => t.weekhour === nd + '_0') || {}).classId;
+
+    if(classId === null)
+        return Boom.badRequest();
+
+    const students = await Student.find({ classId });
+
+    if(students.length !== info.length || !students.map(s => s._id.toString()).every(s => info.map(i => i.studentId).includes(s)))
+        return Boom.badRequest();
+
+    students.filter(s => info.find(i => i.studentId === s._id.toString()).present === false).forEach(s => 
+        s.attendanceEvents.push({ date: HLib.weekhourToDate(nd + '_0'), event: 'absence' })
+    );
+    await Promise.all(students.map(s => s.save()));
+
+    return { success: true };
+};
+
 module.exports = {
     getDailyLectureTopics,
     getAssignments,
     getAttendance,
     recordDailyLectureTopics,
-    recordAssignments
+    recordAssignments,
+    rollCall
 };
