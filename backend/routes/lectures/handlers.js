@@ -44,10 +44,10 @@ const getAttendance = async function(teacherUId) {
 
     const classId = (teacher.timetable.find(t => t.weekhour === nd + '_0') || {}).classId;
 
-    if(classId === null)
+    if(classId === undefined)
         return Boom.badRequest();
 
-    const students = await Student.find({ classId });
+    const students = await Student.find({ classId }, { 'attendanceEvents._id': 0 });
 
     return { classAttendance: students.map(s => {
         return { id: s._id, events: s.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date(Date.now()))) };
@@ -89,7 +89,7 @@ const rollCall = async function(teacherUId, info) {
 
     const classId = (teacher.timetable.find(t => t.weekhour === nd + '_0') || {}).classId;
 
-    if(classId === null)
+    if(classId === undefined)
         return Boom.badRequest();
 
     const students = await Student.find({ classId });

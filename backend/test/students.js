@@ -201,7 +201,7 @@ suite('students', () => {
 
         expect(empty).to.have.length(0);
         expect(full).to.have.length(6);
-        data.forEach((s, i) => jexpect(full.sort((a, b) => a.ssn - b.ssn)[i]).to.include(s));
+        data.forEach((s, i) => jexpect(full.sort((a, b) => a.ssn - b.ssn)[i]).to.include(data[i]));
     });
 
     test('addSchoolClass', async () => {

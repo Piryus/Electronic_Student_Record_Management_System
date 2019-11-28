@@ -130,6 +130,62 @@ suite('lectures', () => {
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
         jexpect(g4.assignments).to.equal(j(data.filter(a => a.due >= new Date().dayStart())));
     });
+
+    test('getAttendance', async () => {
+        const data = [
+            { studentId: '5dca711c89bf46419cf5d485', attendanceEvents: [
+                { date: new Date('2019-11-15T12:00:00'), event: 'early-exit' },
+                { date: new Date('2019-11-27T08:00:00'), event: 'absence' },
+                { date: new Date('2019-11-27T09:00:00'), event: 'late-entry' }
+            ] },
+            { studentId: '5dca711c89bf46419cf5d489', attendanceEvents: [
+                { date: new Date('2019-11-24T12:00:00'), event: 'early-exit' },
+                { date: new Date('2019-11-27T08:00:00'), event: 'absence' }
+            ] },
+            { studentId: '5dca711c89bf46419cf5d48b', attendanceEvents: [
+                { date: new Date('2019-11-15T12:00:00'), event: 'early-exit' },
+                { date: new Date('2019-11-27T16:00:00'), event: 'absence' },
+                { date: new Date('2019-11-28T11:00:00'), event: 'early-exit' }
+            ] },
+            { studentId: '5dca711c89bf46419cf5d48f', attendanceEvents: [
+                { date: new Date('2019-11-15T08:00:00'), event: 'absence' },
+                { date: new Date('2019-11-15T09:00:00'), event: 'late-entry' }
+            ] },
+            { studentId: '5dca711c89bf46419cf5d491', attendanceEvents: [
+                { date: new Date('2019-11-12T08:00:00'), event: 'absence' },
+                { date: new Date('2019-11-15T12:00:00'), event: 'early-exit' },
+                { date: new Date('2019-11-27T16:00:00'), event: 'absence' }
+            ] }
+        ];
+
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-27T16:00:00').getTime());
+
+        await Student.insertMany(testData.students);
+        await Teacher.insertMany(testData.teachers);
+        await Promise.all(data.map(i => Student.updateOne({ _id: i.studentId }, { attendanceEvents: i.attendanceEvents })));
+
+        // teacher not found
+        const a1 = await lectures.getAttendance('ffffffffffffffffffffffff');
+        // teacher has no lecture on first hour today
+        const a2 = await lectures.getAttendance('5dca7e2b461dc52d681804f6');
+        // ok 1
+        const a3 = await lectures.getAttendance('5dca7e2b461dc52d681804f1');
+
+        fakeClock.returns(new Date('2019-11-15T08:01:00').getTime());
+        // ok 2
+        const a4 = await lectures.getAttendance('5dca7e2b461dc52d681804f2');
+
+        fakeClock.restore();
+
+        expect(a1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(a2.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(a3.classAttendance.sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
+            return { id: s._id, events: data.some(i => i.studentId === s._id) ? data.find(i => i.studentId === s._id).attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-27T16:00:00'))) : [] };
+        }).sort((a, b) => b.id - a.id)));
+        jexpect(a4.classAttendance.sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
+            return { id: s._id, events: data.some(i => i.studentId === s._id) ? data.find(i => i.studentId === s._id).attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-15T08:01:00'))) : [] };
+        }).sort((a, b) => b.id - a.id)));
+    });
     
     test('recordAssignments', async () => {
         const daysDelta = (new Date().addDays(14).weekStart().getTime() - new Date().weekStart().getTime()) / HLib.day;
@@ -170,6 +226,67 @@ suite('lectures', () => {
         expect(a7.success).to.be.true();
         expect(sc2.assignments).to.have.length(1);
         jexpect(sc2.assignments[0]).to.include(j({ subject: 'English', description: 'New assignments!', due: HLib.weekhourToDate('1_2').addDays(daysDelta) }));
+    });
+    
+    test('rollCall', async () => {
+        const data = [
+            { studentId: '5dca711c89bf46419cf5d483', present: true },
+            { studentId: '5dca711c89bf46419cf5d484', present: false },
+            { studentId: '5dca711c89bf46419cf5d485', present: true },
+            { studentId: '5dca711c89bf46419cf5d487', present: true },
+            { studentId: '5dca711c89bf46419cf5d488', present: true },
+            { studentId: '5dca711c89bf46419cf5d489', present: true },
+            { studentId: '5dca711c89bf46419cf5d48b', present: true },
+            { studentId: '5dca711c89bf46419cf5d48c', present: false },
+            { studentId: '5dca711c89bf46419cf5d48e', present: true },
+            { studentId: '5dca711c89bf46419cf5d48f', present: false },
+            { studentId: '5dca711c89bf46419cf5d491', present: false }
+        ];
+
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-26T16:00:00').getTime());
+        
+        await Student.insertMany(testData.students);
+        await Teacher.insertMany(testData.teachers);
+
+        // teacher not found
+        const rc1 = await lectures.rollCall('ffffffffffffffffffffffff', data);
+        // teacher has no lecture on first hour today
+        const rc2 = await lectures.rollCall('5dca7e2b461dc52d681804f6', data);
+        // students list not complete
+        const rc3 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
+            { studentId: '5dca711c89bf46419cf5d485', present: true },
+            { studentId: '5dca711c89bf46419cf5d48b', present: false },
+            { studentId: '5dca711c89bf46419cf5d48f', present: true },
+        ]);
+        // some students not belonging to considered class
+        const rc4 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
+            { studentId: '5dca711c89bf46419cf5d486', present: true },
+            { studentId: '5dca711c89bf46419cf5d487', present: false },
+            { studentId: '5dca711c89bf46419cf5d488', present: true },
+            { studentId: '5dca711c89bf46419cf5d489', present: true },
+            { studentId: '5dca711c89bf46419cf5d48a', present: true },
+            { studentId: '5dca711c89bf46419cf5d48b', present: true },
+            { studentId: '5dca711c89bf46419cf5d48c', present: true },
+            { studentId: '5dca711c89bf46419cf5d48d', present: false },
+            { studentId: '5dca711c89bf46419cf5d48e', present: true },
+            { studentId: '5dca711c89bf46419cf5d48f', present: false },
+            { studentId: '5dca711c89bf46419cf5d491', present: true },
+        ]);
+        // ok
+        const rc5 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data);
+
+        const st = await Student.find({ classId: '5dc9c3112d698031f441e1c9' }, { 'attendanceEvents._id': 0 });
+
+        fakeClock.restore();
+
+        expect(rc1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(rc2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(rc3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(rc4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(rc5.success).to.be.true();
+        data.forEach(i => jexpect(st.find(s => s._id.toString() === i.studentId).attendanceEvents).to.equal(j(i.present ? [] : [
+            { date: new Date('2019-11-26T08:00:00'), event: 'absence' }
+        ])));
     });
 
 });
