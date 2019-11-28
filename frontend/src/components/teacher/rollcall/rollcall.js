@@ -78,7 +78,7 @@ export default class Rollcall extends React.Component{
             }
         }
         vecToUpdate[i].state = !vecToUpdate[i].state;
-        vecToUpdate[i].modified = true;
+        vecToUpdate[i].modified = !vecToUpdate[i].modified;
         this.setState({
             studentAbsenceStates: vecToUpdate
         });
