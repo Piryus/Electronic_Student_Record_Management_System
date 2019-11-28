@@ -89,7 +89,6 @@ export default class EditUserForm extends React.Component {
                             <Form.Label>Surname:</Form.Label>
                             <Form.Control type="string"
                                           placeholder="Enter name"
-                                          defaultValue={this.props.user.surname}
                                           value={this.state.surname}
                                           onChange={(e) => this.setState({surname: e.target.value})}/>
                             <Form.Text className="text-muted">
