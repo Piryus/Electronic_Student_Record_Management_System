@@ -136,14 +136,10 @@ export default class Rollcall extends React.Component{
         } else {
             let vectorToSend = [];
             this.state.studentAbsenceStates.forEach(s => {
-                if(s.state === true){
-                    vectorToSend.push(
-                        {
-                            studentId: s.studentId,
-                            attendanceEvent: 'absence'
-                        }
-                    );
-                }
+                vectorToSend.push({
+                        studentId: s.studentId,  //s.state === true if student is absent
+                        present: s.state === true ? false : true
+                });
             });
             await this.pushInfoToDb(vectorToSend);
             let unsetModificationFlags = this.state.studentAbsenceStates;
@@ -160,7 +156,7 @@ export default class Rollcall extends React.Component{
 
     async pushInfoToDb(vectorToSend){
         try {
-            const url = 'http://localhost:3000/attendance';
+            const url = 'http://localhost:3000/rollcall';
             const jsonToSend = JSON.stringify({
                 info: vectorToSend
             });
