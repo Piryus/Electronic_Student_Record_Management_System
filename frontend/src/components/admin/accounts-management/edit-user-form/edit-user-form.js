@@ -1,30 +1,71 @@
 import React from 'react';
-import {Button, Form, Modal} from "react-bootstrap";
-import Select from "react-select";
+import {Alert, Button, Form, Modal} from "react-bootstrap";
 
 export default class EditUserForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            email: this.props.user.mail,
-            name: this.props.user.name,
-            surname: this.props.user.surname,
-            ssn: this.props.user.ssn
+            email: '',
+            name: '',
+            surname: '',
+            ssn: '',
+            error: false
         };
     }
 
-    handleSubmitForm() {
-        // TODO Backend request to modify the user
-        this.props.handleClose();
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if(nextProps.user.mail !== prevState.email){
+            return {
+                email: nextProps.user.mail,
+                name: nextProps.user.name,
+                surname: nextProps.user.surname,
+                ssn: nextProps.user.ssn,
+                error: false
+            };
+        }
+        else return null;
+    }
+
+    async handleSubmitForm() {
+        try {
+            const url = 'http://localhost:3000/users/' + this.props.user._id;
+            const options = {
+                method: 'PATCH',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    mail: this.state.email,
+                    name: this.state.name,
+                    surname: this.state.surname,
+                    ssn: this.state.ssn,
+                    scope: this.props.user.scope[0] // TODO Modify to manage multiple roles
+                })
+            };
+            const response = await fetch(url, options);
+            const responseJson = await response.json();
+            if (responseJson.success) {
+                this.props.handleClose(true);
+            } else {
+                this.setState({error: true});
+            }
+        } catch (e) {
+            this.setState({error: true});
+        }
     };
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={() => this.props.handleClose()}>
+            <Modal show={this.props.show} onHide={() => this.props.handleClose(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Modify {this.state.name} {this.state.surname}</Modal.Title>
+                    <Modal.Title>Modify {this.props.user.name} {this.props.user.surname}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {this.state.error &&(
+                        <Alert variant='danger'>Unable to update this user.</Alert>
+                    )}
                     <Form>
                         <Form.Group controlId="formEmail">
                             <Form.Label>Email:</Form.Label>
@@ -48,6 +89,7 @@ export default class EditUserForm extends React.Component {
                             <Form.Label>Surname:</Form.Label>
                             <Form.Control type="string"
                                           placeholder="Enter name"
+                                          defaultValue={this.props.user.surname}
                                           value={this.state.surname}
                                           onChange={(e) => this.setState({surname: e.target.value})}/>
                             <Form.Text className="text-muted">
@@ -57,6 +99,7 @@ export default class EditUserForm extends React.Component {
                             <Form.Label>SSN:</Form.Label>
                             <Form.Control type="string"
                                           placeholder="Enter SSN"
+                                          defaultValue={this.props.user.ssn}
                                           value={this.state.ssn}
                                           onChange={(e) => this.setState({ssn: e.target.value})}/>
                             <Form.Text className="text-muted">
@@ -66,7 +109,7 @@ export default class EditUserForm extends React.Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="success" onClick={() => this.handleSubmitForm()}>Update user</Button>
-                    <Button variant="danger" onClick={() => this.props.handleClose()}>Cancel</Button>
+                    <Button variant="danger" onClick={() => this.props.handleClose(false)}>Cancel</Button>
                 </Modal.Footer>
             </Modal>
         );
