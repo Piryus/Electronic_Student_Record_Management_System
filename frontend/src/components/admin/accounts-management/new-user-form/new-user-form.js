@@ -43,7 +43,7 @@ export default class NewUserForm extends React.Component {
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.handleClose}>
+            <Modal show={this.props.show} onHide={() => this.props.handleClose(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Add a new user</Modal.Title>
                 </Modal.Header>
@@ -102,7 +102,7 @@ export default class NewUserForm extends React.Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="success" onClick={() => this.handleSubmitForm()}>Add user</Button>
-                    <Button variant="danger" onClick={this.props.handleClose}>Cancel</Button>
+                    <Button variant="danger" onClick={() => this.props.handleClose(false)}>Cancel</Button>
                 </Modal.Footer>
             </Modal>
         );
