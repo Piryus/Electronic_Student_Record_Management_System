@@ -20,7 +20,7 @@ export default class EditUserForm extends React.Component {
 
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.handleClose}>
+            <Modal show={this.props.show} onHide={() => this.props.handleClose()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Modify {this.state.name} {this.state.surname}</Modal.Title>
                 </Modal.Header>
@@ -66,7 +66,7 @@ export default class EditUserForm extends React.Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="success" onClick={() => this.handleSubmitForm()}>Update user</Button>
-                    <Button variant="danger" onClick={this.props.handleClose}>Cancel</Button>
+                    <Button variant="danger" onClick={() => this.props.handleClose()}>Cancel</Button>
                 </Modal.Footer>
             </Modal>
         );

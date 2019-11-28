@@ -4,7 +4,7 @@ import {FaSistrix, FaPen, FaTrash} from 'react-icons/fa';
 import NewUserForm from "./new-user-form/new-user-form";
 import DeleteUserModal from "./delete-user-modal/delete-user-modal";
 import EditUserForm from "./edit-user-form/edit-user-form";
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 export default class AccountsManagement extends React.Component {
     constructor(props) {
@@ -64,12 +64,12 @@ export default class AccountsManagement extends React.Component {
     render() {
         return (
             <Container fluid>
-                <DeleteUserModal user={this.state.targetUser} show={this.state.showDeleteUserModal} handleClose={() => this.setState({showDeleteUserModal: false})} />
-                <EditUserForm user={this.state.targetUser} show={this.state.showEditUserForm} handleClose={() => this.setState({showEditUserForm: false})} />
+                <DeleteUserModal user={this.state.targetUser} show={this.state.showDeleteUserModal} handleClose={async () => {await this.fetchUsers(); this.setState({showDeleteUserModal: false})}} />
+                <EditUserForm user={this.state.targetUser} show={this.state.showEditUserForm} handleClose={async () => {await this.fetchUsers(); this.setState({showEditUserForm: false})}} />
                 <SectionHeader>Users</SectionHeader>
                 <Row className="mb-2">
                     <Button onClick={() => this.setState({showNewUserForm: true})}>New user</Button>
-                    <NewUserForm show={this.state.showNewUserForm} handleClose={(hasAddedUser) => this.handleCloseNewUserForm(hasAddedUser)} />
+                    <NewUserForm show={this.state.showNewUserForm} handleClose={async (hasAddedUser) => {await this.fetchUsers(); this.handleCloseNewUserForm(hasAddedUser)}} />
                     <InputGroup className={"ml-auto col-8 col-md-5 col-lg-4 col-xl-3"}>
                         <InputGroup.Prepend>
                             <InputGroup.Text id="basic-addon1"><FaSistrix/></InputGroup.Text>

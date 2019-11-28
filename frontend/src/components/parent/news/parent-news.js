@@ -1,7 +1,7 @@
 import React from 'react';
 import {Container} from "react-bootstrap";
 import {FaCalendar} from 'react-icons/fa';
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 export default class News extends React.Component {
     constructor(props) {

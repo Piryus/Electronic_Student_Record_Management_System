@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import {Button, Dropdown, DropdownButton, Card, Accordion, Form, Container} from 'react-bootstrap';
 import styles from './styles.module.css';
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 
 

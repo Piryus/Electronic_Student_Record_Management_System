@@ -88,6 +88,22 @@ const routes = [
             }
         }
     },
+    {
+        method: 'POST',
+        path: '/rollcall',
+        handler: async (request, h) => lectures.rollCall(request.auth.credentials.id, request.payload.rollCall),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    info: Valid.rollCall
+                }
+            }
+        }
+    },
 ];
 
 module.exports = routes;

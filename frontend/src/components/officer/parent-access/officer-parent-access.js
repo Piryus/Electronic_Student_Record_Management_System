@@ -3,7 +3,7 @@ import {Button, Form, FormControl, InputGroup} from 'react-bootstrap';
 import Select from 'react-select';
 import styles from './styles.module.css';
 import Alert from "react-bootstrap/Alert";
-import SectionHeader from "../../common-components/section-header";
+import SectionHeader from "../../utils/section-header";
 
 export default class ParentAccountEnabling extends React.Component {
 
