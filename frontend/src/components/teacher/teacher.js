@@ -21,16 +21,14 @@ export default class Teacher extends React.Component {
                 class: value.classId.toString()
             };
         });
-        const now = HLib.dateToWeekhour(new Date(Date.now())); //DISABLE for development purpose
-        //const now = '1_0'; //ENABLE for development purpose -> Mario Bianchi Tuesday, 8.00
-        var classId = this.props.timetable.find(t => t.weekhour === now);
+        const now = new Date().getDay() -1  ; //DISABLE for development purpose
+        var classId = this.props.timetable.find(t => t.weekhour === now.toString()+'_'+0);
         var workingHour = '';
-        if(classId === undefined && now === null){
+        if(classId === undefined){
+            //I'm not working in the first hour
             classId = '';
         } else {
-            //Teacher works today
-            const nowSplitted = now.split('_');
-            workingHour = nowSplitted[1];
+            workingHour = 0;
         }
 
 
