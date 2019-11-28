@@ -30,7 +30,7 @@ const addUser = async function(mail, name, surname, ssn, scope) {
 };
 
 const updateUser = async function(userId, mail, name, surname, ssn, scope) {
-    await User.updateOne({ _id: userId }, { ssn, name, surname, mail, password, scope });
+    await User.updateOne({ _id: userId }, { ssn, name, surname, mail, scope });
 
     return {success: true};
 };
