@@ -1,4 +1,4 @@
-import HLib from '@emarkk/hlib';
+import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';
@@ -6,8 +6,8 @@ import {FaGraduationCap, FaMedal, FaBook, FaCalendarCheck} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
-import Attendances from './attendances/attendances';
-import AppNavbar from "../common-components/navbar/navbar";
+import AppNavbar from "../utils/navbar/navbar";
+import Rollcall from './rollcall/rollcall';
 
 export default class Teacher extends React.Component {
 
@@ -21,17 +21,25 @@ export default class Teacher extends React.Component {
                 class: value.classId.toString()
             };
         });
-        //const now = this.dateToWeekhour(new Date(Date.now())); //DISABLE for development purpose
-        const now = "0_1"; //ENABLE for development purpose
-        const classId = this.props.timetable.find(t => t.weekhour === now);
+        const now = HLib.dateToWeekhour(new Date(Date.now())); //DISABLE for development purpose
+        //const now = '1_0'; //ENABLE for development purpose -> Mario Bianchi Tuesday, 8.00
+        var classId = this.props.timetable.find(t => t.weekhour === now);
+        var workingHour = '';
+        if(classId === undefined && now === null){
+            classId = '';
+        } else {
+            //Teacher works today
+            const nowSplitted = now.split('_');
+            workingHour = nowSplitted[1];
+        }
 
 
         this.state = {
             userRequest: 'lecture',
             students: [],
-            isTeacherWorking: false,
             subjects: subjects,
             classId: classId.classId,
+            workingHour: workingHour,
             classAttendance: []
         };
     }
@@ -39,7 +47,9 @@ export default class Teacher extends React.Component {
     async componentDidMount(){
             //Load all students
             await this.getAllStudents();
-            await this.getStudentAttendances();
+            if(this.state.classId !== ''){
+                await this.getStudentAttendances();
+            }
     }
 
     async getStudentAttendances(){
@@ -56,15 +66,7 @@ export default class Teacher extends React.Component {
             let response = await fetch(url, options);
             const json = await response.json();
             
-            if(json.classAttendance === undefined){
-                this.setState({isTeacherWorking: false});
-            }
-            else{
-                this.setState({
-                    classAttendance: json.classAttendance,
-                    isTeacherWorking: true
-                });
-            }
+            this.setState({classAttendance: json.classAttendance});
         } catch(e){
             alert(e);
         }
@@ -92,23 +94,6 @@ export default class Teacher extends React.Component {
     }
 
 
-    dateToWeekhour = function(d) {
-
-        const hour = 60 * 60 * 1000;
-        const day = 24 * hour;
-        const startHour = 8; 
-        const numHours = 6;
-
-        // saturday (6) and sunday (0) have to be excluded
-        if([0, 6].includes(d.getDay()) || d.getHours() < startHour || d.getHours() > (startHour + numHours - 1))
-            return null;
-    
-        const weekdayIndex = d.getDay() - 1;
-        const hourIndex = d.getHours() - startHour;
-        return weekdayIndex + '_' + hourIndex;
-    };
-
-
 
     setUserRequest(e, choice) {
         this.setState({userRequest: choice});
@@ -133,7 +118,9 @@ export default class Teacher extends React.Component {
                             <Nav.Link
                                 className={this.state.userRequest === 'assignments' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments </Nav.Link>
-                            <Nav.Link className={this.state.userRequest === 'attendances' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "attendances")}><FaCalendarCheck/> Attendances </Nav.Link>
+                            {parseInt(this.state.workingHour) === 0  && (
+                            <Nav.Link className={this.state.userRequest === 'rollcall' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "rollcall")}><FaCalendarCheck/> Rollcall </Nav.Link>
+                            )}
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && (<LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
@@ -146,8 +133,8 @@ export default class Teacher extends React.Component {
                             {this.state.userRequest === 'assignments' && (
                                 <Assignments subjects={this.state.subjects} timetable={this.props.timetable}/>
                             )}
-                            {this.state.userRequest === 'attendances' && this.state.isTeacherWorking === true &&(
-                                <Attendances classAttendance={this.state.classAttendance} classId={this.state.classId}/>
+                            {this.state.userRequest === 'rollcall' &&(
+                                <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour}/>
                             )}
                         </main>
                     </Row>
