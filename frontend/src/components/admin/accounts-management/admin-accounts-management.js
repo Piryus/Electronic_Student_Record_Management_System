@@ -1,6 +1,6 @@
 import React from 'react';
-import {Alert, Button, Container, FormControl, InputGroup, Modal, Pagination, Row, Table} from 'react-bootstrap';
-import {FaSistrix, FaPen, FaTrash} from 'react-icons/fa';
+import {Alert, Button, Container, FormControl, InputGroup, Pagination, Row, Table} from 'react-bootstrap';
+import {FaSistrix} from 'react-icons/fa';
 import NewUserForm from "./new-user-form/new-user-form";
 import DeleteUserModal from "./delete-user-modal/delete-user-modal";
 import EditUserForm from "./edit-user-form/edit-user-form";
@@ -11,6 +11,7 @@ export default class AccountsManagement extends React.Component {
         super(props);
         this.state = {
             users: [],
+            filteredUsers: [],
             showNewUserForm: false,
             hasAddedUser: false,
             showDeleteUserModal: false,
@@ -36,7 +37,8 @@ export default class AccountsManagement extends React.Component {
         const response = await fetch(url, options);
         const responseJson = await response.json();
         this.setState({
-            users: responseJson.users
+            users: responseJson.users,
+            filteredUsers: responseJson.users
         });
     }
 
@@ -61,6 +63,28 @@ export default class AccountsManagement extends React.Component {
         });
     }
 
+    handleFilterUser(value) {
+        value = value.toLowerCase();
+        let filteredUsers = this.state.users.filter(user => {
+            if (user.hasOwnProperty('name') && user.hasOwnProperty('surname')) {
+                if ([user.name, user.surname].join(' ').toLowerCase().startsWith(value)) {
+                    return true;
+                }
+                if ([user.surname, user.name].join(' ').toLowerCase().startsWith(value)) {
+                    return true;
+                }
+            }
+            if (user.hasOwnProperty('ssn') && user.ssn.toLowerCase().startsWith(value)) {
+                return true;
+            }
+            return user.hasOwnProperty('mail') && user.mail.toLowerCase().startsWith(value);
+
+        });
+        this.setState({
+            filteredUsers
+        });
+    }
+
     render() {
         return (
             <Container fluid>
@@ -78,6 +102,7 @@ export default class AccountsManagement extends React.Component {
                             placeholder="User search..."
                             aria-label="User"
                             aria-describedby="basic-addon1"
+                            onChange={(e) => this.handleFilterUser(e.target.value)}
                         />
                     </InputGroup>
                 </Row>
@@ -97,7 +122,7 @@ export default class AccountsManagement extends React.Component {
                         </tr>
                         </thead>
                         <tbody>
-                        {this.state.users.map(user =>
+                        {this.state.filteredUsers.map(user =>
                             <tr key={user.ssn}>
                                 <td className="align-middle">{user.ssn}</td>
                                 <td className="align-middle">{user.name}</td>
@@ -113,7 +138,7 @@ export default class AccountsManagement extends React.Component {
                         </tbody>
                     </Table>
                 </Row>
-                <Row>
+                {/*<Row>
                     <Pagination className="col justify-content-center">
                         <Pagination.First/>
                         <Pagination.Prev/>
@@ -131,7 +156,7 @@ export default class AccountsManagement extends React.Component {
                         <Pagination.Next/>
                         <Pagination.Last/>
                     </Pagination>
-                </Row>
+                </Row>*/}
             </Container>
         );
     }
