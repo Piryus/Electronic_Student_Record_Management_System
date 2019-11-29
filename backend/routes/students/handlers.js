@@ -59,30 +59,26 @@ const recordGrades = async function(teacherUId, subject, grades) {
     return {success: true};
 };
 
-const recordAttendance = async function(teacherUId, attendanceInfo) {
-    const now = HLib.dateToWeekhour(new Date(Date.now()));
+const recordAttendance = async function(teacherUId, classId, info) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
-    const students = await Student.find({ _id: { $in: attendanceInfo.map(a => a.studentId) }});
-    const schoolClassesIds = students.reduce((arr, x) => {
-        if(!arr.some(i => i.equals(x.classId))) arr.push(x.classId);
-        return arr;
-    }, []);
-    
-    if(teacher === null || now === null || students.length != attendanceInfo.length || schoolClassesIds.length !== 1 ||
-        !teacher.timetable.some(t => t.classId.equals(schoolClassesIds[0]) && t.weekhour === now))
+    const students = await Student.find({ _id: { $in: info.map(i => i.studentId) }});
+
+    if(teacher === null || students.length != info.length || !students.every(s => s.classId === classId))
         return Boom.badRequest();
 
-    const absentees = attendanceInfo.filter(a => a.attendanceEvent === 'absent');
+    const whs = teacher.timetable.filter(t => t.classId === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now())));
 
-    if(absentees.length && now.split('_')[1] !== 0)
+    if(whs.length === 0 || info.some(i => !i.time.isTimeIncludedInWeekhours(whs) || !i.time.isTimeValidFor(i.attendanceEvent)))
         return Boom.badRequest();
 
-    students.filter(s => attendanceInfo.map(a => a.studentId).includes(s._id)).forEach(s => 
-        s.attendanceEvents.push({ event: 'absence' })
-    );
+    students.forEach(s => {
+        let sInfo = info.find(i => i.studentId === s._id.toString());
+        s.attendanceEvents = s.attendanceEvents.filter(ae => ae.event !== sInfo.attendanceEvent || !ae.date.isSameDayOf(new Date(Date.now())));
+        s.attendanceEvents.push({ date: HLib.timeToDate(sInfo.time), event: sInfo.attendanceEvent });
+    });
     await Promise.all(students.map(s => s.save()));
 
-    return {success: true};
+    return { success: true };
 };
 
 const addStudent = async function(ssn, name, surname) {

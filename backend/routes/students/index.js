@@ -83,7 +83,7 @@ const routes = [
     {
         method: 'POST',
         path: '/attendance',
-        handler: async (request, h) => students.recordAttendance(request.auth.credentials.id, request.payload.events),
+        handler: async (request, h) => students.recordAttendance(request.auth.credentials.id, request.payload.classId, request.payload.info),
         options: {
             auth: {
                 strategy: 'session',
@@ -91,6 +91,7 @@ const routes = [
             },
             validate: {
                 payload: {
+                    classId: Valid.id.required(),
                     info: Valid.array.items(Valid.attendanceInfo).required()
                 }
             }
