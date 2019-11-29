@@ -63,11 +63,11 @@ const recordAttendance = async function(teacherUId, classId, info) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     const students = await Student.find({ _id: { $in: info.map(i => i.studentId) }});
 
-    if(teacher === null || students.length != info.length || !students.every(s => s.classId === classId))
+    if(teacher === null || students.length != info.length || !students.every(s => s.classId.toString() === classId))
         return Boom.badRequest();
 
-    const whs = teacher.timetable.filter(t => t.classId === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now())));
-
+    const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now()))).map(t => t.weekhour);
+    
     if(whs.length === 0 || info.some(i => !i.time.isTimeIncludedInWeekhours(whs) || !i.time.isTimeValidFor(i.attendanceEvent)))
         return Boom.badRequest();
 
