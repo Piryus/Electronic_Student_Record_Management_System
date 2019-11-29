@@ -201,8 +201,11 @@ export default class EarlyLateRecordComponent extends React.Component{
                     </Form.Group>
                     
                     <Button variant="primary" onClick={() => this.addStudent()}>Add Student</Button><br></br><br></br>
+                    {this.state.addedStudents.length !== 0 && (
+                    <div>
                     <Button variant="outline-success" onClick={() => this.saveChanges()}>Save</Button>
                     <Button variant="danger" className={styles.dangerButton} onClick={() => this.discardChanges()}>Discard</Button>
+                    </div>)}
 
 
                 </Form><br></br>
