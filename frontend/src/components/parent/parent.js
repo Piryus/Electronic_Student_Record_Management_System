@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';
-import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook} from 'react-icons/fa';
+import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook, FaAddressCard} from 'react-icons/fa';
 import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
 import News from "./news/parent-news";
 import Assignment from './Assignment';
+import Attendance from './Attendance';
 
 export default class Parent extends React.Component {
 
@@ -55,6 +56,9 @@ export default class Parent extends React.Component {
                                 className={this.state.userRequest === 'assignments' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments</Nav.Link>
                             <Nav.Link
+                                className={this.state.userRequest === 'attendance' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={(e) => this.setUserRequest(e, "attendance")}><FaAddressCard/> Attendance</Nav.Link>
+                            <Nav.Link
                                 className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
                         </Nav>
                         <main className="col-md-10 ml-sm-auto col-lg-10 px-4 pt-5">
@@ -66,6 +70,9 @@ export default class Parent extends React.Component {
                             )}
                             {this.state.userRequest === 'assignments' && (
                                 <Assignment child={this.state.childSelected}/>
+                            )}
+                            {this.state.userRequest === 'attendance' && (
+                                <Attendance child={this.state.childSelected}/>
                             )}
                         </main>
                     </Row>
