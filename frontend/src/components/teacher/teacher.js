@@ -8,6 +8,7 @@ import StudentGradesSummary from './student-grades-summary/studentGradesSummary'
 import Assignments from './assignments/assignments';
 import AppNavbar from "../utils/navbar/navbar";
 import Rollcall from './rollcall/rollcall';
+import EarlyLateRecordComponenent from '../utils/earlyLateRecordComponent/index';
 
 export default class Teacher extends React.Component {
 
@@ -166,10 +167,10 @@ export default class Teacher extends React.Component {
                                 <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour} updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.workingHour <= 1 && (
-                                <h1>Late-Entry</h1>
+                                <EarlyLateRecordComponenent type={'late-entry'} classId={this.state.classId}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.workingHour > -1 && (
-                                <h1>Early-Exit</h1>
+                                <EarlyLateRecordComponenent type={'early-exit'} classId={this.state.classId}/>
                             )}
                         </main>
                     </Row>
