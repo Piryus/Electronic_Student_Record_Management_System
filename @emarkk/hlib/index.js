@@ -69,6 +69,11 @@ const getAY = function(d) {
     return y + '/' + (y + 1).toString().slice(-2);
 };
 
+const timeToDate = function(t) {
+    const now = new Date(Date.now());
+    return new Date(now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + 'T' + t + ':00');
+};
+
 const weekhourToDate = function(wh) {
     let d = new Date(Date.now()).weekStart();
     const [weekdayIndex, hourIndex] = wh.split('_').map(x => parseInt(x));
@@ -93,6 +98,7 @@ module.exports = {
     startHour,
     getRandomPassword,
     getAY,
+    timeToDate,
     weekhourToDate,
     dateToWeekhour
 };

@@ -223,6 +223,33 @@ suite('HLib', () => {
         expect(ay7).to.equal('2015/16');
     });
 
+    test('timeToDate', async () => {
+        const now = new Date(Date.now());
+        const t = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + 'T';
+        const d1 = HLib.timeToDate('16:10');
+        const d2 = HLib.timeToDate('12:26');
+        const d3 = HLib.timeToDate('10:06');
+        const d4 = HLib.timeToDate('14:24');
+        const d5 = HLib.timeToDate('08:45');
+        const d6 = HLib.timeToDate('09:03');
+        const d7 = HLib.timeToDate('11:19');
+        const d8 = HLib.timeToDate('13:50');
+        const d9 = HLib.timeToDate('18:27');
+        const d10 = HLib.timeToDate('08:40');
+        const d11 = HLib.timeToDate('06:12');
+        expect(d1).to.equal(new Date(t + '16:10' + ':00'));
+        expect(d2).to.equal(new Date(t + '12:26' + ':00'));
+        expect(d3).to.equal(new Date(t + '10:06' + ':00'));
+        expect(d4).to.equal(new Date(t + '14:24' + ':00'));
+        expect(d5).to.equal(new Date(t + '08:45' + ':00'));
+        expect(d6).to.equal(new Date(t + '09:03' + ':00'));
+        expect(d7).to.equal(new Date(t + '11:19' + ':00'));
+        expect(d8).to.equal(new Date(t + '13:50' + ':00'));
+        expect(d9).to.equal(new Date(t + '18:27' + ':00'));
+        expect(d10).to.equal(new Date(t + '08:40' + ':00'));
+        expect(d11).to.equal(new Date(t + '06:12' + ':00'));
+    });
+
     test('weekhourToDate', async () => {
         const ws = new Date().weekStart();
         const d1 = HLib.weekhourToDate('0_4');
