@@ -9,30 +9,17 @@ export default class Rollcall extends React.Component{
     constructor(props){
         super(props);
 
-        let studentStates = [];
-        let i = 0;
-        this.props.classAttendance.forEach((s) => {
-            let absent = false;
-            if(s.events.length !== 0){
-                s.events.forEach(e => {
-                    if(e.event === 'absence'){
-                        absent = true;
-                    }
-                });
-            }
-            studentStates[i] = {
-                studentId: s.id,
-                state: absent, //true if absent
-                modified: false
-            };
-            i++;
-        });
-
         this.state = {
             classAttendance: this.props.classAttendance,
             classId: this.props.classId,
             classStudents: [],
-            studentAbsenceStates: studentStates,
+            studentAbsenceStates: this.props.classAttendance.map(a => {
+                return {
+                    studentId: a.id,
+                    state: a.events.some(e => e.event === 'absence'),
+                    modified: false
+                };
+            }),
             wantEditCheckboxes: false
         }
         this.setEditCheckboxes = this.setEditCheckboxes.bind(this);
@@ -61,14 +48,11 @@ export default class Rollcall extends React.Component{
             };
             let response = await fetch(url, options);
             const json = await response.json();
-            // const sorted = json.students.sort((a, b) => {
-            //     return a.surname.localeCompare(b.surname) || a.name.localeCompare(b.name)
-            // });
-            // this.setState({
-            //     classStudents: sorted
-            // });
+            const sorted = json.students.sort((a, b) => {
+                return a.surname.localeCompare(b.surname) || a.name.localeCompare(b.name)
+            });
             this.setState({
-                classStudents: json.students
+                classStudents: sorted
             });
         } catch(e){
             alert(e);
@@ -108,7 +92,7 @@ export default class Rollcall extends React.Component{
                             <td>{s.surname}</td>
                             <td>{s.name}</td>
                             <td>{s.ssn}</td>
-                            <td><Form.Check type="checkbox" id={s._id} onChange={(e) => this.onCheckChanged(e)} checked={(this.state.studentAbsenceStates[index]).state} disabled={!this.state.wantEditCheckboxes}/></td>
+                            <td><Form.Check type="checkbox" id={s._id} onChange={(e) => this.onCheckChanged(e)} checked={(this.state.studentAbsenceStates.find(abs => abs.studentId === s._id) || {}).state} disabled={!this.state.wantEditCheckboxes}/></td>
                     </tr>);
                 });
         }
