@@ -61,11 +61,14 @@ export default class Rollcall extends React.Component{
             };
             let response = await fetch(url, options);
             const json = await response.json();
-            const sorted = json.students.sort((a, b) => {
-                return a.surname.localeCompare(b.surname) || a.name.localeCompare(b.name)
-            });
+            // const sorted = json.students.sort((a, b) => {
+            //     return a.surname.localeCompare(b.surname) || a.name.localeCompare(b.name)
+            // });
+            // this.setState({
+            //     classStudents: sorted
+            // });
             this.setState({
-                classStudents: sorted
+                classStudents: json.students
             });
         } catch(e){
             alert(e);
@@ -105,7 +108,7 @@ export default class Rollcall extends React.Component{
                             <td>{s.surname}</td>
                             <td>{s.name}</td>
                             <td>{s.ssn}</td>
-                            <td><Form.Check type="checkbox" id={s._id} onChange={(e) => this.onCheckChanged(e)} checked={(this.state.studentAbsenceStates[index] || {}).state} disabled={!this.state.wantEditCheckboxes}/></td>
+                            <td><Form.Check type="checkbox" id={s._id} onChange={(e) => this.onCheckChanged(e)} checked={(this.state.studentAbsenceStates[index]).state} disabled={!this.state.wantEditCheckboxes}/></td>
                     </tr>);
                 });
         }

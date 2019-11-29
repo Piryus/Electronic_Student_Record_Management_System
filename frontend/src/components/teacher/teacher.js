@@ -2,7 +2,7 @@ import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Row, Nav} from 'react-bootstrap';
-import {FaGraduationCap, FaMedal, FaBook, FaCalendarCheck} from 'react-icons/fa'
+import {FaGraduationCap, FaMedal, FaBook, FaCalendarCheck, FaArrowAltCircleLeft} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
@@ -26,9 +26,30 @@ export default class Teacher extends React.Component {
         var workingHour = '';
         if(classId === undefined){
             //I'm not working in the first hour
-            classId = '';
+            classId = this.props.timetable.find(t => t.weekhour === now.toString()+'_'+1);
+            if(classId === undefined){
+                //I'm not working in the second hour
+                let index = 2;
+
+                for( ; index<6 ; index++){
+                    classId = this.props.timetable.find(t => t.weekhour === now.toString()+'_'+index);
+                    if(classId !== undefined){
+                        workingHour = index;
+                        classId = classId.classId
+                        break;
+                    }
+                }
+                if(index === 6){
+                    classId = '';
+
+                }
+            } else {
+                workingHour = 1;
+                classId = classId.classId;
+            }
         } else {
             workingHour = 0;
+            classId= classId.classId;
         }
 
 
@@ -36,7 +57,7 @@ export default class Teacher extends React.Component {
             userRequest: 'lecture',
             students: [],
             subjects: subjects,
-            classId: classId.classId,
+            classId: classId,
             workingHour: workingHour,
             classAttendance: []
         };
@@ -126,6 +147,9 @@ export default class Teacher extends React.Component {
                             {parseInt(this.state.workingHour) === 0  && (
                             <Nav.Link className={this.state.userRequest === 'rollcall' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "rollcall")}><FaCalendarCheck/> Rollcall </Nav.Link>
                             )}
+                            {this.state.classId !== '' && (
+                                <Nav.Link className={this.state.userRequest === 'early-late' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "early-late")}><FaArrowAltCircleLeft/> Late-Entry/Early-Exit </Nav.Link>
+                            )}
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && (<LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
@@ -140,6 +164,12 @@ export default class Teacher extends React.Component {
                             )}
                             {this.state.userRequest === 'rollcall' &&(
                                 <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour} updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
+                            )}
+                            {this.state.userRequest === 'early-late' && this.state.workingHour <= 1 && (
+                                <h1>Late-Entry</h1>
+                            )}
+                            {this.state.userRequest === 'early-late' && this.state.workingHour > -1 && (
+                                <h1>Early-Exit</h1>
                             )}
                         </main>
                     </Row>
