@@ -16,7 +16,9 @@ class Assignment extends Component {
         await this.getChildAssignment();
     }
 
-    // TODO Derived state when switching child (@Emile)
+    async componentDidUpdate() {
+        await this.getChildAssignment();
+    }
 
     async getChildAssignment() {
         // Query child's assignments
@@ -31,9 +33,11 @@ class Assignment extends Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-        this.setState({
-            childAssignment: json.assignments
-        });
+        if (this.state.childAssignment !== json.assignments) {
+            this.setState({
+                childAssignment: json.assignments
+            });
+        }
     }
 
     renderItem = (item, index) => {
