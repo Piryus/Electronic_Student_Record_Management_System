@@ -42,6 +42,64 @@ suite('HLib', () => {
         expect(g13).to.equal(8.75);
         expect(g14).to.equal(2);
     });
+
+    test('String.isTimeIncludedInWeekhours', async () => {
+        const tiw1 = '08:23'.isTimeIncludedInWeekhours(['2_0', '2_1']);
+        const tiw2 = '11:22'.isTimeIncludedInWeekhours(['4_3']);
+        const tiw3 = '12:23'.isTimeIncludedInWeekhours(['1_4']);
+        const tiw4 = '10:56'.isTimeIncludedInWeekhours(['1_5']);
+        const tiw5 = '09:51'.isTimeIncludedInWeekhours(['2_2']);
+        const tiw6 = '12:38'.isTimeIncludedInWeekhours(['3_1', '3_4']);
+        const tiw7 = '08:42'.isTimeIncludedInWeekhours(['2_0']);
+        const tiw8 = '13:06'.isTimeIncludedInWeekhours(['3_3']);
+        const tiw9 = '08:16'.isTimeIncludedInWeekhours(['0_4']);
+        const tiw10 = '12:50'.isTimeIncludedInWeekhours(['1_2', '1_3']);
+        const tiw11 = '10:11'.isTimeIncludedInWeekhours(['4_4']);
+        const tiw12 = '11:33'.isTimeIncludedInWeekhours(['1_3']);
+        const tiw13 = '09:40'.isTimeIncludedInWeekhours(['1_5']);
+        const tiw14 = '13:38'.isTimeIncludedInWeekhours(['2_2', '2_3']);
+        const tiw15 = '11:09'.isTimeIncludedInWeekhours(['4_0']);
+        expect(tiw1).to.be.true();
+        expect(tiw2).to.be.true();
+        expect(tiw3).to.be.true();
+        expect(tiw4).to.be.false();
+        expect(tiw5).to.be.false();
+        expect(tiw6).to.be.true();
+        expect(tiw7).to.be.true();
+        expect(tiw8).to.be.false();
+        expect(tiw9).to.be.false();
+        expect(tiw10).to.be.false();
+        expect(tiw11).to.be.false();
+        expect(tiw12).to.be.true();
+        expect(tiw13).to.be.false();
+        expect(tiw14).to.be.false();
+        expect(tiw15).to.be.false();
+    });
+    
+    test('String.isTimeValidFor', async () => {
+        const tv1 = '08:02'.isTimeValidFor('late-entrance');
+        const tv2 = '08:05'.isTimeValidFor('late-entrance');
+        const tv3 = '08:00'.isTimeValidFor('late-entrance');
+        const tv4 = '08:07'.isTimeValidFor('late-entrance');
+        const tv5 = '08:10'.isTimeValidFor('late-entrance');
+        const tv6 = '08:11'.isTimeValidFor('late-entrance');
+        const tv7 = '09:00'.isTimeValidFor('late-entrance');
+        const tv8 = '08:09'.isTimeValidFor('late-entrance');
+        const tv9 = '09:01'.isTimeValidFor('late-entrance');
+        const tv10 = '10:00'.isTimeValidFor('late-entrance');
+        const tv11 = 'whatever'.isTimeValidFor('whatever');
+        expect(tv1).to.be.true();
+        expect(tv2).to.be.true();
+        expect(tv3).to.be.false();
+        expect(tv4).to.be.true();
+        expect(tv5).to.be.true();
+        expect(tv6).to.be.false();
+        expect(tv7).to.be.true();
+        expect(tv8).to.be.true();
+        expect(tv9).to.be.false();
+        expect(tv10).to.be.false();
+        expect(tv11).to.be.true();
+    });
     
     test('Date.isSameDayOf', async () => {
         const i1 = new Date('2019-01-04T16:54:00').isSameDayOf(new Date('2019-01-04T13:11:59'));

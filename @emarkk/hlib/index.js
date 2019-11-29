@@ -7,6 +7,17 @@ String.prototype.gradify = function() {
     let n = this.replace('+', '.25').replace(/l|L| cum laude/, '').replace(/ 1\/2| and 1\/2/, '.5').replace(/(\d)\/(\d)/, '$1.75');
     return n.indexOf('-') === -1 ? parseFloat(n) : parseFloat(n.replace('-', '')) - 0.25;
 };
+String.prototype.isTimeIncludedInWeekhours = function(whs) {
+    const h = whs.map(wh => parseInt(wh.split('_')[1]));
+    const t = parseInt(this.split(':')[0]) - startHour;
+    return h.includes(t);
+};
+String.prototype.isTimeValidFor = function(event) {
+    if(event === 'late-entrance')
+        return /^(08:(0[1-9]|10)|09:00)$/.test(this);
+        
+    return true;
+};
 
 Date.prototype.shortString = function() {
     return this.getDate() + '/' + this.getMonth();
