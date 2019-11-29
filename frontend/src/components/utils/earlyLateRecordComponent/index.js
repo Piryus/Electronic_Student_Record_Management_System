@@ -76,7 +76,9 @@ export default class EarlyLateRecordComponent extends React.Component{
             alert('Please insert a valid hour.');
         } else if(parseInt(this.state.selectedhh)<8 || parseInt(this.state.selectedhh)>14){
             alert('Please insert a valid hour.');
-        }  else if(isNaN(this.state.selectedmm)){
+        } else if(this.props.type==='late-entrance' && parseInt(this.state.selectedhh)>9){
+            alert('Please insert a valid hour in the range [08:00-9:59].');
+        } else if(isNaN(this.state.selectedmm)){
             alert('Please insert valid minutes.');
         } else if(this.state.selectedhh === ''){
             alert('Please insert valid minutes.');
@@ -90,8 +92,8 @@ export default class EarlyLateRecordComponent extends React.Component{
             } else {
                 addedStudents.push({
                     student: this.state.selectedStudent.value,
-                    hh: this.state.selectedhh,
-                    mm: this.state.selectedmm
+                    hh: this.state.selectedhh.length === 1 ? '0'+this.state.selectedhh : this.state.selectedhh,
+                    mm: this.state.selectedmm.length === 1 ? '0'+this.state.selectedmm : this.state.selectedmm
                 });
                 //Sort eventually here
                 this.setState({
@@ -107,7 +109,51 @@ export default class EarlyLateRecordComponent extends React.Component{
     }
 
     async saveChanges(){
-        
+        let vector = this.state.addedStudents.map(s => {
+            return {
+                studentId: s.student._id,
+                time: s.hh+':'+s.mm,
+                attendanceEvent: this.props.type === 'late-entrance' ? 'late-entrance' : 'early-exit' 
+            };
+        });
+        let dataToSend = {
+            classId: this.state.classId,
+            info: vector
+        }
+        await this.pushDataToDb(dataToSend);
+        this.setState({
+            addedStudents: [],
+            selectedStudent: '',
+            selectedhh: '',
+            selectedmm: ''
+        });
+    }
+
+    async pushDataToDb(dataToSend){
+        try {
+            const url = 'http://localhost:3000/attendance';
+            const jsonToSend = JSON.stringify(dataToSend);
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: jsonToSend
+            };
+            let response = await fetch(url, options);
+            const json = await response.json();
+            if (json.error != null) {
+                alert('Ops! Internal error. Please retry!');
+                window.location.reload(false);
+            } else {
+                alert('Event successfully recorded.');
+            }
+        } catch (err) {
+            alert(err);
+            window.location.reload(false);
+        }
     }
 
     discardChanges(){
@@ -129,8 +175,8 @@ export default class EarlyLateRecordComponent extends React.Component{
 
         return(
             <div>
-                {this.props.type === 'late-entry' && (
-                    <SectionHeader>Late Entry</SectionHeader>
+                {this.props.type === 'late-entrance' && (
+                    <SectionHeader>Late Entrance</SectionHeader>
                 )}
                 {this.props.type === 'early-exit' &&(
                     <SectionHeader>Early Exit</SectionHeader>

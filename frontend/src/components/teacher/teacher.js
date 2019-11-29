@@ -149,7 +149,7 @@ export default class Teacher extends React.Component {
                             <Nav.Link className={this.state.userRequest === 'rollcall' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "rollcall")}><FaCalendarCheck/> Rollcall </Nav.Link>
                             )}
                             {this.state.classId !== '' && (
-                                <Nav.Link className={this.state.userRequest === 'early-late' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "early-late")}><FaArrowAltCircleLeft/> Late-Entry/Early-Exit </Nav.Link>
+                                <Nav.Link className={this.state.userRequest === 'early-late' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "early-late")}><FaArrowAltCircleLeft/> Late-Entrance/Early-Exit </Nav.Link>
                             )}
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
@@ -167,7 +167,7 @@ export default class Teacher extends React.Component {
                                 <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour} updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.workingHour <= 1 && (
-                                <EarlyLateRecordComponenent type={'late-entry'} classId={this.state.classId}/>
+                                <EarlyLateRecordComponenent type={'late-entrance'} classId={this.state.classId}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.workingHour > -1 && (
                                 <EarlyLateRecordComponenent type={'early-exit'} classId={this.state.classId}/>
