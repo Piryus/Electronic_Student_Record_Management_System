@@ -185,6 +185,7 @@ export default class Rollcall extends React.Component{
         return(
             <div>
                 <h1>Attendances</h1>
+                <p>This section is to be used to call the roll. Only the teacher of the first hour is allowed to access this page. Changes (in case of mistakes or omissions) are allowed <i>throughout the day</i>.<br />Please <u>do not</u> use this section to update student attendance in the wake of a late-entrance or early-exit. In those cases, use the corresponding section.</p><br />
                 {this.state.wantEditCheckboxes === false && (<Button variant="primary" onClick={() => this.setEditCheckboxes()}>Edit</Button>)}
                 {this.state.wantEditCheckboxes === true && (
                 <div>
