@@ -1,7 +1,7 @@
 import React from 'react';
 import MyTimetable from '../../utils/my-timetable';
 import SectionHeader from "../../utils/section-header";
-import {Container} from "react-bootstrap";
+import {Container, Spinner} from "react-bootstrap";
 
 export default class Attendance extends React.Component {
 
@@ -9,7 +9,7 @@ export default class Attendance extends React.Component {
         super(props);
         this.state = {
             childAttendance: [],
-
+            isLoading: true,
         }
     }
 
@@ -38,7 +38,8 @@ export default class Attendance extends React.Component {
         const json = await response.json();
         if (this.state.childAttendance !== json.attendance) {
             this.setState({
-                childAttendance: json.attendance
+                childAttendance: json.attendance,
+                isLoading: false
             });
         }
     }
@@ -105,7 +106,11 @@ export default class Attendance extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Attendance</SectionHeader>
-                <MyTimetable data={data}/>
+                {this.state.isLoading &&
+                <div className="d-flex">
+                    <Spinner animation="border" className="mx-auto"/>
+                </div>}
+                {!this.state.isLoading && <MyTimetable data={data}/>}
             </Container>
         );
     }

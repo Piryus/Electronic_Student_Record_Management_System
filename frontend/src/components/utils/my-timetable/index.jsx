@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
-import './style.sass';
 import {Table} from "react-bootstrap";
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const hours = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00'];
 
-class MyTimetable extends Component {
+export default class MyTimetable extends Component {
     render() {
         return (
             <Table responsive bordered>
@@ -33,5 +32,3 @@ class MyTimetable extends Component {
             </Table>);
     }
 }
-
-export default MyTimetable;
