@@ -5,7 +5,7 @@ import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook, FaAddressCard} from 'rea
 import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
 import News from "./news/parent-news";
-import Assignment from './Assignment';
+import Assignments from './assignments';
 import Attendance from './attendance';
 
 export default class Parent extends React.Component {
@@ -69,7 +69,7 @@ export default class Parent extends React.Component {
                                 <Grades child={this.state.childSelected}/>
                             )}
                             {this.state.userRequest === 'assignments' && (
-                                <Assignment child={this.state.childSelected}/>
+                                <Assignments child={this.state.childSelected}/>
                             )}
                             {this.state.userRequest === 'attendance' && (
                                 <Attendance child={this.state.childSelected}/>

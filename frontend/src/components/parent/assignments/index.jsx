@@ -1,22 +1,18 @@
-import React, {Component} from 'react';
-import {Accordion, Card, Col, Container, Row} from "react-bootstrap";
+import React from 'react';
+import {Accordion, Card, Col, Container, Row, Spinner} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 
-class Assignment extends Component {
-
+export default class Assignments extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             childAssignment: [],
+            loading: true,
         }
     }
 
     async componentDidMount() {
-        await this.getChildAssignment();
-    }
-
-    async componentDidUpdate() {
         await this.getChildAssignment();
     }
 
@@ -33,11 +29,10 @@ class Assignment extends Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-        if (this.state.childAssignment !== json.assignments) {
-            this.setState({
-                childAssignment: json.assignments
-            });
-        }
+        this.setState({
+            childAssignment: json.assignments,
+            loading: false
+        });
     }
 
     renderItem = (item, index) => {
@@ -96,10 +91,12 @@ class Assignment extends Component {
         return (
             <Container fluid>
                 <SectionHeader>Assignments</SectionHeader>
-                {output}
+                {this.state.loading &&
+                <div className="d-flex">
+                    <Spinner animation="border" className="mx-auto"/>
+                </div>}
+                {!this.state.loading && output}
             </Container>
         )
     }
 }
-
-export default Assignment;
