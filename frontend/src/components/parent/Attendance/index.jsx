@@ -1,5 +1,5 @@
 import React from 'react';
-import MyTimetable from '../../utils/MyTimetable';
+import MyTimetable from '../../utils/my-timetable';
 import SectionHeader from "../../utils/section-header";
 import {Container} from "react-bootstrap";
 
@@ -9,6 +9,7 @@ export default class Attendance extends React.Component {
         super(props);
         this.state = {
             childAttendance: [],
+
         }
     }
 
