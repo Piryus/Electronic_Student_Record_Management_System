@@ -1,5 +1,6 @@
 import React from 'react';
 import SectionHeader from '../section-header';
+import EarlyLateTable from '../earlyLateTable/earlyLateTable';
 import Select from 'react-select';
 import {Button, Table, Form, FormControl, InputGroup} from 'react-bootstrap';
 import styles from './styles.module.css';
@@ -20,8 +21,9 @@ export default class EarlyLateRecordComponent extends React.Component{
             selectedmm: '',
             addedStudents: [],
             searchOptions: [],
+            wantSeeEvents: false
         }
-
+        this.handleWantSeeEvents = this.handleWantSeeEvents.bind(this);
     }
 
     async componentDidMount(){
@@ -29,6 +31,10 @@ export default class EarlyLateRecordComponent extends React.Component{
             await this.getClassStudents();
             this.computeSearchOptions();
         }
+    }
+
+    handleWantSeeEvents(){
+        this.setState({wantSeeEvents: false});
     }
 
     computeSearchOptions() {
@@ -181,6 +187,9 @@ export default class EarlyLateRecordComponent extends React.Component{
                 {this.props.type === 'early-exit' &&(
                     <SectionHeader>Early Exit</SectionHeader>
                 )}
+                {this.state.wantSeeEvents === false &&(
+                <div>
+                <Button variant="outline-primary" onClick={() => this.setState({wantSeeEvents: true})}>Daily Events</Button><br></br>
                 <Form >
                     <Form.Group>
                         <Form.Label>Search a Student</Form.Label>
@@ -231,6 +240,10 @@ export default class EarlyLateRecordComponent extends React.Component{
                             })}
                         </tbody>
                     </Table>
+                    </div>)}
+                    {this.state.wantSeeEvents === true && (
+                        <EarlyLateTable dontWantSeeEvents={this.handleWantSeeEvents} classStudents={this.state.classStudents} type={this.props.type} timetable={this.props.timetable} now={this.props.now}/>
+                    )}
             </div>
         );
     }

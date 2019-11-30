@@ -23,6 +23,7 @@ export default class Teacher extends React.Component {
             };
         });
         const now = new Date().getDay() -1  ; //DISABLE for development purpose
+        //const now = 4; //DEVELOPMENT PURPOSE
         var classId = this.props.timetable.find(t => t.weekhour === now.toString()+'_'+0);
         var workingHour = '';
         if(classId === undefined){
@@ -60,7 +61,8 @@ export default class Teacher extends React.Component {
             subjects: subjects,
             classId: classId,
             workingHour: workingHour,
-            classAttendance: []
+            classAttendance: [],
+            now: now
         };
         this.updateClassAttendanceHandler = this.updateClassAttendanceHandler.bind(this);
     }
@@ -167,10 +169,10 @@ export default class Teacher extends React.Component {
                                 <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classId} workingHour={this.state.workingHour} updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.workingHour <= 1 && (
-                                <EarlyLateRecordComponenent type={'late-entrance'} classId={this.state.classId}/>
+                                <EarlyLateRecordComponenent type={'late-entrance'} classId={this.state.classId} timetable={this.props.timetable} now={this.state.now}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.workingHour > -1 && (
-                                <EarlyLateRecordComponenent type={'early-exit'} classId={this.state.classId}/>
+                                <EarlyLateRecordComponenent type={'early-exit'} classId={this.state.classId} timetable={this.props.timetable} now={this.state.now}/>
                             )}
                         </main>
                     </Row>
