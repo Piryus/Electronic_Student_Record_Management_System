@@ -3,218 +3,6 @@ import MyTimetable from '../../utils/MyTimetable';
 import SectionHeader from "../../utils/section-header";
 import {Container} from "react-bootstrap";
 
-const absent = "Absent";
-const empty = "";
-const earlyExit = "Left early";
-const lateEntrance = "Arrived late";
-const lateAndEarly = <span>Late Entry <br/> Early Exit</span>;
-var tmp2 = ["a", "b", "c", "d", "e", "f",];
-var tmp3 = [
-    {
-        date: "",
-        content: [
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-        ]
-    },
-    {
-        date: "",
-        content: [
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-        ]
-    },
-    {
-        date: "",
-        content: [
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-        ]
-    },
-    {
-        date: "",
-        content: [
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-        ]
-    },
-    {
-        date: "",
-        content: [
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-            {
-                text: "",
-                color: ""
-            },
-        ]
-
-    }
-];
-const tmp = [
-    {
-        date: "25/11/2019",
-        enter: 1,
-        exit: 5,
-        event: {
-            absent: false,
-            lateEntrance: false,
-            earlyExit: true,
-        },
-
-    },
-    {
-        date: "26/11/2019",
-        enter: 1,
-        exit: 4,
-        event: {
-            absent: false,
-            lateEntrance: false,
-            earlyExit: false,
-        },
-
-    },
-    {
-        date: "27/11/2019",
-        enter: 1,
-        exit: 6,
-        event: {
-            absent: true,
-            lateEntrance: false,
-            earlyExit: false,
-        },
-
-    },
-    {
-        date: "28/11/2019",
-        enter: 1,
-        exit: 5,
-        event: {
-            absent: false,
-            lateEntrance: true,
-            earlyExit: false,
-        },
-
-    },
-    {
-        date: "29/11/2019",
-        enter: 1,
-        exit: 5,
-        event: {
-            absent: false,
-            lateEntrance: false,
-            earlyExit: false,
-        },
-
-    },
-];
-
 export default class Attendance extends React.Component {
 
     constructor(props) {
@@ -231,10 +19,6 @@ export default class Attendance extends React.Component {
     };
 
     async componentDidMount() {
-        await this.getChildAttendance();
-    }
-
-    async componentDidUpdate(prevProps, prevState, snapshot) {
         await this.getChildAttendance();
     }
 
@@ -259,12 +43,6 @@ export default class Attendance extends React.Component {
     }
 
     render() {
-        console.log(this.state.childAttendance);
-        // //Handle data from backend
-        // let store = this.state.childAssignment || tmp;
-        // const now = new Date();
-        // const sw = this.startOfWeek(now);//for weekly query
-
         // Basic data construction
         let data = [];
         for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
@@ -282,21 +60,42 @@ export default class Attendance extends React.Component {
             data.push(dateObject);
         }
 
-        this.state.childAttendance.forEach((event, index) => {
+        // Loop through the events to add them to the DOM
+        this.state.childAttendance.forEach(event => {
+            // Retrieves the event Date object from the date string
             const eventDate = new Date(event.date);
+            // Create a Date object for the beginning of the courses on the date of the event
+            const lectureBeginDate = new Date(eventDate);
+            lectureBeginDate.setHours(8);
+            // Loop through the current DOM data, checking if the event date matches a date to be displayed
             data.forEach(day => {
                 if (eventDate.getDate() === day.date.getDate() &&
                     eventDate.getMonth() === day.date.getMonth() &&
                     eventDate.getFullYear() === day.date.getFullYear()) {
-                    if (event.event === 'absence') {
+                    // Found a match!
+                    if (event.event === 'absence') { // 'Absence' event management
+                        // Each hour of the day will be marked 'absent'
                         day.content.forEach((hour => {
                             hour.color = 'bg-danger text-white';
                             hour.text = 'Absent';
                         }))
-                    } else if (event.event === 'late-entry') {
-                      // TODO Manage this case
-                    } else if (event.event === 'early-exit') {
-                      // TODO Manage this case
+                    } else if (event.event === 'late-entry') { // 'Late entry' event management
+                        // Computes the difference in hours between day beginning and event
+                        const diff = Math.abs(eventDate - lectureBeginDate) / (60 * 60 * 1000);
+                        // Colors and marks the correspondent hour of the day
+                        day.content[diff].color = 'bg-warning text-dark';
+                        day.content[diff].text = 'Arrived late';
+                    } else if (event.event === 'early-exit') { // 'Early exit' event management
+                        // Computes the difference in hours between day beginning and event
+                        const diff = Math.abs(eventDate - lectureBeginDate) / (60 * 60 * 1000);
+                        // Colors and marks the correspondent hour of the day
+                        day.content[diff].color = 'bg-warning text-dark';
+                        day.content[diff].text = 'Left early';
+                        // Colors and marks each following hour of the day with 'Absent'
+                        for (let i = diff + 1; i < day.content.length; i++) {
+                            day.content[i].color = 'bg-danger text-white';
+                            day.content[i].text = 'Absent';
+                        }
                     }
                 }
             });
@@ -305,28 +104,6 @@ export default class Attendance extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Attendance</SectionHeader>
-                {/*{this.state.childAttendance.map((event, index) => {*/}
-                {/*    {*/}
-                {/*        tmp2.map((it, i) => {*/}
-                {/*            if (item.event.absent) {*/}
-                {/*                tmp3[index].content[i].color = 'bg-danger text-white';*/}
-                {/*                tmp3[index].content[i].text = absent;*/}
-                {/*            } else if (item.event.lateEntrance && i == item.enter - 1) {*/}
-                {/*                tmp3[index].content[i].color = 'bg-warning text-white';*/}
-                {/*                tmp3[index].content[i].text = lateEntrance;*/}
-                {/*            } else if (item.event.earlyExit && i == item.exit - 1) {*/}
-                {/*                tmp3[index].content[i].color = 'bg-warning';*/}
-                {/*                tmp3[index].content[i].text = earlyExit;*/}
-                {/*            } else if (i >= item.enter - 1 && i <= item.exit - 1) {*/}
-                {/*                tmp3[index].content[i].color = 'bg-success text-white';*/}
-                {/*                tmp3[index].content[i].text = empty;*/}
-                {/*            } else {*/}
-                {/*                tmp3[index].content[i].color = 'bg-secondary';*/}
-                {/*                tmp3[index].content[i].text = empty;*/}
-                {/*            }*/}
-                {/*        })*/}
-                {/*    }*/}
-                {/*})}*/}
                 <MyTimetable data={data}/>
             </Container>
         );
