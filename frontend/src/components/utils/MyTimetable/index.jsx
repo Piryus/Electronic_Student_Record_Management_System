@@ -13,17 +13,17 @@ class MyTimetable extends Component {
                 <tr>
                     <th/>
                     {this.props.data.map((day, index) =>
-                        <th>{days[index] + ' ' + day.date.getDate() + '/' + day.date.getMonth()}</th>)}
+                        <th key={index}>{days[index] + ' ' + day.date.getDate() + '/' + day.date.getMonth()}</th>)}
                 </tr>
                 </thead>
                 <tbody>
-                {hours.map((hour, index) => {
+                {hours.map((hour, hourIndex) => {
                     return (
-                        <tr>
+                        <tr key={hourIndex}>
                             <td>{hour}</td>
-                            {this.props.data.map(day => {
+                            {this.props.data.map((day, dayIndex) => {
                                 return (
-                                    <td className={day.content[index].color}>{day.content[index].text}</td>
+                                    <td key={dayIndex} className={day.content[hourIndex].color}>{day.content[hourIndex].text}</td>
                                 );
                             })}
                         </tr>
