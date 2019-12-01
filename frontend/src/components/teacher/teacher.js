@@ -22,8 +22,7 @@ export default class Teacher extends React.Component {
                 class: value.classId.toString()
             };
         });
-        //const now = new Date(Date.now()).getNormalizedDay();
-        const now = new Date('2019-11-29').getNormalizedDay();
+        const now = new Date(Date.now()).getNormalizedDay();
 
         var classId = this.props.timetable.find(t => t.weekhour === now.toString()+'_'+0);
         var workingHour = '';
