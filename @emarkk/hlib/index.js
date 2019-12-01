@@ -71,7 +71,8 @@ const getAY = function(d) {
 
 const timeToDate = function(t) {
     const now = new Date(Date.now());
-    return new Date(now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + 'T' + t + ':00');
+    const datetime = now.getFullYear() + '-' + ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2) + 'T' + t + ':00';
+    return new Date(datetime);
 };
 
 const weekhourToDate = function(wh) {
