@@ -36,8 +36,7 @@ const getAssignments = async function(parentUId, studentId) {
 };
 
 const getAttendance = async function(teacherUId) {
-    const nd = new Date(Date.now()).getNormalizedDay(); //DISALE ONLY FOR DEVELOPMENT
-    //const nd = 4; //ONLY FOR DEVELOPMENT -> to be diabled
+    const nd = new Date(Date.now()).getNormalizedDay();
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null)
@@ -51,8 +50,7 @@ const getAttendance = async function(teacherUId) {
     const students = await Student.find({ classId }, { 'attendanceEvents._id': 0 });
 
     return { classAttendance: students.map(s => {
-        //return { id: s._id, events: s.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date(Date.now()))) }; //DISABLE FOR DEVELOPMENT
-        return { id: s._id, events: s.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-29'))) };
+        return { id: s._id, events: s.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date(Date.now()))) };
     }) };
 };
 

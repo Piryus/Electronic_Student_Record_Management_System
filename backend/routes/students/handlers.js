@@ -1,7 +1,7 @@
 'use strict';
 
 const Boom = require('boom');
-const HLib = require('@emarkk/hlib');
+const HLib = require('../../../@emarkk/hlib');
 
 const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
@@ -66,9 +66,7 @@ const recordAttendance = async function(teacherUId, classId, info) {
     if(teacher === null || students.length != info.length || !students.every(s => s.classId.toString() === classId))
         return Boom.badRequest();
 
-    const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now()))).map(t => t.weekhour); //DISABLE FOR DEVELOPMENT
-    //const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date('2019-11-29'))).map(t => t.weekhour); //ONLY FOR DEVELOPMENT
-
+    const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now()))).map(t => t.weekhour);
 
     if(whs.length === 0 || info.some(i => !i.time.isTimeIncludedInWeekhours(whs) || !i.time.isTimeValidFor(i.attendanceEvent)))
         return Boom.badRequest();

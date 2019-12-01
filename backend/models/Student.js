@@ -16,7 +16,7 @@ const attendanceEventSchema = new Schema({
     date: Date,
     event: {
         type: String,
-        enum: ['absence', 'late-entry', 'early-exit']
+        enum: ['absence', 'late-entrance', 'early-exit']
     }
 });
 
