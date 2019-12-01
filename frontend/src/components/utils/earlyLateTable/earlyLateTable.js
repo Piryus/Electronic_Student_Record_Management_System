@@ -1,4 +1,5 @@
 import React from 'react';
+import HLib from '@emarkk/hlib/index';
 import {Button, Table, Form, FormControl, InputGroup} from 'react-bootstrap';
 import LectureTopics from '../../teacher/lecture-topics';
 import { parse } from 'path';
@@ -66,17 +67,17 @@ export default class EarlyLateTable extends React.Component{
                         <tbody>
                             {this.state.classEvents.map((s, idx) => {
                             let event = this.state.classEvents[idx].events.find(e => {
-                                let hour = e.date.split('T');
+                                let hour = new Date(e.date).longString().split(' ');
                                 hour = hour[1].split(':');
                                 hour = parseInt(hour[0]) - 8;
                                 return e.event === this.props.type && this.state.workingHours.includes(hour);
                             });
-                            console.log(this.state.workingHours);
+        
                             return event === undefined ? null : (<tr key={idx}>
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).surname}</td>
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).name}</td>
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).ssn}</td>
-                                    <td>{event.date.split('T')[1].split('+')[0].split('.')[0]}</td>
+                                    <td>{new Date(event.date).longString().split(' ')[1]}</td>
                                     <td><Button variant="danger" size="sm" onClick={() => this.removeItem(this.state.addedStudents[idx].student._id)}>Remove</Button></td>
                                 </tr>);
                             })}

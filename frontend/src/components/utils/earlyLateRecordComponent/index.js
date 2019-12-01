@@ -118,7 +118,7 @@ export default class EarlyLateRecordComponent extends React.Component{
         let vector = this.state.addedStudents.map(s => {
             return {
                 studentId: s.student._id,
-                time: s.hh+':'+s.mm,
+                time: s.hh +':'+s.mm,
                 attendanceEvent: this.props.type === 'late-entrance' ? 'late-entrance' : 'early-exit' 
             };
         });
