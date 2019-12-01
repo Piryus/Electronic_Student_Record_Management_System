@@ -144,7 +144,7 @@ export default class StudentGradesSummary extends React.Component{
             alert('Grade format not valid. Please insert a correct grade.');
         } else{
             //Check if the teacher is inserting the grade in the day he has a lesson for the selected subject for the selected class
-            let day = new Date().getDay() - 1;
+            let day = new Date(Date.now()).getNormalizedDay();
             let teacherHadLesson = false;
             let lessonDay = -1;
             let toSplit = [];

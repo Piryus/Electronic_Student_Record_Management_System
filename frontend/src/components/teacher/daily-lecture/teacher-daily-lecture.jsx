@@ -18,7 +18,7 @@ class DailyLecture extends Component {
 
   validateData = (event) => {
 
-    var d= new Date();
+    var d= new Date(Date.now());
     var d2= new Date(this.state.date);
     var lastSunday= new Date(d.toString());
     var error= "";

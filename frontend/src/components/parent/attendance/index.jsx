@@ -10,7 +10,7 @@ export default class Attendance extends React.Component {
         this.state = {
             childAttendance: [],
             isLoading: true,
-            focusDay: new Date()
+            focusDay: new Date(Date.now())
         }
     }
 
@@ -18,7 +18,7 @@ export default class Attendance extends React.Component {
         let focusDay = this.state.focusDay;
         switch (week) {
             case 0:
-                this.setState({focusDay: new Date()});
+                this.setState({focusDay: new Date(Date.now())});
                 break;
             case 1:
                 focusDay.setDate(focusDay.getDate() + 7);

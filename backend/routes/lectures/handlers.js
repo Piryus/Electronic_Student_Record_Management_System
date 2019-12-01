@@ -31,7 +31,7 @@ const getAssignments = async function(parentUId, studentId) {
         return Boom.badRequest();
 
     const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 });
-    const assignments = schoolClass.assignments.filter(a => a.due >= new Date().dayStart());
+    const assignments = schoolClass.assignments.filter(a => a.due >= new Date(Date.now()).dayStart());
     return { assignments };
 };
 

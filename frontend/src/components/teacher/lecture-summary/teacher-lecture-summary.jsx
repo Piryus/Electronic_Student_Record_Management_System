@@ -80,7 +80,7 @@ class TeacherLectureSummary extends Component {
   }
 
   validateEdit = (event, sub, dat, cla, sum) => {
-    var d= new Date();
+    var d= new Date(Date.now());
     var d2= new Date(dat);
     var lastSunday= new Date(d.toString());
 

@@ -22,7 +22,7 @@ export default class Teacher extends React.Component {
                 class: value.classId.toString()
             };
         });
-        const now = new Date().getNormalizedDay();
+        const now = new Date(Date.now()).getNormalizedDay();
         var classId = this.props.timetable.find(t => t.weekhour === now.toString()+'_'+0);
         var workingHour = '';
         if(classId === undefined){
@@ -128,7 +128,7 @@ export default class Teacher extends React.Component {
     }
 
     render() {
-        const now = new Date();
+        const now = new Date(Date.now());
         return (
             <div className={styles.root}>
                 <AppNavbar type='classic' onLogout={() => this.props.onLogout()} onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>

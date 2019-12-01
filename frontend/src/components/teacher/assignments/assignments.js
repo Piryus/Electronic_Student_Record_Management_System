@@ -13,7 +13,7 @@ export default class Assignments extends React.Component {
     constructor(props) {
         super(props);
 
-        var today = new Date();
+        var today = new Date(Date.now());
         var dd = String(today.getDate()).padStart(2, '0');
         var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         var yyyy = today.getFullYear();
@@ -88,7 +88,7 @@ export default class Assignments extends React.Component {
             } else if (parseInt(chosenDay[2]) <= parseInt(currentDay[2]) && parseInt(chosenDay[1]) === parseInt(currentDay[1])) {
                 alert('Please select a date starting tomorrow.');
             } else {
-                let day = new Date(this.state.selectedDate).getDay() - 1;
+                let day = new Date(this.state.selectedDate).getNormalizedDay();
                 let toSplit;
                 let hour = '';
                 this.props.timetable.forEach((t) => {
