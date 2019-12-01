@@ -1,7 +1,7 @@
 import React from 'react';
 import MyTimetable from '../../utils/my-timetable';
 import SectionHeader from "../../utils/section-header";
-import {Container, Spinner} from "react-bootstrap";
+import {Button, Container, Spinner} from "react-bootstrap";
 
 export default class Attendance extends React.Component {
 
@@ -10,6 +10,24 @@ export default class Attendance extends React.Component {
         this.state = {
             childAttendance: [],
             isLoading: true,
+            focusDay: new Date()
+        }
+    }
+
+    handleWeek(week) {
+        let focusDay = this.state.focusDay;
+        switch (week) {
+            case 0:
+                this.setState({focusDay: new Date()});
+                break;
+            case 1:
+                focusDay.setDate(focusDay.getDate() + 7);
+                this.setState({focusDay});
+                break;
+            case -1:
+                focusDay.setDate(focusDay.getDate() - 7);
+                this.setState({focusDay});
+                break;
         }
     }
 
@@ -49,7 +67,7 @@ export default class Attendance extends React.Component {
         let data = [];
         for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
             let dateObject = {};
-            dateObject.date = new Date(this.startOfWeek(new Date())); // TODO Use hlib
+            dateObject.date = new Date(this.startOfWeek(this.state.focusDay)); // TODO Use hlib
             dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
             let content = [];
             for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
@@ -110,7 +128,16 @@ export default class Attendance extends React.Component {
                 <div className="d-flex">
                     <Spinner animation="border" className="mx-auto"/>
                 </div>}
-                {!this.state.isLoading && <MyTimetable data={data}/>}
+                {!this.state.isLoading &&
+                <>
+                    <div className='mb-2 d-flex justify-content-between'>
+                        <Button onClick={() => this.handleWeek(-1)}>Previous week</Button>
+                        <Button onClick={() => this.handleWeek(0)}>Current week</Button>
+                        <Button onClick={() => this.handleWeek(1)}>Next week</Button>
+                    </div>
+                    < MyTimetable data={data}/>
+                </>
+                }
             </Container>
         );
     }

@@ -6,7 +6,7 @@ import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
 import News from "./news/parent-news";
 import Assignments from './assignments';
-import Attendance from './Attendance/index';
+import Attendance from './attendance/';
 
 export default class Parent extends React.Component {
 
