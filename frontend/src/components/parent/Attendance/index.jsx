@@ -81,7 +81,7 @@ export default class Attendance extends React.Component {
                             hour.color = 'bg-danger text-white';
                             hour.text = 'Absent';
                         }))
-                    } else if (event.event === 'late-entry') { // 'Late entry' event management
+                    } else if (event.event === 'late-entrance') { // 'Late entrance' event management
                         // Computes the difference in hours between day beginning and event
                         const diff = Math.abs(eventDate - lectureBeginDate) / (60 * 60 * 1000);
                         // Colors and marks the correspondent hour of the day
