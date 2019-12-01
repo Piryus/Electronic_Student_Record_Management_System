@@ -1,6 +1,6 @@
 import '@emarkk/hlib';
 import React from 'react';
-import {Accordion, Button, Card, Container} from "react-bootstrap";
+import {Accordion, Button, Card, Container, Spinner} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 
 export default class Grades extends React.Component {
@@ -9,14 +9,11 @@ export default class Grades extends React.Component {
         super(props);
         this.state = {
             childGrades: null,
+            isLoading: true
         }
     }
 
     async componentDidMount() {
-        await this.getChildGrades();
-    }
-
-    async componentWillUpdate() {
         await this.getChildGrades();
     }
 
@@ -34,7 +31,8 @@ export default class Grades extends React.Component {
         let response = await fetch(url, options);
         const json = await response.json();
         this.setState({
-            childGrades: json.grades
+            childGrades: json.grades,
+            isLoading: false
         });
     }
 
@@ -50,14 +48,14 @@ export default class Grades extends React.Component {
                 }
                 let date = grade.date.split("T");
                 gradesSortedTopic[grade.subject].push(
-                {
-                    htmlElement : <Accordion.Collapse eventKey={grade.subject}>
-                        <Card.Body>Grade : {grade.value} Date
-                            : {date[0]}</Card.Body>
-                    </Accordion.Collapse>,
-                    date: date[0],
-                    grade: parseFloat(realGrade)
-                });
+                    {
+                        htmlElement: <Accordion.Collapse eventKey={grade.subject}>
+                            <Card.Body>Grade : {grade.value} Date
+                                : {date[0]}</Card.Body>
+                        </Accordion.Collapse>,
+                        date: date[0],
+                        grade: parseFloat(realGrade)
+                    });
             });
             let index;
             let average;
@@ -66,7 +64,7 @@ export default class Grades extends React.Component {
                 //First compute the average
                 average = 0;
                 sum = 0;
-                for(var i = 0 ; i < gradesSortedTopic[index].length ; i++){
+                for (var i = 0; i < gradesSortedTopic[index].length; i++) {
                     sum += gradesSortedTopic[index][i].grade;
                 }
                 average = sum / gradesSortedTopic[index].length;
@@ -74,7 +72,7 @@ export default class Grades extends React.Component {
                 average = Math.round(average * 100) / 100;
 
                 //Sort by reversed chronological order
-                gradesSortedTopic[index].sort(function(a, b){
+                gradesSortedTopic[index].sort(function (a, b) {
                     return new Date(b.date) - new Date(a.date);
                 });
 
@@ -96,11 +94,16 @@ export default class Grades extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Grades</SectionHeader>
+                {this.state.isLoading &&
+                <div className="d-flex">
+                    <Spinner animation="border" className="mx-auto"/>
+                </div>}
+                {!this.state.isLoading &&
                 <Accordion className="mt-3" defaultActiveKey="0">
                     {gradesDOM.map((subject) => {
                         return subject;
                     })}
-                </Accordion>
+                </Accordion>}
             </Container>
         );
     };
