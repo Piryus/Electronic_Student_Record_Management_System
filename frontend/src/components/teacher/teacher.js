@@ -81,8 +81,10 @@ export default class Teacher extends React.Component {
             };
             let response = await fetch(url, options);
             const json = await response.json();
+
+            let attendance = json.attendance[this.state.classSelected.classId];
             
-            this.setState({classAttendance: json.classAttendance});
+            this.setState({classAttendance: attendance});
         } catch(e){
             alert(e);
         }
