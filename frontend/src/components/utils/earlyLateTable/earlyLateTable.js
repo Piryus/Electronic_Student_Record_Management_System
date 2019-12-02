@@ -58,7 +58,7 @@ export default class EarlyLateTable extends React.Component{
                                 <th>Name</th>
                                 <th>SSN</th>
                                 <th>{this.props.type === 'late-entrance' ? 'Entrance Hour' : 'Exit Hour'}</th>
-                                <th></th>
+                                {/* <th></th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -75,7 +75,7 @@ export default class EarlyLateTable extends React.Component{
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).name}</td>
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).ssn}</td>
                                     <td>{new Date(event.date).longString().split(' ')[1]}</td>
-                                    <td><Button variant="danger" size="sm" onClick={() => this.removeItem(this.state.addedStudents[idx].student._id)}>Remove</Button></td>
+                                    {/* <td><Button variant="danger" size="sm" onClick={() => this.removeItem(this.state.addedStudents[idx].student._id)}>Remove</Button></td> */}
                                 </tr>);
                             })}
                         </tbody>

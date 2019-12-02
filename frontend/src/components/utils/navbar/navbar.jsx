@@ -21,6 +21,19 @@ export default class AppNavbar extends React.Component {
                         </Dropdown.Item>);
             });
         }
+        let classNotSelected = [];
+        if(this.props.type === 'teacher' ) {
+                this.props.classes.forEach(c => {
+                    if (c.classId !== this.props.selectedClass.classId){
+                        childNotSelected.push(
+                            <Dropdown.Item key={c.classId}
+                                           onClick={() => this.props.classSelection(c)}>
+                                {c.name}
+                            </Dropdown.Item>
+                        );
+                    }
+            });
+        }
 
         return (
             <Navbar fixed="top" bg="dark" className={["navbar-dark shadow flex-md-nowrap", styles.navbar]}>
@@ -36,6 +49,17 @@ export default class AppNavbar extends React.Component {
                     <Dropdown.Menu>
                         {childNotSelected.map((child) => {
                             return child
+                        })}
+                    </Dropdown.Menu>
+                </Dropdown>}
+                {this.props.type === 'teacher' &&
+                <Dropdown className={'ml-auto'}>
+                    <Dropdown.Toggle id="dropdown-basic">
+                        {this.props.selectedClass.name}
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {classNotSelected.map((c) => {
+                            return c
                         })}
                     </Dropdown.Menu>
                 </Dropdown>}
