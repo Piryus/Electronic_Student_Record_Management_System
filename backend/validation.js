@@ -31,7 +31,7 @@ schema.rollCall = schema.array.items({
 })
 schema.attendanceInfo = {
     studentId: schema.id,
-    time: schema.hmTime,
+    time: schema.hmTime.allow(null),
     attendanceEvent: schema.attendanceEvent
 };
 

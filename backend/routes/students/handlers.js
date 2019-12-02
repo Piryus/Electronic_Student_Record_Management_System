@@ -74,7 +74,8 @@ const recordAttendance = async function(teacherUId, classId, info) {
     students.forEach(s => {
         let sInfo = info.find(i => i.studentId === s._id.toString());
         s.attendanceEvents = s.attendanceEvents.filter(ae => ae.event !== sInfo.attendanceEvent || !ae.date.isSameDayOf(new Date(Date.now())));
-        s.attendanceEvents.push({ date: HLib.timeToDate(sInfo.time), event: sInfo.attendanceEvent });
+        if(sInfo.time !== null)
+            s.attendanceEvents.push({ date: HLib.timeToDate(sInfo.time), event: sInfo.attendanceEvent });
     });
     await Promise.all(students.map(s => s.save()));
 
