@@ -102,11 +102,16 @@ export default class EarlyLateRecordComponent extends React.Component{
                 let hh = this.state.selectedhh.length === 1 ? '0'+this.state.selectedhh : this.state.selectedhh;
                 let mm = this.state.selectedmm.length === 1 ? '0'+this.state.selectedmm : this.state.selectedmm;
                 let completeHour = hh + ':' + mm;
-                if(this.props.type === 'late-entrance' && !/^(08:(0[1-9]|10))$/.test(completeHour) && this.state.workingHours.includes(0) && !this.state.workingHours.includes(1)) {
+                if(this.props.type === 'early-exit' && !this.state.workingHours.includes(parseInt(hh) - 8)){
+                    alert('Input hour not valid. You can insert hour values included in your working timetable only.');
+                } else if(this.props.type === 'late-entrance' && !/^(08:(0[1-9]|10))$/.test(completeHour) && this.state.workingHours.includes(0) && !this.state.workingHours.includes(1)) {
                     //First hour teacher
                     alert('Only Range [ 08:01 - 08:10 ] is allowed for teacher working in the first hour.');
                 } else if(this.props.type === 'late-entrance' && !/^(09:00)$/.test(completeHour) && !this.state.workingHours.includes(0) && this.state.workingHours.includes(1)){
+                    //Second hour teacher
                     alert('Only value [ 09:00 ] is allowed for teacher working in the second hour.');
+                } else if(this.props.type === 'late-entrance' && !/^(08:(0[1-9]|10)|09:00)$/.test(completeHour) && this.state.workingHours.includes(0) && this.state.workingHours.includes(1)){
+                    alert('Only Range [ 08:01 - 08:10 ] and value [ 09:00 ] are allowed for teacher working in the first two hours.');
                 } else {
                     addedStudents.push({
                         student: this.state.selectedStudent.value,
