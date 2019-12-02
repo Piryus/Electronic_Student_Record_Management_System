@@ -68,7 +68,7 @@ const recordAttendance = async function(teacherUId, classId, info) {
 
     const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now()))).map(t => t.weekhour);
 
-    if(whs.length === 0 || info.some(i => !i.time.isTimeIncludedInWeekhours(whs) || !i.time.isTimeValidFor(i.attendanceEvent)))
+    if(whs.length === 0 || info.some(i => i.time !== null && (!i.time.isTimeIncludedInWeekhours(whs) || !i.time.isTimeValidFor(i.attendanceEvent))))
         return Boom.badRequest();
 
     students.forEach(s => {
