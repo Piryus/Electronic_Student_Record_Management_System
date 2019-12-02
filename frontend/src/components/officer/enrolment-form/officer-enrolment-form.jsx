@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Table from 'react-bootstrap/table';
-import Form from 'react-bootstrap/form';
+import Table from 'react-bootstrap/Table';
+import Form from 'react-bootstrap/Form';
 import SectionHeader from "../../utils/section-header";
 
 
