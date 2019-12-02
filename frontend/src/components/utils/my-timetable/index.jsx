@@ -12,7 +12,7 @@ export default class MyTimetable extends Component {
                 <tr>
                     <th/>
                     {this.props.data.map((day, index) =>
-                        <th key={index}>{days[index] + ' ' + day.date.getDate() + '/' + day.date.getMonth()}</th>)}
+                        <th key={index}>{days[index] + ' ' + day.date.getDate() + '/' + (day.date.getMonth() + 1)}</th>)}
                 </tr>
                 </thead>
                 <tbody>
