@@ -166,8 +166,8 @@ suite('lectures', () => {
 
         // teacher not found
         const a1 = await lectures.getAttendance('ffffffffffffffffffffffff');
-        // teacher has no lecture on first hour today
-        const a2 = await lectures.getAttendance('5dca7e2b461dc52d681804f6');
+        // teacher has no lecture today
+        const a2 = await lectures.getAttendance('5dca7e2b461dc52d681804f2');
         // ok 1
         const a3 = await lectures.getAttendance('5dca7e2b461dc52d681804f1');
 
@@ -179,10 +179,10 @@ suite('lectures', () => {
 
         expect(a1.output.statusCode).to.equal(BAD_REQUEST);
         expect(a2.output.statusCode).to.equal(BAD_REQUEST);
-        jexpect(a3.classAttendance.sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
+        jexpect(a3.attendance['5dc9c3112d698031f441e1c9'].sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
             return { id: s._id, events: data.some(i => i.studentId === s._id) ? data.find(i => i.studentId === s._id).attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-27T16:00:00'))) : [] };
         }).sort((a, b) => b.id - a.id)));
-        jexpect(a4.classAttendance.sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
+        jexpect(a4.attendance['5dc9c3112d698031f441e1c9'].sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
             return { id: s._id, events: data.some(i => i.studentId === s._id) ? data.find(i => i.studentId === s._id).attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-15T08:01:00'))) : [] };
         }).sort((a, b) => b.id - a.id)));
     });

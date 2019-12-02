@@ -42,16 +42,23 @@ const getAttendance = async function(teacherUId) {
     if(teacher === null)
         return Boom.badRequest();
 
-    const classId = (teacher.timetable.find(t => t.weekhour === nd + '_0') || {}).classId;
+    const classes = teacher.timetable.filter(t => t.weekhour.startsWith(nd + '_')).map(t => t.classId);
 
-    if(classId === undefined)
+    if(classes.length === 0)
         return Boom.badRequest();
 
-    const students = await Student.find({ classId }, { 'attendanceEvents._id': 0 });
+    const students = await Student.find({ classId: { $in: classes } }, { 'attendanceEvents._id': 0 });
+    const attendance = students.reduce((acc, i) => {
+        let cId = i.classId.toString();
+        let data = { id: i._id, events: i.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date(Date.now()))) };
+        if(acc[cId] === undefined)
+            acc[cId] = [data];
+        else if(!acc[cId].some(s => s.id.equals(i._id)))
+            acc[cId].push(data);
+        return acc;
+    }, {});
 
-    return { classAttendance: students.map(s => {
-        return { id: s._id, events: s.attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date(Date.now()))) };
-    }) };
+    return { attendance };
 };
 
 const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
