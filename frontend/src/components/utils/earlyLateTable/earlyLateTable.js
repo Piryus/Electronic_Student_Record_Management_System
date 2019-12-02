@@ -10,15 +10,12 @@ export default class EarlyLateTable extends React.Component{
     constructor(props){
         super(props);
 
-        let whs = [];
-        whs = this.props.timetable.map(t => t.weekhour);
-        whs = whs.filter(wh => parseInt(wh.charAt(0))===this.props.now);
-        whs = whs.map(dh => parseInt(dh.charAt(2)));
+
 
         this.state = {
             classStudents: this.props.classStudents,
             classEvents: [],
-            workingHours : whs
+            workingHours : this.props.whs
         }
     }
 

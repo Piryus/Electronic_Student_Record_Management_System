@@ -1,4 +1,5 @@
 import React from 'react';
+import HLib from '@emarkk/hlib/index';
 import SectionHeader from '../section-header';
 import EarlyLateTable from '../earlyLateTable/earlyLateTable';
 import Select from 'react-select';
@@ -13,6 +14,11 @@ export default class EarlyLateRecordComponent extends React.Component{
     constructor(props){
         super(props);
 
+        let whs = [];
+        whs = this.props.timetable.map(t => t.weekhour);
+        whs = whs.filter(wh => parseInt(wh.charAt(0))===this.props.now);
+        whs = whs.map(dh => parseInt(dh.charAt(2)));
+
         this.state = {
             classId: this.props.classId,
             classStudents: [],
@@ -21,7 +27,8 @@ export default class EarlyLateRecordComponent extends React.Component{
             selectedmm: '',
             addedStudents: [],
             searchOptions: [],
-            wantSeeEvents: false
+            wantSeeEvents: false,
+            workingHours: whs
         }
         this.handleWantSeeEvents = this.handleWantSeeEvents.bind(this);
     }
@@ -76,19 +83,15 @@ export default class EarlyLateRecordComponent extends React.Component{
     addStudent(){
         if(this.state.selectedStudent === ''){
             alert('Please select a student.');
-        } else if(isNaN(this.state.selectedhh)){
-            alert('Please insert a valid hour.');
-        } else if(this.state.selectedhh === ''){
-            alert('Please insert a valid hour.');
-        } else if(parseInt(this.state.selectedhh)<8 || parseInt(this.state.selectedhh)>14){
-            alert('Please insert a valid hour.');
-        } else if(this.props.type==='late-entrance' && parseInt(this.state.selectedhh)>9){
-            alert('Please insert a valid hour in the range [08:00-9:59].');
-        } else if(isNaN(this.state.selectedmm)){
-            alert('Please insert valid minutes.');
-        } else if(this.state.selectedhh === ''){
-            alert('Please insert valid minutes.');
-        } else if(parseInt(this.state.selectedhh)<0 || parseInt(this.state.selectedhh)>59){
+        } else if(this.state.selectedhh === '' || this.state.selectedmm === ''){
+            alert('Please please insert hour and minutes.');
+        } else if(isNaN(this.state.selectedhh) || isNaN(this.state.selectedmm)){
+            alert('Please insert valid hour and minutes in the format [hh] and [mm].');
+        } else if(this.state.selectedhh.length > 2 || this.state.selectedmm.length > 2){
+            alert('Please insert valid hour and minutes in the format [hh] and [mm].');
+        } else if(parseInt(this.state.selectedhh)<8 || parseInt(this.state.selectedhh)>13){
+            alert('Please insert a valid working hour.');
+        } else if(parseInt(this.state.selectedmm)<0 || parseInt(this.state.selectedmm)>59){
             alert('Please insert valid minutes.');
         } else{
             let addedStudents = this.state.addedStudents;
@@ -96,18 +99,28 @@ export default class EarlyLateRecordComponent extends React.Component{
             if(alreadyExists !== undefined && alreadyExists !== null){
                 alert('Student already added to list');
             } else {
-                addedStudents.push({
-                    student: this.state.selectedStudent.value,
-                    hh: this.state.selectedhh.length === 1 ? '0'+this.state.selectedhh : this.state.selectedhh,
-                    mm: this.state.selectedmm.length === 1 ? '0'+this.state.selectedmm : this.state.selectedmm
-                });
-                //Sort eventually here
-                this.setState({
-                    addedStudents: addedStudents,
-                    selectedStudent: '',
-                    selectedhh: '',
-                    selectedmm: ''
-                });
+                let hh = this.state.selectedhh.length === 1 ? '0'+this.state.selectedhh : this.state.selectedhh;
+                let mm = this.state.selectedmm.length === 1 ? '0'+this.state.selectedmm : this.state.selectedmm;
+                let completeHour = hh + ':' + mm;
+                if(this.props.type === 'late-entrance' && !/^(08:(0[1-9]|10))$/.test(completeHour) && this.state.workingHours.includes(0) && !this.state.workingHours.includes(1)) {
+                    //First hour teacher
+                    alert('Only Range [ 08:01 - 08:10 ] is allowed for teacher working in the first hour.');
+                } else if(this.props.type === 'late-entrance' && !/^(09:00)$/.test(completeHour) && !this.state.workingHours.includes(0) && this.state.workingHours.includes(1)){
+                    alert('Only value [ 09:00 ] is allowed for teacher working in the second hour.');
+                } else {
+                    addedStudents.push({
+                        student: this.state.selectedStudent.value,
+                        hh: hh,
+                        mm: mm
+                    });
+                    //Sort eventually here
+                    this.setState({
+                        addedStudents: addedStudents,
+                        selectedStudent: '',
+                        selectedhh: '',
+                        selectedmm: ''
+                    });
+                }
             }
  
         }
@@ -242,7 +255,7 @@ export default class EarlyLateRecordComponent extends React.Component{
                     </Table>
                     </div>)}
                     {this.state.wantSeeEvents === true && (
-                        <EarlyLateTable dontWantSeeEvents={this.handleWantSeeEvents} classStudents={this.state.classStudents} type={this.props.type} timetable={this.props.timetable} now={this.props.now}/>
+                        <EarlyLateTable dontWantSeeEvents={this.handleWantSeeEvents} classStudents={this.state.classStudents} type={this.props.type} whs={this.state.workingHours} now={this.props.now}/>
                     )}
             </div>
         );
