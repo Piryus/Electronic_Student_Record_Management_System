@@ -71,10 +71,17 @@ export default class Attendance extends React.Component {
             dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
             let content = [];
             for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
-                content.push({
-                    text: '',
-                    color: 'bg-success text-white'
-                });
+                if (dateObject.date < Date.now()) {
+                    content.push({
+                        text: '',
+                        color: 'bg-success text-white'
+                    });
+                } else {
+                    content.push({
+                        text: '',
+                        color: 'bg-secondary'
+                    });
+                }
             }
             dateObject.content = content;
             data.push(dateObject);
