@@ -260,7 +260,7 @@ export default class EarlyLateRecordComponent extends React.Component{
                     </Table>
                     </div>)}
                     {this.state.wantSeeEvents === true && (
-                        <EarlyLateTable dontWantSeeEvents={this.handleWantSeeEvents} classStudents={this.state.classStudents} type={this.props.type} whs={this.state.workingHours} now={this.props.now}/>
+                        <EarlyLateTable dontWantSeeEvents={this.handleWantSeeEvents} classStudents={this.state.classStudents} type={this.props.type} whs={this.state.workingHours} now={this.props.now} classId={this.state.classId}/>
                     )}
             </div>
         );

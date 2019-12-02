@@ -15,6 +15,7 @@ export default class EarlyLateTable extends React.Component{
         this.state = {
             classStudents: this.props.classStudents,
             classEvents: [],
+            removedItems: [],
             workingHours : this.props.whs
         }
     }
@@ -36,16 +37,60 @@ export default class EarlyLateTable extends React.Component{
             };
             let response = await fetch(url, options);
             const json = await response.json();
+
+            let attendance = json.attendance[this.props.classId];
+
             
-            this.setState({classEvents: json.classAttendance});
+            this.setState({classEvents: attendance});
         } catch(e){
             alert(e);
         }
     }
 
-    removeItem(id){
-
+    async removeItem(studentEvents){
+        let eventsVector = [
+            {
+                studentId: studentEvents.id,
+                time: null,
+                attendanceEvent: this.props.type
+            }
+        ];
+        let infoToSend = {
+            classId: this.props.classId,
+            info: eventsVector
+        }
+        await this.pushDataToDb(infoToSend);
+        await this.getEvents();
     }
+
+    async pushDataToDb(infoToSend){
+        try {
+            const url = 'http://localhost:3000/attendance';
+            const jsonToSend = JSON.stringify(infoToSend);
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: jsonToSend
+            };
+            let response = await fetch(url, options);
+            const json = await response.json();
+            if (json.error != null) {
+                alert('Ops! Internal error. Please retry!');
+                window.location.reload(false);
+            } else {
+                alert('Event successfully removed.');
+            }
+        } catch (err) {
+            alert(err);
+            window.location.reload(false);
+        }
+    }
+
+
 
     render(){
         return(
@@ -58,7 +103,7 @@ export default class EarlyLateTable extends React.Component{
                                 <th>Name</th>
                                 <th>SSN</th>
                                 <th>{this.props.type === 'late-entrance' ? 'Entrance Hour' : 'Exit Hour'}</th>
-                                {/* <th></th> */}
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,7 +120,7 @@ export default class EarlyLateTable extends React.Component{
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).name}</td>
                                     <td>{this.state.classStudents.find( st => this.state.classEvents[idx].id === st._id).ssn}</td>
                                     <td>{new Date(event.date).longString().split(' ')[1]}</td>
-                                    {/* <td><Button variant="danger" size="sm" onClick={() => this.removeItem(this.state.addedStudents[idx].student._id)}>Remove</Button></td> */}
+                                    <td><Button variant="danger" size="sm" onClick={() => this.removeItem(this.state.classEvents[idx])}>Remove</Button></td>
                                 </tr>);
                             })}
                         </tbody>
