@@ -13,7 +13,18 @@ export default class Assignments extends React.Component {
     }
 
     async componentDidMount() {
-        await this.getChildAssignment();
+        const assignments = await this.getChildAssignment();
+        this.setState({
+            childAssignment: assignments,
+            loading: false
+        });
+    }
+
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        const assignments = await this.getChildAssignment();
+        this.setState({
+            childAssignment: assignments
+        });
     }
 
     async getChildAssignment() {
@@ -29,10 +40,7 @@ export default class Assignments extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-        this.setState({
-            childAssignment: json.assignments,
-            loading: false
-        });
+        return json.assignments;
     }
 
     renderItem = (item, index) => {
