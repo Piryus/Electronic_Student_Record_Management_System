@@ -22,23 +22,78 @@ const routes = [
     },
     {
         method: 'GET',
-        path: '/students/all',
-        handler: async (request, h) => students.getAllStudents(),
+        path: '/attendance/{studentId}',
+        handler: async (request, h) => students.getAttendance(request.auth.credentials.id, request.params.studentId),
         options: {
             auth: {
                 strategy: 'session',
-                scope: 'officer'
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
             }
         }
     },
     {
         method: 'GET',
-        path: '/classes/all',
-        handler: async (request, h) => students.getAllClasses(),
+        path: '/students',
+        handler: async (request, h) => students.getStudents(request.query.classId || null),
         options: {
             auth: {
                 strategy: 'session',
-                scope: 'officer'
+                scope: ['officer', 'teacher']
+            },
+            validate: {
+                query: {
+                    classId: Valid.id
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/classes',
+        handler: async (request, h) => students.getClasses(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: ['officer', 'teacher']
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/grades',
+        handler: async (request, h) => students.recordGrades(request.auth.credentials.id, request.payload.subject, request.payload.grades),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    subject: Valid.subject.required(),
+                    grades: Valid.array.items(Valid.gradeInfo).required() 
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/attendance',
+        handler: async (request, h) => students.recordAttendance(request.auth.credentials.id, request.payload.classId, request.payload.info),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    classId: Valid.id.required(),
+                    info: Valid.array.items(Valid.attendanceInfo).required()
+                }
             }
         }
     },
@@ -66,9 +121,9 @@ const routes = [
     {
         method: 'POST',
         path: '/classes',
-        handler: async (request, h) => {
-            const { name, students } = request.payload;
-            return students.addSchoolClass(name, students);
+        handler: async (request, h) => { //Don't use same name "students" both for imported students.js and for parameter in payload. It will cause an error. (FIXED)
+            const { name, studentIds } = request.payload;
+            return students.addSchoolClass(name, studentIds);
         },
         options: {
             auth: {
@@ -78,7 +133,7 @@ const routes = [
             validate: {
                 payload: {
                     name: Valid.className.required(),
-                    students: Valid.array.items(Valid.id).required()
+                    studentIds: Valid.array.items(Valid.id).required()
                 }
             }
         }

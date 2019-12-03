@@ -4,3 +4,6 @@
 # Backend
 /backend/node_modules
 /backend/config/keys.js
+
+# Lib
+/@emarkk/hlib/node_modules

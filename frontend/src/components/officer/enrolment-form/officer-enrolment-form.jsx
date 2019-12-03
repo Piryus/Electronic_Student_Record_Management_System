@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import Table from 'react-bootstrap/table';
-import Form from 'react-bootstrap/form';
+import Table from 'react-bootstrap/Table';
+import Form from 'react-bootstrap/Form';
+import SectionHeader from "../../utils/section-header";
 
 
 
@@ -23,7 +24,7 @@ class EnrolmentForm extends Component {
   }
 
   async getAllStudents(){
-    const url = 'http://localhost:3000/students/all';
+    const url = 'http://localhost:3000/students';
     const options = {
         method: 'GET',
         headers: {
@@ -99,9 +100,9 @@ class EnrolmentForm extends Component {
     return (
       <div>
         {this.state.wantEnroll === false && (<div>
-        <h1>Enrolled Students</h1>
+                <SectionHeader>Enroll students</SectionHeader>
         <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.setState({wantEnroll: true})} role="button">Enroll a Student</p>
-        <Table striped bordered hover size="sm">
+        <Table striped bordered hover responsive size="sm">
           <thead>
             <tr>
               <th>#</th>

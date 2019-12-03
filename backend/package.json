@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emarkk/hlib": "^1.0.3",
     "@hapi/code": "7.0.x",
     "@hapi/cookie": "^10.1.2",
     "@hapi/hapi": "^18.4.0",

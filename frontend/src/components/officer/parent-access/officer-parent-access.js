@@ -3,6 +3,7 @@ import {Button, Form, FormControl, InputGroup} from 'react-bootstrap';
 import Select from 'react-select';
 import styles from './styles.module.css';
 import Alert from "react-bootstrap/Alert";
+import SectionHeader from "../../utils/section-header";
 
 export default class ParentAccountEnabling extends React.Component {
 
@@ -27,7 +28,7 @@ export default class ParentAccountEnabling extends React.Component {
 
     async getStudents() {
         // Query children list
-        const url = 'http://localhost:3000/students/all';
+        const url = 'http://localhost:3000/students';
         const options = {
             method: 'GET',
             headers: {
@@ -58,7 +59,7 @@ export default class ParentAccountEnabling extends React.Component {
     }
 
     async handleSubmitForm() {
-        const url = 'http://localhost:3000/parent/add';
+        const url = 'http://localhost:3000/parent';
         const mail = this.state.parentEmail;
         const name = this.state.parentName;
         const surname = this.state.parentSurname;
@@ -93,7 +94,7 @@ export default class ParentAccountEnabling extends React.Component {
     render() {
         return (
             <div>
-                <h1>Create a parent account</h1>
+                <SectionHeader>Create a parent account</SectionHeader>
                 {this.state.alertDom}
                 <Form
                     className={styles.formContainer}

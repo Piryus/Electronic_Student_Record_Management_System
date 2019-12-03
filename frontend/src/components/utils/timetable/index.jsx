@@ -1,14 +1,14 @@
+import '@emarkk/hlib';
 import React, { Component } from 'react';
 import styles from './style.css';
 
-import '../../../lib';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
 class Timetable extends Component {
 
   render() {
-    const now = new Date();
+    const now = new Date(Date.now());
     const ws = now.weekStart();
     const timetable = this.props.data || {};
     return (

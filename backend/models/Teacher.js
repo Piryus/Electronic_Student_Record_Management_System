@@ -11,9 +11,6 @@ const timetableEntrySchema = new Schema({
 
 const teacherSchema = new Schema({
     userId: Schema.Types.ObjectId,
-    ssn: String,
-    name: String,
-    surname: String,
     subjects: [String],
     timetable: [timetableEntrySchema]
 });
