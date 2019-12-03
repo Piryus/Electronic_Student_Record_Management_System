@@ -180,18 +180,18 @@ export default class Teacher extends React.Component {
                                 <Assignments subjects={this.state.subjects} timetable={this.props.timetable}/>
                             )}
                             {this.state.userRequest === 'rollcall' && (
-                                <Rollcall classAttendance={this.state.classAttendance[this.state.classSelected.classId]}
+                                <Rollcall classAttendance={this.state.classAttendance[this.state.classSelected._id]}
                                           classId={this.state.classesHours.find(ch => ch.hour === '0').classId}
                                           updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.classesHours.find(ch => ch.hour === '0' || ch.hour === '1') !== undefined && (
                                 <EarlyLateRecordComponenent type={'late-entrance'}
-                                                            classId={this.state.classSelected.classId}
+                                                            classId={this.state.classSelected._id}
                                                             timetable={this.props.timetable} now={this.state.now}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.classesHours.length > 0 && (
                                 <EarlyLateRecordComponenent type={'early-exit'}
-                                                            classId={this.state.classSelected.classId}
+                                                            classId={this.state.classSelected._id}
                                                             timetable={this.props.timetable} now={this.state.now}/>
                             )}
                         </main>
