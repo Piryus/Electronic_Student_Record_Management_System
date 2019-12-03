@@ -38,7 +38,18 @@ export default class Attendance extends React.Component {
     };
 
     async componentDidMount() {
-        await this.getChildAttendance();
+        const attendance = await this.getChildAttendance();
+        this.setState({
+            childAttendance: attendance,
+            isLoading: false
+        });
+    }
+
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        const attendance = await this.getChildAttendance();
+        this.setState({
+            childAttendance: attendance
+        });
     }
 
     async getChildAttendance() {
@@ -54,12 +65,7 @@ export default class Attendance extends React.Component {
         };
         const response = await fetch(url, options);
         const json = await response.json();
-        if (this.state.childAttendance !== json.attendance) {
-            this.setState({
-                childAttendance: json.attendance,
-                isLoading: false
-            });
-        }
+        return json.attendance;
     }
 
     render() {
