@@ -25,7 +25,6 @@ export default class Parent extends React.Component {
     selectChild(child) {
         this.setState({
             childSelected: child,
-            userRequest: 'grades',
             sidebarOpen: false,
         });
     };
