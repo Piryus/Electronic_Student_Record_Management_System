@@ -110,7 +110,7 @@ export default class AccountsManagement extends React.Component {
                     <Alert variant='success'>The user has been successfully created and will receive an email containing their credentials.</Alert>
                 )}
                 <Row>
-                    <Table className="col" striped hover bordered responsive >
+                    <Table className="col" striped hover bordered responsive size="sm">
                         <thead>
                         <tr>
                             <th>SSN</th>
