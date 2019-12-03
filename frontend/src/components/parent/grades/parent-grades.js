@@ -14,7 +14,18 @@ export default class Grades extends React.Component {
     }
 
     async componentDidMount() {
-        await this.getChildGrades();
+        const grades = await this.getChildGrades();
+        this.setState({
+            childGrades: grades,
+            isLoading: false
+        });
+    }
+
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        const grades = await this.getChildGrades();
+        this.setState({
+            childGrades: grades
+        });
     }
 
     async getChildGrades() {
@@ -30,10 +41,7 @@ export default class Grades extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-        this.setState({
-            childGrades: json.grades,
-            isLoading: false
-        });
+        return json.grades;
     }
 
     render() {
