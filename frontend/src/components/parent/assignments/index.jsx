@@ -1,6 +1,7 @@
 import React from 'react';
 import {Accordion, Card, Col, Container, Row, Spinner} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
+import LoadingSpinner from "../../utils/loading-spinner";
 
 export default class Assignments extends React.Component {
 
@@ -99,10 +100,7 @@ export default class Assignments extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Assignments</SectionHeader>
-                {this.state.loading &&
-                <div className="d-flex">
-                    <Spinner animation="border" className="mx-auto"/>
-                </div>}
+                {this.state.loading && <LoadingSpinner/>}
                 {!this.state.loading && output}
             </Container>
         )

@@ -1,7 +1,8 @@
 import '@emarkk/hlib';
 import React from 'react';
-import {Accordion, Button, Card, Container, Spinner} from "react-bootstrap";
+import {Accordion, Button, Card, Container} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
+import LoadingSpinner from "../../utils/loading-spinner";
 
 export default class Grades extends React.Component {
 
@@ -102,10 +103,7 @@ export default class Grades extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Grades</SectionHeader>
-                {this.state.isLoading &&
-                <div className="d-flex">
-                    <Spinner animation="border" className="mx-auto"/>
-                </div>}
+                {this.state.loading && <LoadingSpinner/>}
                 {!this.state.isLoading &&
                 <Accordion className="mt-3" defaultActiveKey="0">
                     {gradesDOM.map((subject) => {

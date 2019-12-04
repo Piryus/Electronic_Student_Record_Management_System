@@ -3,18 +3,23 @@ import {Button, Container} from "react-bootstrap";
 import {FaCalendar} from 'react-icons/fa';
 import NewArticleModal from "./new-article-modal/new-article-modal";
 import SectionHeader from "../section-header";
+import LoadingSpinner from "../loading-spinner";
 
 export default class News extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             articles: [],
-            showNewArticleModal: false
+            showNewArticleModal: false,
+            loading: true,
         };
     }
 
     async componentDidMount() {
-        await this.fetchArticles();
+        const articles = await this.fetchArticles();
+        if (articles !== null) {
+            this.setState({articles, loading: false});
+        }
     }
 
     async fetchArticles() {
@@ -29,30 +34,33 @@ export default class News extends React.Component {
         };
         const response = await fetch(url, options);
         const responseJson = await response.json();
-        this.setState({
-            articles: responseJson.articles,
-        });
+        return responseJson.articles;
     }
 
     render() {
         return (
             <Container fluid className="mt-2">
                 <SectionHeader>News</SectionHeader>
-                {this.props.isOfficer &&
-                <Button onClick={() => this.setState({showNewArticleModal: true})} className="mb-2">Write an article</Button>}
-                <NewArticleModal show={this.state.showNewArticleModal}
-                                 handleClose={() => this.setState({showNewArticleModal: false})}/>
-                {this.state.articles.map(article => {
-                    return (
-                        <div className="mb-4" key={article.id}>
-                            <h5>{article.title}</h5>
-                            <span className="font-italic"><FaCalendar size={14}
-                                className="align-baseline mr-2"/>{new Date(article.date).longString()} - by&nbsp;
-                                {article.authorId ? [article.authorId.name, article.authorId.surname].join(' ') : 'Administrative Office'}
+                {this.state.loading && <LoadingSpinner/>}
+                {!this.state.loading &&
+                <>
+                    {this.props.isOfficer &&
+                    <Button onClick={() => this.setState({showNewArticleModal: true})} className="mb-2">Write an
+                        article</Button>}
+                    <NewArticleModal show={this.state.showNewArticleModal}
+                                     handleClose={() => this.setState({showNewArticleModal: false})}/>
+                    {this.state.articles.map(article => {
+                        return (
+                            <div className="mb-4" key={article.id}>
+                                <h5>{article.title}</h5>
+                                <span className="font-italic"><FaCalendar size={14}
+                                                                          className="align-baseline mr-2"/>{new Date(article.date).longString()} - by&nbsp;
+                                    {article.authorId ? [article.authorId.name, article.authorId.surname].join(' ') : 'Administrative Office'}
                             </span>
-                            <p className="text-justify">{article.content}</p>
-                        </div>)
-                })}
+                                <p className="text-justify">{article.content}</p>
+                            </div>)
+                    })}
+                </>}
             </Container>
         );
     }

@@ -1,7 +1,8 @@
 import React from 'react';
 import MyTimetable from '../../utils/my-timetable';
 import SectionHeader from "../../utils/section-header";
-import {Button, Container, Spinner} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
+import LoadingSpinner from "../../utils/loading-spinner";
 
 export default class Attendance extends React.Component {
 
@@ -137,10 +138,7 @@ export default class Attendance extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Attendance</SectionHeader>
-                {this.state.isLoading &&
-                <div className="d-flex">
-                    <Spinner animation="border" className="mx-auto"/>
-                </div>}
+                {this.state.isLoading && <LoadingSpinner/>}
                 {!this.state.isLoading &&
                 <>
                     <div className='mb-2 d-flex justify-content-between'>
