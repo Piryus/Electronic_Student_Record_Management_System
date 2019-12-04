@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
 import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
-import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
+import StudentGradesSummary from './grades';
 import Assignments from './assignments/assignments';
 import AppNavbar from "../utils/navbar/navbar";
 import Rollcall from './rollcall/rollcall';
@@ -29,10 +29,12 @@ export default class Teacher extends React.Component {
 
         let subjects = [];
         this.props.timetable.forEach((value) => {
-            subjects[value.subject] = {
-                subject: value.subject,
-                class: value.classId.toString()
-            };
+            if (subjects.find(subject => subject.subject === value.subject) === undefined) {
+                subjects.push({
+                    subject: value.subject,
+                    class: value.classId.toString()
+                });
+            }
         });
 
         this.state = {
