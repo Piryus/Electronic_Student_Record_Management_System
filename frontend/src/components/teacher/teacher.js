@@ -9,6 +9,7 @@ import Assignments from './assignments/assignments';
 import AppNavbar from "../utils/navbar/navbar";
 import Rollcall from './rollcall/rollcall';
 import EarlyLateRecordComponenent from '../utils/earlyLateRecordComponent/index';
+import NotesToParents from "./notes-to-parents";
 
 export default class Teacher extends React.Component {
 
@@ -165,6 +166,9 @@ export default class Teacher extends React.Component {
                                     onClick={() => this.setState({userRequest: "early-late"})}><FaArrowAltCircleLeft/> Students
                                     attendance</Nav.Link>
                             )}
+                            <Nav.Link
+                                className={this.state.userRequest === 'notes' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "notes"})}><FaBook/> Notes to parents</Nav.Link>
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && (
@@ -194,6 +198,9 @@ export default class Teacher extends React.Component {
                                                             classId={this.state.classSelected._id}
                                                             timetable={this.props.timetable} now={this.state.now}/>
                             )}
+                            {this.state.userRequest === 'notes' &&
+                                <NotesToParents students={this.state.students} />
+                            }
                         </main>
                     </Row>
                 </Container>
