@@ -11,7 +11,7 @@ const routes = [
         options: {
             auth: {
                 strategy: 'session',
-                scope: 'officer'
+                scope: ['officer', 'parent']
             }
         }
     },

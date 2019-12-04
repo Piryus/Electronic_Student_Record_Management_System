@@ -6,7 +6,7 @@ import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
 import {FaCog, FaGraduationCap, FaLayerGroup, FaRegNewspaper, FaUserEdit} from 'react-icons/fa';
 import AppNavbar from "../utils/navbar/navbar";
-import News from "./news/officer-news";
+import News from "../utils/news";
 
 export default class Officer extends React.Component {
 
@@ -55,7 +55,7 @@ export default class Officer extends React.Component {
                                 <EnrolmentForm/>
                             )}
                             {this.state.userRequest === 'news' && (
-                                <News/>
+                                <News isOfficer />
                             )}
                         </main>
                     </Row>

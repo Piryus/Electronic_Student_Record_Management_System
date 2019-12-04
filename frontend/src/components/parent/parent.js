@@ -4,9 +4,9 @@ import {Container, Row, Nav} from 'react-bootstrap';
 import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook, FaAddressCard} from 'react-icons/fa';
 import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
-import News from "./news/parent-news";
 import Assignments from './assignments';
 import Attendance from './attendance/';
+import News from "../utils/news";
 
 export default class Parent extends React.Component {
 
