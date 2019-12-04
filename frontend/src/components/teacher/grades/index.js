@@ -178,7 +178,6 @@ export default class StudentGradesSummary extends React.Component {
         //     );
         // }
 
-        console.log(this.state.subjects);
         return (
             <Container fluid>
                 <SectionHeader>Student grades</SectionHeader>
@@ -194,32 +193,37 @@ export default class StudentGradesSummary extends React.Component {
                 </Form.Group>
 
                 {this.state.selectedStudent !== undefined && <h6>{this.state.selectedStudent.value.name}'s grades:</h6>}
-                <Accordion>
-                    {this.state.selectedStudent !== undefined && (
-                        <p>There are not available grades for this student.</p>
-                    )}
 
-                    {this.state.subjects.map(subject => {
+                <Accordion>
+                    {this.state.selectedStudent !== undefined && this.state.subjects.map(subject => {
                         let gradeCounter = 0;
                         return (
-                            <Card key={subject}>
+                            <Card key={subject.subject}>
                                 <Card.Header>
-                                    <Accordion.Toggle as={Button} variant="link" eventKey={subject}>
+                                    <Accordion.Toggle as={Button} variant="link" eventKey={subject.subject}>
                                         {subject.subject}
                                     </Accordion.Toggle>
-                                </Card.Header>);
+                                </Card.Header>
                                 {this.state.selectedStudent.value.grades.map(grade => {
                                     if (grade.subject === subject.subject) {
                                         gradeCounter++;
                                         return (
-                                            <Accordion.Collapse eventKey={grade.subject}>
+                                            <Accordion.Collapse eventKey={grade.subject} key={grade}>
                                                 <Card.Body>Grade {gradeCounter}: {grade.value} Date
                                                     : {grade.date.split("T")[0]}</Card.Body>
-                                            </Accordion.Collapse>);
+                                            </Accordion.Collapse>
+                                        );
                                     }
                                 })}
+                                {gradeCounter === 0 &&
+                                <Accordion.Collapse eventKey={subject.subject}>
+                                    <Card.Body>{this.state.selectedStudent.value.name} doesn't have any registered
+                                        grades in {subject.subject}.</Card.Body>
+                                </Accordion.Collapse>
+                                }
                             </Card>);
-                    })}
+                    })
+                    }
                 </Accordion>
 
                 {/*{this.state.selectedStudent !== undefined &&*/}
