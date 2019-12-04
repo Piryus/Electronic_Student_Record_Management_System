@@ -2,7 +2,7 @@ import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
-import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal} from 'react-icons/fa'
+import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal, FaExclamationTriangle} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
@@ -168,7 +168,7 @@ export default class Teacher extends React.Component {
                             )}
                             <Nav.Link
                                 className={this.state.userRequest === 'notes' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={() => this.setState({userRequest: "notes"})}><FaBook/> Notes to parents</Nav.Link>
+                                onClick={() => this.setState({userRequest: "notes"})}><FaExclamationTriangle/> Notes to parents</Nav.Link>
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && (
