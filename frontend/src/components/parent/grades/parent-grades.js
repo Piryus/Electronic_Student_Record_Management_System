@@ -103,7 +103,7 @@ export default class Grades extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Grades</SectionHeader>
-                {this.state.loading && <LoadingSpinner/>}
+                {this.state.isLoading && <LoadingSpinner/>}
                 {!this.state.isLoading &&
                 <Accordion className="mt-3" defaultActiveKey="0">
                     {gradesDOM.map((subject) => {
