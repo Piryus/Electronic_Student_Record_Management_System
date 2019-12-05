@@ -12,9 +12,11 @@ const getNotes = async function(teacherUId) {
     if(teacher === null)
         return Boom.badRequest();
 
-    const notes = students.flatMap(s => s.notes.map(n => Object.assign({}, n, { studentId: s._id, student: [s.name, s.surname].join(' ')})))
-                        .filter(n => n.teacherId === teacher._id.toString())
-                        .sort((a, b) => b.date - a.date);
+    const notes = students.flatMap(s => s.notes.map(n => Object.assign({
+        teacherId: n.teacherId,
+        description: n.description,
+        date: n.date
+    }, { studentId: s._id, student: [s.name, s.surname].join(' ')}))).filter(n => n.teacherId.equals(teacher._id)).sort((a, b) => b.date - a.date);
 
     return { notes };
 };
