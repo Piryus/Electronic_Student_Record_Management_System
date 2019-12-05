@@ -38,6 +38,22 @@ const routes = [
     },
     {
         method: 'GET',
+        path: '/notes/{studentId}',
+        handler: async (request, h) => students.getNotes(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/students',
         handler: async (request, h) => students.getStudents(request.query.classId || null),
         options: {
@@ -93,6 +109,25 @@ const routes = [
                 payload: {
                     classId: Valid.id.required(),
                     info: Valid.array.items(Valid.attendanceInfo).required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/notes/{studentId}',
+        handler: async (request, h) => students.recordNote(request.auth.credentials.id, request.params.studentId, request.payload.description),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                },
+                payload: {
+                    description: Valid.longText.required()
                 }
             }
         }

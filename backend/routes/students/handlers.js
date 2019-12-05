@@ -7,6 +7,7 @@ const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
+const User = require('../../models/User');
 
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
@@ -26,6 +27,26 @@ const getAttendance = async function(parentUId, studentId) {
         return Boom.badRequest();
 
     return { attendance: student.attendanceEvents };
+};
+
+const getNotes = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    let decorator = student.notes.map(async n => {
+        const teacher = await Teacher.findOne({ _id: n.teacherId });
+        const user = await User.findOne({ _id: teacher.userId });
+        return Object.assign(
+            { _id: n._id, date: n.date, description: n.description },
+            { teacher: [user.name, user.surname].join(' ') }
+        );
+    });
+    const teacherDecoratedNotes = await Promise.all(decorator);
+
+    return { notes: teacherDecoratedNotes };
 };
 
 const getStudents = async function(classId) {
@@ -82,6 +103,22 @@ const recordAttendance = async function(teacherUId, classId, info) {
     return { success: true };
 };
 
+const recordNote = async function(teacherUId, studentId, description) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    const student = await Student.findById(studentId);
+
+    if(teacher === null || student === null)
+        return Boom.badRequest();
+
+    student.notes.push({
+        teacherId: teacher._id,
+        description
+    });
+    await student.save();
+
+    return { success: true };
+};
+
 const addStudent = async function(ssn, name, surname) {
     const newStudent = new Student({ ssn, name, surname });
     await newStudent.save();
@@ -100,10 +137,12 @@ const addSchoolClass = async function(name, students) {
 module.exports = {
     getGrades,
     getAttendance,
+    getNotes,
     getStudents,
     getClasses,
     recordGrades,
     recordAttendance,
+    recordNote,
     addStudent,
     addSchoolClass
 };
