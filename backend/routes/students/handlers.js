@@ -7,6 +7,7 @@ const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
+const User = require('../../models/User');
 
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
@@ -35,7 +36,17 @@ const getNotes = async function(parentUId, studentId) {
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
 
-    return { notes: student.notes };
+    let decorator = student.notes.map(async n => {
+        const teacher = await Teacher.findOne({ _id: n.teacherId });
+        const user = await User.findOne({ _id: teacher.userId });
+        return Object.assign(
+            { _id: n._id, date: n.date, description: n.description },
+            { teacher: [user.name, user.surname].join(' ') }
+        );
+    });
+    const teacherDecoratedNotes = await Promise.all(decorator);
+
+    return { notes: teacherDecoratedNotes };
 };
 
 const getStudents = async function(classId) {
