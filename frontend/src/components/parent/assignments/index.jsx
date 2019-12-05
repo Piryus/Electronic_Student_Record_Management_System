@@ -1,7 +1,9 @@
 import React from 'react';
-import {Accordion, Card, Col, Container, Row, Spinner} from "react-bootstrap";
+import {Accordion, Card, Col, Container, Row, Spinner, Button, Table} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import LoadingSpinner from "../../utils/loading-spinner";
+import {FaDownload} from 'react-icons/fa';
+
 
 export default class Assignments extends React.Component {
 
@@ -10,6 +12,12 @@ export default class Assignments extends React.Component {
         this.state = {
             childAssignment: [],
             loading: true,
+            files: [ //Hardcoded for frontend development
+                {
+                    name: 'file.txt',
+                    token:  'thisisatoken',
+                }
+            ]
         }
     }
 
@@ -44,6 +52,12 @@ export default class Assignments extends React.Component {
         return json.assignments;
     }
 
+    downloadFile(event, index){
+        event.preventDefault();
+        alert('Download started');
+        //Trigger file download here
+    }
+
     renderItem = (item, index) => {
         return (
             <Card>
@@ -55,7 +69,36 @@ export default class Assignments extends React.Component {
                     </Row>
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey={index.toString()}>
-                    <Card.Body>{item.description}</Card.Body>
+                    <Card.Body>
+                        {item.description}
+                        {this.state.files.length !== 0 &&(
+                            <div>
+                                <br></br><p>Attached files:</p>
+                                <Table striped responsive>
+                                    {/* <thead>
+                                        <tr>
+                                            <th>Filename</th>
+                                            <th>Download</th>
+                                        </tr>
+                                    </thead> */}
+                                    <tbody>
+                                        {this.state.files.map((f, index) => {
+                                            return (
+                                                <tr>
+                                                    <td style={{textDecoration: 'underline'}}>
+                                                        {f.name}
+                                                    </td>
+                                                    <td>
+                                                        <Button size="sm" variant="outline-primary" onClick={(event) => this.downloadFile(event, index)}><FaDownload/></Button>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </Table>
+                            </div>
+                        )}
+                    </Card.Body>
                 </Accordion.Collapse>
             </Card>
         );
