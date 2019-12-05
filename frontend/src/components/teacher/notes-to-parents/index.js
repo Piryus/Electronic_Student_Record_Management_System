@@ -28,11 +28,7 @@ export default class NotesToParents extends React.Component {
     }
 
     async componentDidMount() {
-        const teacherNotes = await this.getTeacherNotes();
-        this.setState({
-            teacherNotes,
-            isLoading: false
-        });
+        await this.getTeacherNotes();
     }
 
     // Query the notes the teacher has written
@@ -49,7 +45,10 @@ export default class NotesToParents extends React.Component {
             };
             const response = await fetch(url, options);
             const json = await response.json();
-            return json.notes;
+            this.setState({
+                teacherNotes: json.notes,
+                isLoading: false
+            });
         } catch (e) {
             console.log(e);
         }
@@ -70,7 +69,7 @@ export default class NotesToParents extends React.Component {
                     <NewNoteForm
                         show={this.state.showNewNoteForm}
                         studentsSearchOptions={this.state.studentsSearchOptions}
-                        handleClose={() => this.setState({showNewNoteForm: false})}/>
+                        handleClose={async () => {this.getTeacherNotes(); this.setState({showNewNoteForm: false})}}/>
 
                     {Array.isArray(this.state.teacherNotes) && this.state.teacherNotes.length > 0 &&
                     <Table responsive>
