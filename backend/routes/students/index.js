@@ -99,6 +99,25 @@ const routes = [
     },
     {
         method: 'POST',
+        path: '/notes/{studentId}',
+        handler: async (request, h) => students.recordNote(request.auth.credentials.id, request.params.studentId, request.payload.description),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                },
+                payload: {
+                    description: Valid.longText.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
         path: '/students',
         handler: async (request, h) => {
             const { ssn, name, surname } = request.payload;

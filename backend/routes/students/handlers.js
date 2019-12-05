@@ -82,6 +82,22 @@ const recordAttendance = async function(teacherUId, classId, info) {
     return { success: true };
 };
 
+const recordNote = async function(teacherUId, studentId, description) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    const student = await Student.findById(studentId);
+
+    if(teacher === null || student === null)
+        return Boom.badRequest();
+
+    student.notes.push({
+        teacherId: teacher._id,
+        description
+    });
+    await student.save();
+
+    return { success: true };
+};
+
 const addStudent = async function(ssn, name, surname) {
     const newStudent = new Student({ ssn, name, surname });
     await newStudent.save();
@@ -104,6 +120,7 @@ module.exports = {
     getClasses,
     recordGrades,
     recordAttendance,
+    recordNote,
     addStudent,
     addSchoolClass
 };
