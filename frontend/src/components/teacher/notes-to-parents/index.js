@@ -1,8 +1,9 @@
 import React from "react";
 import {Button, Container, Table} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
-import Select from "react-select";
 import NewNoteForm from "./new-note-form";
+import '@emarkk/hlib';
+import LoadingSpinner from "../../utils/loading-spinner";
 
 export default class NotesToParents extends React.Component {
     constructor(props) {
@@ -21,14 +22,16 @@ export default class NotesToParents extends React.Component {
             selectedStudent: undefined,
             selectedStudentNotes: [],
             teacherNotes: [],
-            showNewNoteForm: false
+            showNewNoteForm: false,
+            isLoading: true
         }
     }
 
     async componentDidMount() {
         const teacherNotes = await this.getTeacherNotes();
         this.setState({
-            teacherNotes
+            teacherNotes,
+            isLoading: false
         });
     }
 
@@ -57,31 +60,46 @@ export default class NotesToParents extends React.Component {
             <Container fluid>
                 <SectionHeader>Notes to parents</SectionHeader>
 
-                <Button className='mb-2'
-                        onClick={() => this.setState({showNewNoteForm: true})}>
-                    Add a note
-                </Button>
-                <NewNoteForm
-                    show={this.state.showNewNoteForm}
-                    studentsSearchOptions={this.state.studentsSearchOptions}
-                    handleClose={() => this.setState({showNewNoteForm: false})} />
+                {this.state.isLoading && <LoadingSpinner/>}
+                {!this.state.isLoading &&
+                <>
+                    <Button className='mb-2'
+                            onClick={() => this.setState({showNewNoteForm: true})}>
+                        Add a note
+                    </Button>
+                    <NewNoteForm
+                        show={this.state.showNewNoteForm}
+                        studentsSearchOptions={this.state.studentsSearchOptions}
+                        handleClose={() => this.setState({showNewNoteForm: false})}/>
 
-                <Table responsive>
-                    <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Note</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {this.state.teacherNotes.map(note =>
-                        <tr key={note._id}>
-                            <td>{note.date}</td>
-                            <td>{note.description}</td>
+                    {Array.isArray(this.state.teacherNotes) && this.state.teacherNotes.length > 0 &&
+                    <Table responsive>
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Student</th>
+                            <th>Note</th>
                         </tr>
-                    )}
-                    </tbody>
-                </Table>
+                        </thead>
+                        <tbody>
+                        {this.state.teacherNotes.map(note => {
+                                const student = this.props.students.find(student => student._id === note.studentId);
+                                return (
+                                    <tr key={note._id}>
+                                        <td>{new Date(note.date).longString()}</td>
+                                        <td>{student.name + ' ' + student.surname}</td>
+                                        <td>{note.description}</td>
+                                    </tr>);
+                            }
+                        )}
+                        </tbody>
+                    </Table>}
+
+                    {Array.isArray(this.state.teacherNotes) && this.state.teacherNotes.length === 0 &&
+                    <h6>You didn't submit any notes yet!</h6>
+                    }
+                </>
+                }
             </Container>
         );
     }
