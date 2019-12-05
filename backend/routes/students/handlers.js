@@ -28,6 +28,16 @@ const getAttendance = async function(parentUId, studentId) {
     return { attendance: student.attendanceEvents };
 };
 
+const getNotes = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    return { attendance: student.notes };
+};
+
 const getStudents = async function(classId) {
     const filter = classId !== null ? { classId } : {};
     const students = await Student.find(filter, { 'grades._id': 0 });
@@ -116,6 +126,7 @@ const addSchoolClass = async function(name, students) {
 module.exports = {
     getGrades,
     getAttendance,
+    getNotes,
     getStudents,
     getClasses,
     recordGrades,
