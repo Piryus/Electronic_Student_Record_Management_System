@@ -35,7 +35,7 @@ const getNotes = async function(parentUId, studentId) {
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
 
-    return { attendance: student.notes };
+    return { notes: student.notes };
 };
 
 const getStudents = async function(classId) {
