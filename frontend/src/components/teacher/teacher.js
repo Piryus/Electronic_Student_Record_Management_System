@@ -2,7 +2,7 @@ import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
-import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal, FaExclamationTriangle, FaFilePdf, FaFile} from 'react-icons/fa'
+import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal, FaExclamationTriangle, FaFilePdf} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';

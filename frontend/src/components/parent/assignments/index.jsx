@@ -46,10 +46,15 @@ export default class Assignments extends React.Component {
         return json.assignments;
     }
 
-    downloadFile(event, index){
+    downloadFile(event, f){
         event.preventDefault();
-        alert('Download started');
-        //Trigger file download here
+        var file_path = "http://localhost:3000/file/" + f._id.toString();
+        var a = document.createElement('A');
+        a.href = file_path;
+        a.download = file_path.substr(file_path.lastIndexOf('/') + 1);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     renderItem = (item, index) => {
@@ -83,7 +88,7 @@ export default class Assignments extends React.Component {
                                                         {f.filename}
                                                     </td>
                                                     <td>
-                                                        <Button size="sm" variant="outline-primary" onClick={(event) => this.downloadFile(event, index)}><FaDownload/></Button>
+                                                        <Button size="sm" variant="outline-primary" onClick={(event) => this.downloadFile(event, f)}><FaDownload/></Button>
                                                     </td>
                                                 </tr>
                                             );
