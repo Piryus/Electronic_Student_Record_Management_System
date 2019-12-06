@@ -2,6 +2,7 @@
 .idea
 
 # Backend
+/backend/uploads
 /backend/node_modules
 /backend/config/keys.js
 

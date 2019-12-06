@@ -1,6 +1,7 @@
 const Joi = require('@hapi/joi');
 
 let schema = {
+    any: Joi.any(),
     array: Joi.array(),
     id: Joi.string().hex().length(24),
     ssn: Joi.string(),
