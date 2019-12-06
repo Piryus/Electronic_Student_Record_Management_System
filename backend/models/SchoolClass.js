@@ -11,7 +11,10 @@ const assignmentSchema = new Schema({
         default: Date.now
     },
     due: Date,
-    attachments: [Schema.Types.ObjectId]
+    attachments: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'File'
+    }]
 });
 
 const supportMaterialSchema = new Schema({
