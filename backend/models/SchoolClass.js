@@ -14,9 +14,19 @@ const assignmentSchema = new Schema({
     attachments: [Schema.Types.ObjectId]
 });
 
+const supportMaterialSchema = new Schema({
+    subject: String,
+    uploaded: {
+        type: Date,
+        default: Date.now
+    },
+    attachments: [Schema.Types.ObjectId]
+});
+
 const schoolclassSchema = new Schema({
     name: String,
-    assignments: [assignmentSchema]
+    assignments: [assignmentSchema],
+    supportMaterials: [supportMaterialSchema]
 });
 
 module.exports = mongoose.model('SchoolClass', schoolclassSchema);
