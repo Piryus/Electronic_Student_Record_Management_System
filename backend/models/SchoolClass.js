@@ -10,7 +10,8 @@ const assignmentSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    due: Date
+    due: Date,
+    attachments: [Schema.Types.ObjectId]
 });
 
 const schoolclassSchema = new Schema({
