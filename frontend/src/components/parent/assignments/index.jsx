@@ -24,10 +24,12 @@ export default class Assignments extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
-        const assignments = await this.getChildAssignment();
-        this.setState({
-            childAssignment: assignments
-        });
+        if (prevProps.child._id !== this.props.child._id) {
+            const assignments = await this.getChildAssignment();
+            this.setState({
+                childAssignment: assignments
+            });
+        }
     }
 
     async getChildAssignment() {
