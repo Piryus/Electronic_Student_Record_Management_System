@@ -2,7 +2,7 @@ import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
-import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal, FaExclamationTriangle} from 'react-icons/fa'
+import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal, FaExclamationTriangle, FaFilePdf, FaFile} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
@@ -10,6 +10,7 @@ import AppNavbar from "../utils/navbar/navbar";
 import Rollcall from './rollcall/rollcall';
 import EarlyLateRecordComponenent from '../utils/earlyLateRecordComponent/index';
 import NotesToParents from "./notes-to-parents";
+import Material from "./material/material";
 
 export default class Teacher extends React.Component {
 
@@ -22,7 +23,7 @@ export default class Teacher extends React.Component {
             if (class_.weekhour.split('_')[0] === todayDayNumber.toString()) {
                 classes.push({
                     hour: class_.weekhour.split('_')[1],
-                    classId: class_.classId
+                    classId: class_.classId,
                 });
             }
             return classes;
@@ -38,13 +39,14 @@ export default class Teacher extends React.Component {
 
         this.state = {
             userRequest: 'lecture',
-            classes: [],
+            classes: [],   
             classSelected: '',
             students: [],
             subjects: subjects,
             classesHours: classes,
             classAttendance: [],
-            now: todayDayNumber
+            now: todayDayNumber,
+            allClasses: []
         };
     }
 
@@ -124,6 +126,7 @@ export default class Teacher extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
+        this.setState({allClasses: json.classes});
         return json.classes.filter(class_ => {
             return this.state.classesHours.find(classHour => classHour.classId === class_._id) !== undefined;
         });
@@ -169,7 +172,10 @@ export default class Teacher extends React.Component {
                             <Nav.Link
                                 className={this.state.userRequest === 'notes' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={() => this.setState({userRequest: "notes"})}><FaExclamationTriangle/> Notes to parents</Nav.Link>
-                        </Nav>
+                            <Nav.Link
+                                className={this.state.userRequest === 'material' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support material </Nav.Link>
+                        </Nav>    
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && (
                                 <LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
@@ -201,6 +207,9 @@ export default class Teacher extends React.Component {
                             {this.state.userRequest === 'notes' &&
                                 <NotesToParents students={this.state.students} />
                             }
+                            {this.state.userRequest === 'material' && (
+                                <Material timetable={this.props.timetable} classes={this.state.allClasses}/>
+                            )}
                         </main>
                     </Row>
                 </Container>
