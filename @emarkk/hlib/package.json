@@ -1,6 +1,6 @@
 {
   "name": "@emarkk/hlib",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Group H Library",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,8 @@
   "author": "Group H",
   "license": "MIT",
   "dependencies": {
-    "@hapi/code": "7.0.x"
+    "@hapi/code": "7.0.x",
+    "mv": "^2.1.1"
   },
   "devDependencies": {
     "@hapi/lab": "21.x.x",

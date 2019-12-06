@@ -1,3 +1,5 @@
+const mv = require('mv');
+
 const hour = 60 * 60 * 1000;
 const day = 24 * hour;
 
@@ -93,6 +95,17 @@ const dateToWeekhour = function(d) {
     return weekdayIndex + '_' + hourIndex;
 };
 
+const moveFile = function(src, dst) {
+    return new Promise((resolve, reject) => {
+        mv(src, dst, { mkdirp: true }, function(err) {
+            if(err)
+                reject(err);
+
+            resolve();
+        });
+    });
+};
+
 module.exports = {
     hour,
     day,
@@ -101,5 +114,6 @@ module.exports = {
     getAY,
     timeToDate,
     weekhourToDate,
-    dateToWeekhour
+    dateToWeekhour,
+    moveFile
 };
