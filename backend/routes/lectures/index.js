@@ -71,8 +71,8 @@ const routes = [
         method: 'POST',
         path: '/assignments',
         handler: async (request, h) => {
-            const { subject, description, due } = request.payload;
-            return lectures.recordAssignments(request.auth.credentials.id, subject, description, due);
+            const { subject, description, due, attachments } = request.payload;
+            return lectures.recordAssignments(request.auth.credentials.id, subject, description, due, attachments);
         },
         options: {
             auth: {
@@ -83,8 +83,14 @@ const routes = [
                 payload: {
                     subject: Valid.subject.required(),
                     description: Valid.longText.required(),
-                    due: Valid.date.required()
+                    due: Valid.date.required(),
+                    attachments: Valid.any
                 }
+            },
+            payload: {
+                maxBytes: 10485760,
+                output: 'file',
+                parse: true
             }
         }
     },

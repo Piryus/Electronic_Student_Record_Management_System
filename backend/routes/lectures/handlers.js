@@ -3,6 +3,8 @@
 const Boom = require('boom');
 const HLib = require('@emarkk/hlib');
 
+const Util = require('../../utils');
+
 const Lecture = require('../../models/Lecture');
 const SchoolClass = require('../../models/SchoolClass');
 const Parent = require('../../models/Parent');
@@ -73,15 +75,17 @@ const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
     return { success: true };
 };
 
-const recordAssignments = async function(teacherUId, subject, description, due) {
+const recordAssignments = async function(teacherUId, subject, description, due, files) {
     const weekhour = HLib.dateToWeekhour(due);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)) || due < new Date(Date.now()).addDays(1).dayStart())
         return Boom.badRequest();
+
+    const attachments = await Util.saveFiles(files);
         
     const schoolClass = await SchoolClass.findOne({ _id: teacher.timetable.find(t => t.weekhour === weekhour).classId });
-    schoolClass.assignments.push({ subject, description, due });
+    schoolClass.assignments.push({ subject, description, due, attachments });
     await schoolClass.save();
 
     return { success: true };
