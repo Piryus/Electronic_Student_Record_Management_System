@@ -11,13 +11,7 @@ export default class Assignments extends React.Component {
         super(props);
         this.state = {
             childAssignment: [],
-            loading: true,
-            files: [ //Hardcoded for frontend development
-                {
-                    name: 'file.txt',
-                    token:  'thisisatoken',
-                }
-            ]
+            loading: true
         }
     }
 
@@ -71,7 +65,7 @@ export default class Assignments extends React.Component {
                 <Accordion.Collapse eventKey={index.toString()}>
                     <Card.Body>
                         {item.description}
-                        {this.state.files.length !== 0 &&(
+                        {item.attachments.length !== 0 &&(
                             <div>
                                 <br></br><p>Attached files:</p>
                                 <Table striped responsive>
@@ -82,11 +76,11 @@ export default class Assignments extends React.Component {
                                         </tr>
                                     </thead> */}
                                     <tbody>
-                                        {this.state.files.map((f, index) => {
+                                        {item.attachments.map((f, index) => {
                                             return (
                                                 <tr>
                                                     <td style={{textDecoration: 'underline'}}>
-                                                        {f.name}
+                                                        {f.filename}
                                                     </td>
                                                     <td>
                                                         <Button size="sm" variant="outline-primary" onClick={(event) => this.downloadFile(event, index)}><FaDownload/></Button>
