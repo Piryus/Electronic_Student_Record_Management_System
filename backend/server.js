@@ -1,5 +1,7 @@
 'use strict';
 
+const path = require('path');
+
 const Hapi = require('@hapi/hapi');
 
 const routes = require('./routes');
@@ -12,6 +14,9 @@ const init = async (debug) => {
         host: '0.0.0.0',
         debug,
         routes: {
+            files: {
+                relativeTo: path.join(__dirname, 'uploads')
+            },
             cors: {
                 origin: ['*'],
                 maxAge: 86400,
@@ -22,6 +27,7 @@ const init = async (debug) => {
         }
     });
 
+    await server.register(require('@hapi/inert'));
     await server.register(require('@hapi/cookie'));
     
     server.auth.strategy('session', 'cookie', cookieStrategy);
