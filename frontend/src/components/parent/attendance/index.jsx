@@ -47,10 +47,12 @@ export default class Attendance extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
-        const attendance = await this.getChildAttendance();
-        this.setState({
-            childAttendance: attendance
-        });
+        if (prevProps.child._id !== this.props.child._id) {
+            const attendance = await this.getChildAttendance();
+            this.setState({
+                childAttendance: attendance
+            });
+        }
     }
 
     async getChildAttendance() {

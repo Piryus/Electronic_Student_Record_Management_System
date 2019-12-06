@@ -23,10 +23,12 @@ export default class Grades extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
-        const grades = await this.getChildGrades();
-        this.setState({
-            childGrades: grades
-        });
+        if (prevProps.child._id !== this.props.child._id) {
+            const grades = await this.getChildGrades();
+            this.setState({
+                childGrades: grades
+            });
+        }
     }
 
     async getChildGrades() {
