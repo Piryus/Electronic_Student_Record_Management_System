@@ -82,7 +82,7 @@ const recordAssignments = async function(teacherUId, subject, description, due, 
     if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)) || due < new Date(Date.now()).addDays(1).dayStart())
         return Boom.badRequest();
 
-    const attachments = await Util.saveFiles(files);
+    const attachments = await Util.saveFiles(Array.isArray(files) ? files : [files]);
         
     const schoolClass = await SchoolClass.findOne({ _id: teacher.timetable.find(t => t.weekhour === weekhour).classId });
     schoolClass.assignments.push({ subject, description, due, attachments });
