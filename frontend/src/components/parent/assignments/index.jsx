@@ -1,8 +1,8 @@
 import React from 'react';
-import {Accordion, Card, Col, Container, Row, Spinner, Button, Table} from "react-bootstrap";
+import {Accordion, Card, Col, Container, Row, Spinner} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import LoadingSpinner from "../../utils/loading-spinner";
-import {FaDownload} from 'react-icons/fa';
+import DownloadFileTable from '../../utils/downloadfiletable/downloadfiletable';
 
 
 export default class Assignments extends React.Component {
@@ -46,17 +46,6 @@ export default class Assignments extends React.Component {
         return json.assignments;
     }
 
-    downloadFile(event, f){
-        event.preventDefault();
-        var file_path = "http://localhost:3000/file/" + f._id.toString();
-        var a = document.createElement('A');
-        a.href = file_path;
-        a.download = file_path.substr(file_path.lastIndexOf('/') + 1);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
-
     renderItem = (item, index) => {
         return (
             <Card>
@@ -73,13 +62,13 @@ export default class Assignments extends React.Component {
                         {item.attachments.length !== 0 &&(
                             <div>
                                 <br></br><p>Attached files:</p>
-                                <Table striped responsive>
-                                    {/* <thead>
+                                {/* <Table striped responsive>
+                                    <thead>
                                         <tr>
                                             <th>Filename</th>
                                             <th>Download</th>
                                         </tr>
-                                    </thead> */}
+                                    </thead>
                                     <tbody>
                                         {item.attachments.map((f, index) => {
                                             return (
@@ -94,7 +83,8 @@ export default class Assignments extends React.Component {
                                             );
                                         })}
                                     </tbody>
-                                </Table>
+                                </Table> */}
+                                <DownloadFileTable type='assignment' files={item.attachments}/>
                             </div>
                         )}
                     </Card.Body>
