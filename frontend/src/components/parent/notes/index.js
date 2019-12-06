@@ -22,6 +22,16 @@ export default class NotesToParents extends React.Component {
         });
     }
 
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.child._id !== this.props.child._id) {
+            const notes = await this.getNotes();
+            this.setState({
+                notes,
+                isLoading: false
+            });
+        }
+    }
+
     // Query the notes the teacher has written
     async getNotes() {
         try {
