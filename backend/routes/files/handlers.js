@@ -20,11 +20,14 @@ const get = async function(h, parentUId, fileId) {
     
     const schoolClasses = await SchoolClass.find({ _id: { $in: students.map(s => s.classId) }});
     
-    if(!schoolClasses.flatMap(sc => [...sc.assignments, ...sc.supportMaterials]).flatMap(x => x.attachments).includes(fileId))
+    if(!schoolClasses.flatMap(sc => [...sc.assignments, ...sc.supportMaterials]).flatMap(x => x.attachments).some(a => a.toString() === fileId))
         return Boom.badRequest();
 
-    const file = File.findOne({ _id: fileId });
-    return h.file(fileId, { filename: file.filename });
+    const file = await File.findOne({ _id: fileId });
+    return h.file(fileId, {
+        mode: 'attachment',
+        filename: file.filename
+    });
 };
 
 module.exports = {
