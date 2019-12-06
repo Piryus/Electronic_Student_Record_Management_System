@@ -51,19 +51,17 @@ export default class Assignments extends React.Component {
         try {
             const url = 'http://localhost:3000/assignments';
             const date = new Date(this.state.selectedDate + 'T' + effectiveHour + ':00:00');
-            const jsonToSend = JSON.stringify({
-                subject: this.state.selectedSubject,
-                description: this.state.description,
-                due: date
+            const formData = new FormData();
+            formData.append('subject', this.state.selectedSubject);
+            formData.append('description', this.state.description);
+            formData.append('due', date);
+            this.state.selectedFiles.forEach(f => {
+                formData.append('attachments', f);
             });
             const options = {
                 method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                },
                 credentials: 'include',
-                body: jsonToSend
+                body: formData
             };
             let response = await fetch(url, options);
             const json = await response.json();
