@@ -1,11 +1,11 @@
-import React, {createRef} from 'react';
+import React from 'react';
 import {Button, Form, Dropdown, Container, Alert, Table} from 'react-bootstrap';
 import 'moment/locale/it.js';
 import {DatePickerInput} from 'rc-datepicker';
 import 'rc-datepicker/lib/style.css';
 import styles from '../student-grades-summary/styles.module.css';
 import SectionHeader from "../../utils/section-header";
-import Dropzone from 'react-dropzone';
+import HDropzone from "../../utils/hdropzone/hdropzone";
 
 export default class Assignments extends React.Component {
 
@@ -30,7 +30,7 @@ export default class Assignments extends React.Component {
             selectedWeekhour: null,
             selectedFiles: [],
         }
-
+        this.selectedFilesHandler = this.selectedFilesHandler.bind(this);
     }
 
     hourTable = ["08", "09", "10", "11", "12", "13"];
@@ -40,41 +40,10 @@ export default class Assignments extends React.Component {
         this.setState({wantAddAssignment: true});
     }
 
-    dropzoneRef = createRef();
-    openDialog = () => {
-        if (this.dropzoneRef.current) {
-            this.dropzoneRef.current.open()
-        }
-    };
-
-    onDrop = (droppedFiles) => {
-        let currentFiles = this.state.selectedFiles;
-        currentFiles = currentFiles.concat(droppedFiles);
-        this.setState({selectedFiles: currentFiles});
+    selectedFilesHandler(newSelectedFiles){
+        this.setState({selectedFiles: newSelectedFiles});
     }
 
-    removeFile(event, index){
-        event.preventDefault();
-        let currentFiles = this.state.selectedFiles;
-        if(currentFiles.length === 1){
-            currentFiles = [];
-        } else{
-            currentFiles.splice(index, 1);
-        }
-        this.setState({selectedFiles: currentFiles});
-    }
-
-    formatBytes(bytes, decimals = 2) {
-        if (bytes === 0) return '0 Bytes';
-    
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
 
     async saveAssignmentIntoDb(day, hour) {
         let effectiveHour = this.hourTable[hour];
@@ -177,8 +146,9 @@ export default class Assignments extends React.Component {
                 )}
                 {this.state.wantAddAssignment === true && (
                     <div>
-                        <p>Complete the form below to add an Assignment</p><br></br>
+                        <p>Complete the form below to add an Assignment</p>
                         <Form>
+                        <Button onClick={(e) => this.saveChanges(e)} type="primary">Save</Button>
                             <Form.Group>
                                 <Form.Label>Subject: </Form.Label>
                                 <Dropdown>
@@ -209,47 +179,7 @@ export default class Assignments extends React.Component {
                                 <Form.Control placeholder="Insert a description here." as="textarea" rows="3"
                                               onChange={(e) => this.setState({description: e.target.value})}/>
                             </Form.Group>
-                            <Form.Group>
-                                <Form.Label>
-                                    {this.state.selectedFiles.length === 0 ? 'Upload files:' : 'Drag \'n\' drop some files here below, or click inside the grey area to select files.'}
-                                </Form.Label><br></br>
-                                <Alert variant='light'>
-                                <Dropzone onDrop={acceptedFiles => this.onDrop(acceptedFiles)} ref={this.dropzoneRef} noClick noKeyboard>
-                                    {({getRootProps, getInputProps, acceptedFiles}) => (
-                                        <div className="container">
-                                            <div {...getRootProps({className: 'dropzone'})}>
-                                                <input {...getInputProps()} />
-                                                {this.state.selectedFiles.length === 0 &&(
-                                                        <p>Drag 'n' drop some files here, or click to select files.</p>
-                                                )}
-                                                <Button  size="sm" variant="outline-secondary" onClick={this.openDialog}>Select a file</Button>
-                                                {this.state.selectedFiles.length !== 0 && (
-                                                    <div>
-                                                        <Table borderless responsive>
-                                                            <thead>
-                                                            <tr>
-                                                                <th>File name</th>
-                                                                <th>File size</th>
-                                                                <th></th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            {this.state.selectedFiles.map((f, index) => <tr>
-                                                            <td>{f.name}</td>
-                                                            <td>{this.formatBytes(f.size)}</td>
-                                                            <td><Button variant="danger" size="sm" type="primary" onClick={(event) => this.removeFile(event,index)}>Remove</Button></td>
-                                                        </tr>)}
-                                                            </tbody>
-                                                        </Table>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </Dropzone>
-                                </Alert>
-                            </Form.Group>
-                            <Button onClick={(e) => this.saveChanges(e)} type="primary">Save</Button>
+                            <HDropzone selectedFilesHandler={(newSelectedFiles) => this.selectedFilesHandler(newSelectedFiles)} selectedFiles={this.state.selectedFiles}/>
                         </Form>
                     </div>
                 )}
