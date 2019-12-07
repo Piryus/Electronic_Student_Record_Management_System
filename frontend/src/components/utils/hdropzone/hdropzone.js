@@ -3,6 +3,7 @@ import Dropzone from 'react-dropzone';
 import {Button, Form, Container, Alert, Table} from 'react-bootstrap';
 
 
+
 export default class HDropzone extends React.Component {
     constructor(props){
         super(props);
@@ -55,12 +56,12 @@ export default class HDropzone extends React.Component {
     render(){
         return(
             <React.Fragment>
-                <Form.Group>
+                        <Form.Group>
                                 <Form.Label>
                                     {this.state.selectedFiles.length === 0 ? 'Upload files:' : 'Drag \'n\' drop some files here below, or click inside the grey area to select files.'}
                                 </Form.Label><br></br>
                                 <Button  size="sm" variant="outline-secondary" onClick={this.openDialog}>Select a file</Button><br></br><br></br>
-                                <Alert variant='light'>
+                                <div style={{border: 'dashed 2px lightGrey', borderRadius: '15.0px', backgroundColor: 'white'}}>
                                 <Dropzone onDrop={acceptedFiles => this.onDrop(acceptedFiles)} ref={this.dropzoneRef} noClick noKeyboard>
                                     {({getRootProps, getInputProps, acceptedFiles}) => (
                                         <div className="container">
@@ -68,8 +69,9 @@ export default class HDropzone extends React.Component {
                                                 <input {...getInputProps()} />
                                                 {this.state.selectedFiles.length === 0 &&(
                                                     <React.Fragment>
-                                                        <p style={{textAlign: 'center'}}>Drag 'n' drop some files here,</p>
-                                                        <p style={{textAlign: 'center'}}>or press "Select a file" button.</p>
+                                                        <p/>
+                                                        <p style={{textAlign: 'center', fontWeight: 'bold', color: '#737272'}}>Drag 'n' drop some files here,</p>
+                                                        <p style={{textAlign: 'center', fontWeight: 'bold', color: '#737272'}}>or press "Select a file" button.</p>
                                                     </React.Fragment>
                                                 )}
                                                 {this.state.selectedFiles.length !== 0 && (
@@ -96,8 +98,8 @@ export default class HDropzone extends React.Component {
                                         </div>
                                     )}
                                 </Dropzone>
-                                </Alert>
-                            </Form.Group>
+                                </div>
+                        </Form.Group>
             </React.Fragment>
         );
     }
