@@ -1,63 +1,55 @@
-import '@emarkk/hlib';
-import React, { Component } from 'react';
-import styles from './style.css';
-
+import React, {Component} from 'react';
+import {Table} from "react-bootstrap";
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const hours = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00'];
 
-class Timetable extends Component {
+export default class Timetable extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedWeekHour: ''
+        };
+    }
 
-  render() {
-    const now = new Date(Date.now());
-    const ws = now.weekStart();
-    const timetable = this.props.data || {};
-    return (
-      <div className="schedule">
-        <div className="schedule-timeline">
-          <ul>
-            <li><span>08:00</span></li>
-            <li><span>09:00</span></li>
-            <li><span>10:00</span></li>
-            <li><span>11:00</span></li>
-            <li><span>12:00</span></li>
-            <li><span>13:00</span></li>
-          </ul>
-        </div>
-        <div className="schedule-events">
-          <ul>
-            {[...Array(5).keys()].map(i => (
-              <li className="schedule-group" key={i}>
-                <div className="schedule-top-info"><span>{days[i]}</span><span className="schedule-date">{ws.addDays(i).shortString()}</span></div>
-                <ul>
-                  {[...Array(6).keys()].map(j => {
-                    const key = i + '_' + j;
-                    const entry = timetable[key];
-                    let classes = ['schedule-event'];
-                    
-                    if(this.props.selectable)
-                      classes.push('schedule-event' + (this.props.selected === key ? '' : '-not') + '-selected');
-                    if(entry && !entry.active)
-                      classes.push('schedule-event-disabled');
+    selectCell = (dayIndex, hourIndex) => {
+        if (this.props.selectable) {
+            const weekHour = dayIndex + '_' + hourIndex;
+            this.setState({
+                selectedWeekHour: weekHour
+            });
+            this.props.selectionHandler(weekHour);
+        }
+    };
 
-                    return entry ? (
-                      <li className={classes.join(' ')} key={key}>
-                        <a onClick={() => {entry.active && this.props.onClick(key)}}>
-                          <span className="schedule-name">{entry.name}</span>
-                        </a>
-                      </li>
-                    ) : (
-                      <li className="schedule-emptyevent" key={key}>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    )
-  }
+    render() {
+        return (
+            <Table responsive bordered>
+                <thead>
+                <tr>
+                    <th/>
+                    {this.props.data.map((day, index) =>
+                        <th key={index}>{days[index] + ' ' + day.date.getDate() + '/' + (day.date.getMonth() + 1)}</th>)}
+                </tr>
+                </thead>
+                <tbody>
+                {hours.map((hour, hourIndex) => {
+                    return (
+                        <tr key={hourIndex}>
+                            <td>{hour}</td>
+                            {this.props.data.map((day, dayIndex) => {
+                                return (
+                                    <td key={dayIndex}
+                                        className={this.state.selectedWeekHour === dayIndex + '_' + hourIndex ? 'bg-warning' : day.content[hourIndex].color}
+                                        onClick={() => this.selectCell(dayIndex, hourIndex)}>
+                                        {day.content[hourIndex].text}
+                                    </td>
+                                );
+                            })}
+                        </tr>
+                    );
+                })}
+                </tbody>
+            </Table>);
+    }
 }
-
-export default Timetable;

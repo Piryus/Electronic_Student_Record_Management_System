@@ -39,7 +39,7 @@ export default class Teacher extends React.Component {
 
         this.state = {
             userRequest: 'lecture',
-            classes: [],   
+            classes: [],
             classSelected: '',
             students: [],
             subjects: subjects,
@@ -175,13 +175,9 @@ export default class Teacher extends React.Component {
                             <Nav.Link
                                 className={this.state.userRequest === 'material' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support material </Nav.Link>
-                        </Nav>    
+                        </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
-                            {this.state.userRequest === 'lecture' && (
-                                <LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
-                                    obj[x.weekhour] = {name: x.subject, active: HLib.weekhourToDate(x.weekhour) < now};
-                                    return obj;
-                                }, {})}/>)}
+                            {this.state.userRequest === 'lecture' && <LectureTopics timetable={this.props.timetable}/> }
                             {this.state.userRequest === 'grades' && (
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects}
                                                       timetable={this.props.timetable} type='teacher-grades'/>
