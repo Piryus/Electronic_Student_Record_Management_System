@@ -84,9 +84,24 @@ const recordAssignments = async function(teacherUId, subject, description, due, 
         return Boom.badRequest();
 
     const attachments = await Util.saveFiles(Array.isArray(files) ? files : [files]);
-        
+
     const schoolClass = await SchoolClass.findOne({ _id: teacher.timetable.find(t => t.weekhour === weekhour).classId });
     schoolClass.assignments.push({ subject, description, due, attachments });
+    await schoolClass.save();
+
+    return { success: true };
+};
+
+const addSupportMaterial = async function(teacherUId, classId, subject, description, files) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    if(teacher === null || !teacher.timetable.some(t => t.classId.toString() === classId && t.subject === subject))
+        return Boom.badRequest();
+    
+    const attachments = await Util.saveFiles(Array.isArray(files) ? files : [files]);
+
+    const schoolClass = await SchoolClass.findOne({ _id: classId });
+    schoolClass.supportMaterials.push({ subject, description, attachments });
     await schoolClass.save();
 
     return { success: true };
@@ -126,5 +141,6 @@ module.exports = {
     getAttendance,
     recordDailyLectureTopics,
     recordAssignments,
+    addSupportMaterial,
     rollCall
 };

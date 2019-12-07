@@ -96,6 +96,33 @@ const routes = [
     },
     {
         method: 'POST',
+        path: '/material',
+        handler: async (request, h) => {
+            const { classId, subject, description, attachments } = request.payload;
+            return lectures.addSupportMaterial(request.auth.credentials.id, classId, subject, description, attachments);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    classId: Valid.id.required(),
+                    subject: Valid.subject.required(),
+                    description: Valid.shortText.required(),
+                    attachments: Valid.any.required()
+                }
+            },
+            payload: {
+                maxBytes: 10485760,
+                output: 'file',
+                parse: true
+            }
+        }
+    },
+    {
+        method: 'POST',
         path: '/rollcall',
         handler: async (request, h) => lectures.rollCall(request.auth.credentials.id, request.payload.info),
         options: {

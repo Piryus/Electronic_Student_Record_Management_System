@@ -19,6 +19,7 @@ const assignmentSchema = new Schema({
 
 const supportMaterialSchema = new Schema({
     subject: String,
+    description: String,
     uploaded: {
         type: Date,
         default: Date.now
