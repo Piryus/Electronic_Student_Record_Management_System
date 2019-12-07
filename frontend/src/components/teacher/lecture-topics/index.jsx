@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import SectionHeader from "../../utils/section-header";
 import {Button, Container, Form} from "react-bootstrap";
-import MyTimetable from "../../utils/my-timetable";
+import Timetable from "../../utils/timetable";
 import Toast from "react-bootstrap/Toast";
 
 class LectureTopics extends Component {
@@ -111,7 +111,7 @@ class LectureTopics extends Component {
                     </Toast>
                 </div>
 
-                <MyTimetable data={data} selectable selectionHandler={(weekhour) => this.handleSelection(weekhour)}/>
+                <Timetable data={data} selectable selectionHandler={(weekhour) => this.handleSelection(weekhour)}/>
                 <h6>Topics covered:</h6>
                 <Form.Control as="textarea"
                               rows="5"

@@ -4,7 +4,7 @@ import {Table} from "react-bootstrap";
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const hours = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00'];
 
-export default class MyTimetable extends Component {
+export default class Timetable extends Component {
     constructor(props) {
         super(props);
         this.state = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import MyTimetable from '../../utils/my-timetable';
+import Timetable from '../../utils/timetable';
 import SectionHeader from "../../utils/section-header";
 import {Button, Container} from "react-bootstrap";
 import LoadingSpinner from "../../utils/loading-spinner";
@@ -148,7 +148,7 @@ export default class Attendance extends React.Component {
                         <Button onClick={() => this.handleWeek(0)}>Current week</Button>
                         <Button onClick={() => this.handleWeek(1)}>Next week</Button>
                     </div>
-                    < MyTimetable data={data}/>
+                    < Timetable data={data}/>
                 </>
                 }
             </Container>
