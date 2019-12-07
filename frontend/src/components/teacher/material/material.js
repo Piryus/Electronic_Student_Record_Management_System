@@ -98,14 +98,14 @@ export default class Material extends React.Component {
                         </Form.Group>
                     }
                     {this.state.selectedSubject !== '' &&
-                    <Container fluid>
+                    <React.Fragment>
                         <Form.Group>
                             <Form.Label>Description:</Form.Label>
                             <Form.Control placeholder="Insert a description here." rows="3"
                                 onChange={(e) => this.setState({selectedDescription: e.target.value})}/>
                         </Form.Group>
                         <HDropzone selectedFilesHandler={(newSelectedFiles) => this.selectedFilesHandler(newSelectedFiles)} selectedFiles={this.state.selectedFiles}></HDropzone>
-                    </Container>
+                    </React.Fragment>
                     }
 
                 </Form>
