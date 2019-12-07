@@ -54,7 +54,7 @@ export default class HDropzone extends React.Component {
 
     render(){
         return(
-            <Container fluid>
+            <React.Fragment>
                 <Form.Group>
                                 <Form.Label>
                                     {this.state.selectedFiles.length === 0 ? 'Upload files:' : 'Drag \'n\' drop some files here below, or click inside the grey area to select files.'}
@@ -67,10 +67,10 @@ export default class HDropzone extends React.Component {
                                             <div {...getRootProps({className: 'dropzone'})}>
                                                 <input {...getInputProps()} />
                                                 {this.state.selectedFiles.length === 0 &&(
-                                                    <Container fluid>
+                                                    <React.Fragment>
                                                         <p style={{textAlign: 'center'}}>Drag 'n' drop some files here,</p>
                                                         <p style={{textAlign: 'center'}}>or press "Select a file" button.</p>
-                                                    </Container>
+                                                    </React.Fragment>
                                                 )}
                                                 {this.state.selectedFiles.length !== 0 && (
                                                     <div>
@@ -98,7 +98,7 @@ export default class HDropzone extends React.Component {
                                 </Dropzone>
                                 </Alert>
                             </Form.Group>
-            </Container>
+            </React.Fragment>
         );
     }
 }
