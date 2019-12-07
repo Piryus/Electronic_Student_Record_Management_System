@@ -8,15 +8,17 @@ export default class MyTimetable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedCell: ''
+            selectedWeekHour: ''
         };
     }
 
     selectCell = (dayIndex, hourIndex) => {
         if (this.props.selectable) {
+            const weekHour = dayIndex + '_' + hourIndex;
             this.setState({
-                selectedCell: dayIndex + '_' + hourIndex
-            })
+                selectedWeekHour: weekHour
+            });
+            this.props.selectionHandler(weekHour);
         }
     };
 
@@ -38,7 +40,7 @@ export default class MyTimetable extends Component {
                             {this.props.data.map((day, dayIndex) => {
                                 return (
                                     <td key={dayIndex}
-                                        className={this.state.selectedCell === dayIndex + '_' + hourIndex ? 'bg-warning' : day.content[hourIndex].color}
+                                        className={this.state.selectedWeekHour === dayIndex + '_' + hourIndex ? 'bg-warning' : day.content[hourIndex].color}
                                         onClick={() => this.selectCell(dayIndex, hourIndex)}>
                                         {day.content[hourIndex].text}
                                     </td>
