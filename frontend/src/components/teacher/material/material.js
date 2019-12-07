@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Container, Form, Dropdown, Alert} from "react-bootstrap";
+import {Button, Container, Form, Dropdown, Alert, Row, Col} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import HDropzone from "../../utils/hdropzone/hdropzone";
 
@@ -37,17 +37,33 @@ export default class Material extends React.Component {
                 selectedDescription: '',
                 selectedClass: '',
                 selectedSubject: '',
-                requestSatisfied: false
+                requestSatisfied: true
             });
         }
     }
 
     async pushMaterialToDb(){
-        try{
-            //Send data to backend here
-        }
-        catch(e){
-            alert('Ops. Internal error.');
+        try {
+            const url = 'http://localhost:3000/material';
+            const formData = new FormData();
+            formData.append('classId', this.state.selectedClass._id);
+            formData.append('subject', this.state.selectedSubject);
+            formData.append('description', this.state.selectedDescription);
+            this.state.selectedFiles.forEach(f => {
+                formData.append('attachments', f);
+            });
+            const options = {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            };
+            let response = await fetch(url, options);
+            const json = await response.json();
+            if (json.error != null) {
+                alert('Ops! Internal error. Please retry!');
+            }
+        } catch (err) {
+            alert(err);
         }
     }
 
@@ -73,7 +89,8 @@ export default class Material extends React.Component {
                     <Button variant="outline-success" onClick={(event) => this.uploadMaterial(event)}>Upload Material</Button>
                 }
                 <Form>
-                    <Form.Group>
+                    <Row>
+                    <Col>
                         <Form.Label>Class:</Form.Label>
                         <Dropdown>
                             <Dropdown.Toggle variant="primary" id="dropdown-basic">
@@ -83,9 +100,10 @@ export default class Material extends React.Component {
                                 {renderClassDropdownMenu.map(c => c)}
                             </Dropdown.Menu>
                         </Dropdown>
-                    </Form.Group>
+                    </Col>
+                    <Col>
                     {this.state.selectedClass !== '' &&
-                        <Form.Group>
+                        <React.Fragment>
                             <Form.Label>Subject:</Form.Label>
                             <Dropdown>
                                 <Dropdown.Toggle variant="primary" id="dropdown-basic">
@@ -95,8 +113,11 @@ export default class Material extends React.Component {
                                     {renderSubjects.map(s => s)}
                                 </Dropdown.Menu>
                             </Dropdown>
-                        </Form.Group>
+                        </React.Fragment>
                     }
+                    </Col>
+                    <Col/>
+                    </Row>
                     {this.state.selectedSubject !== '' &&
                     <React.Fragment>
                         <Form.Group>
@@ -107,7 +128,6 @@ export default class Material extends React.Component {
                         <HDropzone selectedFilesHandler={(newSelectedFiles) => this.selectedFilesHandler(newSelectedFiles)} selectedFiles={this.state.selectedFiles}></HDropzone>
                     </React.Fragment>
                     }
-
                 </Form>
             </Container>
         );
