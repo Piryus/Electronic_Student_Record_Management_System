@@ -24,7 +24,10 @@ const supportMaterialSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    attachments: [Schema.Types.ObjectId]
+    attachments: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'File'
+    }]
 });
 
 const schoolclassSchema = new Schema({

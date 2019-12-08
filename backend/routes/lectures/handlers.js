@@ -35,7 +35,27 @@ const getAssignments = async function(parentUId, studentId) {
 
     const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 }).populate('assignments.attachments');
     const assignments = schoolClass.assignments.filter(a => a.due >= new Date(Date.now()).dayStart());
+
     return { assignments };
+};
+
+const getSupportMaterials = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+    
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+        
+    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 }).populate('supportMaterials.attachments');
+    const supportMaterials = schoolClass.supportMaterials.reduce((obj, x) => {
+        if(obj[x.subject])
+            obj[x.subject].push(x);
+        else
+            obj[x.subject] = [x];
+        return obj;
+    }, {});
+
+    return { supportMaterials };
 };
 
 const getAttendance = async function(teacherUId) {
@@ -138,6 +158,7 @@ const rollCall = async function(teacherUId, info) {
 module.exports = {
     getDailyLectureTopics,
     getAssignments,
+    getSupportMaterials,
     getAttendance,
     recordDailyLectureTopics,
     recordAssignments,
