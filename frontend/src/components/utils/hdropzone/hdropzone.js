@@ -1,6 +1,8 @@
 import React, {createRef} from 'react';
 import Dropzone from 'react-dropzone';
 import {Button, Form, Container, Alert, Table} from 'react-bootstrap';
+import {FaCloudUploadAlt} from 'react-icons/fa'
+
 
 
 
@@ -60,8 +62,8 @@ export default class HDropzone extends React.Component {
                                 <Form.Label>
                                     {this.state.selectedFiles.length === 0 ? 'Upload files:' : 'Drag \'n\' drop some files here below, or click inside the grey area to select files.'}
                                 </Form.Label><br></br>
-                                <Button  size="sm" variant="outline-secondary" onClick={this.openDialog}>Select a file</Button><br></br><br></br>
-                                <div style={{border: 'dashed 2px lightGrey', borderRadius: '15.0px', backgroundColor: 'white'}}>
+                                <Button  size="sm" variant="outline-primary" onClick={this.openDialog}>Select a file</Button><br></br><br></br>
+                                <div style={{border: 'dashed 3px lightGrey', borderRadius: '15.0px', backgroundColor: 'white'}}>
                                 <Dropzone onDrop={acceptedFiles => this.onDrop(acceptedFiles)} ref={this.dropzoneRef} noClick noKeyboard>
                                     {({getRootProps, getInputProps, acceptedFiles}) => (
                                         <div className="container">
@@ -70,8 +72,8 @@ export default class HDropzone extends React.Component {
                                                 {this.state.selectedFiles.length === 0 &&(
                                                     <React.Fragment>
                                                         <p/>
-                                                        <p style={{textAlign: 'center', fontWeight: 'bold', color: '#737272'}}>Drag 'n' drop some files here,</p>
-                                                        <p style={{textAlign: 'center', fontWeight: 'bold', color: '#737272'}}>or press "Select a file" button.</p>
+                                                        <p style={{textAlign: 'center', color: '#737272'}}><FaCloudUploadAlt style={{height: '50px'}} size='sm'/></p>
+                                                        <p style={{textAlign: 'center', fontWeight: 'bold', color: '#737272'}}>Drag 'n' drop one file or multiple files here, or press "Select a file" button.</p>
                                                     </React.Fragment>
                                                 )}
                                                 {this.state.selectedFiles.length !== 0 && (
