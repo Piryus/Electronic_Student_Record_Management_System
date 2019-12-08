@@ -10,44 +10,64 @@ export default class Material extends React.Component {
 
         this.state = {
             selectedSubject: '',
-            filesMetadata: [    //Hardcoded data
-                {
-                    fileId: 'fileid',
-                    filename: 'filename',
-                    fileSize: 'filesize',
-                    subject: 'subjectName'
-                }
-            ],
-            subjects: [
-                'subjectName'
-            ]
+            realFilesMetadata:[],
+            subjects: [],
+            wantedFiles: []
         }
 
     }
 
     async componentDidMount(){
-        //Load files metadata here
-        await this.downloadFileMetadata();
-        //Fix subjects here
+        let filesMetadata = await this.downloadFileMetadata();
+        let filesPerSubject = this.getSubjects(filesMetadata);
+        this.setState({
+            realFilesMetadata: filesPerSubject,
+        });
+    }
+
+    getSubjects(filesMetadata){
+        let filesPerSubject = [];
+        for(var i in filesMetadata){
+            filesPerSubject.push({
+                subject: i,
+                files: filesMetadata[i].map(f => {
+                    return {
+                        description: f.description,
+                        filename: f.attachments[0].filename,
+                        _id: f.attachments[0]._id,
+                        bytes:  f.attachments[0].bytes
+                    };
+                })
+            });
+        }
+        return filesPerSubject;
     }
 
     async downloadFileMetadata(){
-        try{}
-        catch(e){
-            alert('Ops! Internal error.');
-        }
+        const url = 'http://localhost:3000/material/' + this.props.child._id;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        return json.supportMaterials;
     }
 
     render(){
 
         let renderSubjectDropdown = [];
 
-        renderSubjectDropdown = this.state.subjects.map(s => <Dropdown.Item onClick={() => this.setState({selectedSubject: s})}>{s}</Dropdown.Item>);
+        renderSubjectDropdown = this.state.realFilesMetadata.map(s => <Dropdown.Item onClick={() => this.setState({selectedSubject: s.subject, wantedFiles: s.files})}>{s.subject}</Dropdown.Item>);
 
         return(
             <Container fluid>
                 <SectionHeader>Support material</SectionHeader>
-                {this.state.filesMetadata.length !== 0 &&
+                {this.state.realFilesMetadata.length !== 0 &&
                 <Form>
                     <Form.Group>
                         <Form.Label>Subject:</Form.Label>
@@ -59,10 +79,10 @@ export default class Material extends React.Component {
                         </Dropdown>
                     </Form.Group>
                     {this.state.selectedSubject !== '' &&
-                        <DownloadFileTable type='support-material' files={this.state.filesMetadata.filter(fm => fm.subject === this.state.selectedSubject)}/>
+                        <DownloadFileTable type='support-material' files={this.state.wantedFiles}/>
                     }
                 </Form>}
-                {this.state.filesMetadata.length === 0 &&
+                {this.state.realFilesMetadata.length === 0 &&
                     <i>There is no support material on the portal.</i>
                 }
             </Container>

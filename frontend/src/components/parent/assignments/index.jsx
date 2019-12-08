@@ -63,29 +63,7 @@ export default class Assignments extends React.Component {
                         {item.description}
                         {item.attachments.length !== 0 &&(
                             <div>
-                                <br></br><p>Attached files:</p>
-                                {/* <Table striped responsive>
-                                    <thead>
-                                        <tr>
-                                            <th>Filename</th>
-                                            <th>Download</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {item.attachments.map((f, index) => {
-                                            return (
-                                                <tr>
-                                                    <td style={{textDecoration: 'underline'}}>
-                                                        {f.filename}
-                                                    </td>
-                                                    <td>
-                                                        <Button size="sm" variant="outline-primary" onClick={(event) => this.downloadFile(event, f)}><FaDownload/></Button>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </Table> */}
+                                <br></br><i>Attached files:</i>
                                 <DownloadFileTable type='assignment' files={item.attachments}/>
                             </div>
                         )}

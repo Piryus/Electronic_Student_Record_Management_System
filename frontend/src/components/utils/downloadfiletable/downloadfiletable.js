@@ -7,6 +7,7 @@ import {FaDownload} from 'react-icons/fa';
 export default class DownloadFileTable extends React.Component {
     constructor(props){
         super(props);
+        console.log(this.props.type);
     }
 
     downloadFile(event, f){
@@ -20,16 +21,29 @@ export default class DownloadFileTable extends React.Component {
         document.body.removeChild(a);
     }
 
+    formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+    
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
     render(){
         return(
             <Table striped responsive>
-                {this.props.type === 'support-material' && 
                 <thead>
                     <tr>
                         <th>Filename</th>
+                        {this.props.type === 'assignment' ? null : <th>Description</th>}
+                        <th>Size</th>
                         <th>Download</th>
                     </tr>
-                </thead> }
+                </thead>
                 <tbody>
                 {this.props.files.map((f, index) => {
                      return (
@@ -37,6 +51,8 @@ export default class DownloadFileTable extends React.Component {
                             <td style={{textDecoration: 'underline'}}>
                                 {f.filename}
                             </td>
+                            {this.props.type === 'support-material' &&<td>{f.description}</td>}
+                            <td>{this.formatBytes(f.bytes)}</td>
                             <td>
                                 <Button size="sm" variant="outline-primary" onClick={(event) => this.downloadFile(event, f)}><FaDownload/></Button>
                             </td>
