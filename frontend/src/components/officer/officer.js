@@ -1,12 +1,13 @@
 import React from 'react';
 import styles from './styles.module.css';
-import {Button, Container, Nav, Row} from 'react-bootstrap';
+import {Container, Nav, Row} from 'react-bootstrap';
 import ParentAccountEnabling from './parent-access/officer-parent-access';
 import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
-import {FaCog, FaGraduationCap, FaLayerGroup, FaRegNewspaper, FaUserEdit} from 'react-icons/fa';
+import {FaCalendarAlt, FaGraduationCap, FaLayerGroup, FaRegNewspaper, FaUserEdit} from 'react-icons/fa';
 import AppNavbar from "../utils/navbar/navbar";
 import News from "../utils/news";
+import TimetablesManager from "./timetables";
 
 export default class Officer extends React.Component {
 
@@ -25,10 +26,12 @@ export default class Officer extends React.Component {
     render() {
         return (
             <div className={styles.root}>
-                <AppNavbar type='classic' onLogout={() => this.props.onLogout()} onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>
+                <AppNavbar type='classic' onLogout={() => this.props.onLogout()}
+                           onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>
                 <Container fluid>
                     <Row>
-                        <Nav className={[this.state.sidebarOpen ? 'bg-light col-5':'d-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
+                        <Nav
+                            className={[this.state.sidebarOpen ? 'bg-light col-5' : 'd-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
                             <Nav.Link
                                 className={this.state.userRequest === 'news' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "news")}><FaRegNewspaper/> News</Nav.Link>
@@ -42,7 +45,8 @@ export default class Officer extends React.Component {
                                 className={this.state.userRequest === 'enrollStudent' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "enrollStudent")}><FaGraduationCap/> Students</Nav.Link>
                             <Nav.Link
-                                className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
+                                className={this.state.userRequest === 'timetables' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={(e) => this.setUserRequest(e, "timetables")}><FaCalendarAlt/> Timetables</Nav.Link>
                         </Nav>
                         <main className={"col-md-10 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'accounts' && (
@@ -55,7 +59,10 @@ export default class Officer extends React.Component {
                                 <EnrolmentForm/>
                             )}
                             {this.state.userRequest === 'news' && (
-                                <News isOfficer />
+                                <News isOfficer/>
+                            )}
+                            {this.state.userRequest === 'timetables' && (
+                                <TimetablesManager />
                             )}
                         </main>
                     </Row>
