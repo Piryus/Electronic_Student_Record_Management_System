@@ -1,5 +1,5 @@
 import React from "react";
-import {Container, Dropdown, DropdownButton} from "react-bootstrap";
+import {Button, Container, Dropdown, DropdownButton, Form} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import Timetable from "../../utils/timetable";
 
@@ -102,7 +102,14 @@ export default class TimetablesManager extends React.Component {
                 {this.state.classTimetable !== null &&
                 <Timetable data={timetableData}/>}
                 {this.state.selectedClass !== null && this.state.classTimetable === null &&
-                <h6>{this.state.selectedClass.name} doesn't have a timetable yet!</h6>}
+                    <>
+                        <h6>{this.state.selectedClass.name} doesn't have a timetable yet!</h6>
+                        <div className="custom-file col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                            <input type="file" className="custom-file-input" id="customFile" onChange={() => console.log('File selected')}/>
+                                <label className="custom-file-label" htmlFor="customFile">Import a timetable...</label>
+                        </div>
+                    </>
+                }
             </Container>
         );
     }
