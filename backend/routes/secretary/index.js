@@ -58,6 +58,22 @@ const routes = [
             }
         }
     },
+    {
+        method: 'POST',
+        path: '/timetables',
+        handler: async (request, h) => secretary.publishTimetables(request.payload.timetablesFile),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    timetablesFile: Valid.any.required()
+                }
+            }
+        }
+    }
 ];
 
 module.exports = routes;

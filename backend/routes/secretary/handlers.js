@@ -45,8 +45,13 @@ const addParent = async function(ssn, name, surname, mail, childSsn) {
     return { success: true };
 };
 
+const publishTimetables = async function(timetablesFile) {
+    return { success: true };
+};
+
 module.exports = {
     getArticles,
     addArticle,
-    addParent
+    addParent,
+    publishTimetables
 };
