@@ -71,7 +71,7 @@ const routes = [
                 payload: {
                     timetablesFile: Valid.any.required()
                 }
-            },,
+            },
             payload: {
                 maxBytes: 10485760,
                 output: 'file',
