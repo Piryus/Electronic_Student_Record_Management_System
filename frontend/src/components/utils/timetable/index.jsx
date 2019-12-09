@@ -34,7 +34,7 @@ export default class Timetable extends Component {
         }
 
         return (
-            <Table responsive bordered>
+            <Table responsive bordered size={this.props.small ? 'sm' : ''}>
                 <thead>
                 <tr>
                     <th/>
