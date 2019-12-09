@@ -111,7 +111,7 @@ class LectureTopics extends Component {
                     </Toast>
                 </div>
 
-                <Timetable data={data} selectable selectionHandler={(weekhour) => this.handleSelection(weekhour)}/>
+                <Timetable data={data} selectable selectionHandler={(weekhour) => this.handleSelection(weekhour)} frequency={60}/>
                 <h6>Topics covered:</h6>
                 <Form.Control as="textarea"
                               rows="5"

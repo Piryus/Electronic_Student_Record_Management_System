@@ -148,7 +148,7 @@ export default class Attendance extends React.Component {
                         <Button onClick={() => this.handleWeek(0)}>Current week</Button>
                         <Button onClick={() => this.handleWeek(1)}>Next week</Button>
                     </div>
-                    < Timetable data={data}/>
+                    < Timetable data={data} frequency={60} />
                 </>
                 }
             </Container>

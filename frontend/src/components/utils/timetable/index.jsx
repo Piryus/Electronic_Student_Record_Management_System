@@ -1,12 +1,14 @@
 import React, {Component} from 'react';
 import {Table} from "react-bootstrap";
+import moment from 'moment';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-const hours = ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00'];
+
 
 export default class Timetable extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             selectedWeekHour: ''
         };
@@ -23,6 +25,14 @@ export default class Timetable extends Component {
     };
 
     render() {
+        const hours = [];
+        let time = moment('8:00', 'HH:mm');
+        let endOfDay = moment('14:00', 'HH:mm');
+        while (time.isBefore(endOfDay)) {
+            hours.push(time.format('HH:mm'));
+            time.add(this.props.frequency, 'm');
+        }
+
         return (
             <Table responsive bordered>
                 <thead>

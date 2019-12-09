@@ -91,7 +91,7 @@ export default class TimetablesManager extends React.Component {
                     )}
                 </DropdownButton>
                 {this.state.selectedClass !== null && this.state.selectedClass.timetable.length > 0 &&
-                <Timetable data={timetableData}/>}
+                <Timetable data={timetableData} frequency={60} />}
                 {this.state.selectedClass !== null && this.state.selectedClass.timetable.length === 0 &&
                 <>
                     <h6>{this.state.selectedClass.name} doesn't have a timetable yet!</h6>
