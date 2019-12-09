@@ -1,8 +1,16 @@
-import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
-import {FaArrowAltCircleLeft, FaBook, FaCalendarCheck, FaGraduationCap, FaMedal, FaExclamationTriangle, FaFilePdf} from 'react-icons/fa'
+import {
+    FaArrowAltCircleLeft,
+    FaBook,
+    FaCalendarCheck,
+    FaExclamationTriangle,
+    FaFilePdf,
+    FaGraduationCap,
+    FaHandshake,
+    FaMedal
+} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
@@ -11,6 +19,7 @@ import Rollcall from './rollcall/rollcall';
 import EarlyLateRecordComponenent from '../utils/earlyLateRecordComponent/index';
 import NotesToParents from "./notes-to-parents";
 import Material from "./material/material";
+import Meetings from "./meetings";
 
 export default class Teacher extends React.Component {
 
@@ -171,13 +180,19 @@ export default class Teacher extends React.Component {
                             )}
                             <Nav.Link
                                 className={this.state.userRequest === 'notes' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={() => this.setState({userRequest: "notes"})}><FaExclamationTriangle/> Notes to parents</Nav.Link>
+                                onClick={() => this.setState({userRequest: "notes"})}><FaExclamationTriangle/> Notes to
+                                parents</Nav.Link>
                             <Nav.Link
                                 className={this.state.userRequest === 'material' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support material </Nav.Link>
+                                onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support
+                                material</Nav.Link>
+                            <Nav.Link
+                                className={this.state.userRequest === 'meetings' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "meetings"})}><FaHandshake/> Meetings with
+                                parents</Nav.Link>
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
-                            {this.state.userRequest === 'lecture' && <LectureTopics timetable={this.props.timetable}/> }
+                            {this.state.userRequest === 'lecture' && <LectureTopics timetable={this.props.timetable}/>}
                             {this.state.userRequest === 'grades' && (
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects}
                                                       timetable={this.props.timetable} type='teacher-grades'/>
@@ -201,10 +216,13 @@ export default class Teacher extends React.Component {
                                                             timetable={this.props.timetable} now={this.state.now}/>
                             )}
                             {this.state.userRequest === 'notes' &&
-                                <NotesToParents students={this.state.students} />
+                            <NotesToParents students={this.state.students}/>
                             }
                             {this.state.userRequest === 'material' && (
                                 <Material timetable={this.props.timetable} classes={this.state.allClasses}/>
+                            )}
+                            {this.state.userRequest === 'meetings' && (
+                                <Meetings/>
                             )}
                         </main>
                     </Row>
