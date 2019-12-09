@@ -9,7 +9,6 @@ export default class TimetablesManager extends React.Component {
         this.state = {
             classes: [],
             selectedClass: null,
-            classTimetable: null,
         };
     }
 
@@ -35,26 +34,9 @@ export default class TimetablesManager extends React.Component {
         return json.classes;
     };
 
-    async getClassTimetable() {
-        const url = 'http://localhost:3000/classes';
-        const options = {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        };
-        let response = await fetch(url, options);
-        const json = await response.json();
-        return null;
-    };
-
     async selectClass(class_) {
-        const timetable = await this.getClassTimetable();
         this.setState({
-            selectedClass: class_,
-            classTimetable: timetable
+            selectedClass: class_
         })
     }
 
@@ -89,6 +71,14 @@ export default class TimetablesManager extends React.Component {
             timetableData.push(dateObject);
         }
 
+        if (this.state.selectedClass !== null) {
+            this.state.selectedClass.timetable.forEach(class_ => {
+                const [day, hour] = class_.weekhour.split('_');
+                timetableData[day].content[hour].text = class_.subject;
+                timetableData[day].content[hour].color = 'bg-success text-white';
+            });
+        }
+
         return (
             <Container fluid>
                 <SectionHeader>Manage timetables</SectionHeader>
@@ -99,9 +89,9 @@ export default class TimetablesManager extends React.Component {
                             onClick={async () => await this.selectClass(class_)}>{class_.name}</Dropdown.Item>
                     )}
                 </DropdownButton>
-                {this.state.classTimetable !== null &&
+                {this.state.selectedClass !== null && this.state.selectedClass.timetable.length > 0 &&
                 <Timetable data={timetableData}/>}
-                {this.state.selectedClass !== null && this.state.classTimetable === null &&
+                {this.state.selectedClass !== null && this.state.selectedClass.timetable.length === 0 &&
                 <>
                     <h6>{this.state.selectedClass.name} doesn't have a timetable yet!</h6>
                     <div className="custom-file col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
