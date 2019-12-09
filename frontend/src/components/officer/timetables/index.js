@@ -74,7 +74,7 @@ export default class TimetablesManager extends React.Component {
         if (this.state.selectedClass !== null) {
             this.state.selectedClass.timetable.forEach(class_ => {
                 const [day, hour] = class_.weekhour.split('_');
-                timetableData[day].content[hour].text = class_.subject;
+                timetableData[day].content[hour].text = class_.subject + ' (' + class_.teacher.surname + ' ' + class_.teacher.name + ')';
                 timetableData[day].content[hour].color = 'bg-success text-white';
             });
         }
