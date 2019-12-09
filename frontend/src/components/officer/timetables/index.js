@@ -83,9 +83,10 @@ export default class TimetablesManager extends React.Component {
             <Container fluid>
                 <SectionHeader>Manage timetables</SectionHeader>
                 <DropdownButton className='mb-2'
-                                title={this.state.selectedClass && this.state.selectedClass.name || 'Select a class'}>
+                                title={this.state.selectedClass ? this.state.selectedClass.name : 'Select a class'}>
                     {this.state.classes.map(class_ =>
                         <Dropdown.Item
+                            key={class_._id}
                             onClick={async () => await this.selectClass(class_)}>{class_.name}</Dropdown.Item>
                     )}
                 </DropdownButton>
