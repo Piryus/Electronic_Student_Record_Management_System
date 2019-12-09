@@ -56,7 +56,20 @@ const getStudents = async function(classId) {
 };
 
 const getClasses = async function() {
-    const classes = await SchoolClass.find({});
+    let classes = await SchoolClass.find();
+    const teachers = await Teacher.find().populate('userId');
+
+    const timetableInfo = teachers.flatMap(t => {
+        const teacherInfo = { _id: t._id, ssn: t.userId.ssn, surname: t.userId.surname, name: t.userId.name };
+        return t.timetable.map(w => {
+            return { weekhour: w.weekhour, subject: w.subject, classId: w.classId, teacher: teacherInfo };
+        });
+    });
+    classes = classes.map(c => {
+        const timetable = timetableInfo.filter(w => w.classId.equals(c._id));
+        return { _id: c._id, name: c.name, timetable };
+    })
+
     return { classes };
 };
 

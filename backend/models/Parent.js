@@ -4,7 +4,10 @@ const mongoose = require('mongoose');
 const {Schema} = mongoose;
 
 const parentSchema = new Schema({
-    userId: Schema.Types.ObjectId,
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
     children: [Schema.Types.ObjectId]
 });
 
