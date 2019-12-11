@@ -80,7 +80,7 @@ export default class Assignments extends React.Component {
         let store = this.state.childAssignment;
         if (Array.isArray(store) && store.length) {
             store.sort(function (a, b) {
-                return new Date(a) - new Date(b);
+                return new Date(b.due) - new Date(a.due);
             });
             store.map((item) => {
                 let tmp = [];
