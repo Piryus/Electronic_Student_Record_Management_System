@@ -16,6 +16,17 @@ const routes = [
         }
     },
     {
+        method: 'GET',
+        path: '/meetings/availability',
+        handler: async (request, h) => teachers.getMeetingsAvailability(request.auth.credentials.id),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/meetings/availability',
         handler: async (request, h) => teachers.setMeetingsAvailability(request.auth.credentials.id, request.payload.timeSlots),
@@ -30,7 +41,7 @@ const routes = [
                 }
             }
         }
-    },
+    }
 ];
 
 module.exports = routes;

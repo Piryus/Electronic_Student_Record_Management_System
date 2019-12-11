@@ -21,6 +21,15 @@ const getNotes = async function(teacherUId) {
     return { notes };
 };
 
+const getMeetingsAvailability = async function(teacherUId) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    
+    if(teacher === null)
+        return Boom.badRequest();
+
+    return { timeSlots: teacher.meetingsTimeSlots };
+};
+
 const setMeetingsAvailability = async function(teacherUId, timeSlots) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     
@@ -35,5 +44,6 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
 
 module.exports = {
     getNotes,
+    getMeetingsAvailability,
     setMeetingsAvailability
 };
