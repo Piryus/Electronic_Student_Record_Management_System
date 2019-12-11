@@ -12,7 +12,10 @@ export default class FinalGrades extends React.Component {
             enableProcedure: false,
             allClasses: this.props.allClasses === undefined ? [] : this.props.allClasses,
             computedGrades: [],
-            satisfiedRequest: false
+            satisfiedRequest: false,
+            success: '',
+            error: '',
+            warning: ''
         };
     }
 
@@ -80,7 +83,11 @@ export default class FinalGrades extends React.Component {
             }
         }
         if(notValidGrade !== undefined){
-            alert('Please insert a grade in the range [0 - 10] for each subject and for each student.');
+            this.setState({
+                warning: 'Please insert a grade in the range [0 - 10] for each subject and for each student.',
+                success: '',
+                error: ''
+            });
         } else {
             //Prepare data here
             let data = [];
@@ -88,7 +95,9 @@ export default class FinalGrades extends React.Component {
             this.setState({
                 enableProcedure: false, //Send request again to db for
                 allClasses: this.props.allClasses === undefined ? [] : this.props.allClasses,
-                satisfiedRequest: true
+                success: 'Grades have been recorded successfully!',
+                warning: '',
+                error: ''
             });
         }
     }
@@ -144,8 +153,14 @@ export default class FinalGrades extends React.Component {
         return(
             <Container fluid>
                 <SectionHeader>Final grades of the term</SectionHeader>
-                {this.state.satisfiedRequest === true &&(
-                    <Alert variant="success">Grades have been recorded successfully!</Alert>
+                {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&(
+                    <Alert variant="success">{this.state.success}</Alert>
+                )}
+                {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&(
+                    <Alert variant="warning">{this.state.warning}</Alert>
+                )}
+                {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&(
+                    <Alert variant="danger">{this.state.error}</Alert>
                 )}
                 {this.state.enableSection === false &&
                     <i>This section is currently not available. This section will be enabled
