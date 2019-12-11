@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, Button, Form} from 'react-bootstrap';
+import {Table, Button, Form, Alert} from 'react-bootstrap';
 import styles from './styles.module.css';
 
 
@@ -20,7 +20,10 @@ export default class Rollcall extends React.Component{
                     modified: false
                 };
             }),
-            wantEditCheckboxes: false
+            wantEditCheckboxes: false,
+            success: '',
+            warning: '',
+            error: ''
         }
         this.setEditCheckboxes = this.setEditCheckboxes.bind(this);
     }
@@ -55,7 +58,11 @@ export default class Rollcall extends React.Component{
                 classStudents: sorted
             });
         } catch(e){
-            alert(e);
+            this.setState({
+                success: '',
+                warning: '',
+                error: e
+            });
         }
     }
 
@@ -122,7 +129,11 @@ export default class Rollcall extends React.Component{
             }
         }
         if(n_modified === 0){
-            alert('No student to be updated.');
+            this.setState({
+                success: '',
+                warning: 'No student to be updated.',
+                error: ''
+            });
             this.setState({
                 wantEditCheckboxes: false
             });
@@ -166,14 +177,24 @@ export default class Rollcall extends React.Component{
             let response = await fetch(url, options);
             const json = await response.json();
             if (json.error != null) {
-                alert('Ops! Internal error. Please retry!');
-                window.location.reload(false);
+                this.setState({
+                    success: '',
+                    warning:'',
+                    error: 'Ops! Internal error. Please retry!'
+                });
             } else {
-                alert('Rollcall successfully recorded.');
+                this.setState({
+                    success: 'Rollcall successfully recorded.',
+                    warning:'',
+                    error: ''
+                });
             }
         } catch (err) {
-            alert(err);
-            window.location.reload(false);
+            this.setState({
+                success: '',
+                warning:'',
+                error: err
+            });
         }
     }
 
@@ -186,6 +207,15 @@ export default class Rollcall extends React.Component{
             <div>
                 <h1>Attendances</h1>
                 <p>This section is to be used to call the roll. Only the teacher of the first hour is allowed to access this page. Changes (in case of mistakes or omissions) are allowed <i>throughout the day</i>.<br />Please <u>do not</u> use this section to update student attendance in the wake of a late-entrance or early-exit. In those cases, use the corresponding section.</p><br />
+                {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&
+                    <Alert variant='success'>{this.state.success}</Alert>
+                }
+                {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&
+                    <Alert variant='warning'>{this.state.warning}</Alert>
+                }
+                {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&
+                    <Alert variant='danger'>{this.state.error}</Alert>
+                }
                 {this.state.wantEditCheckboxes === false && (<Button variant="primary" onClick={() => this.setEditCheckboxes()}>Edit</Button>)}
                 {this.state.wantEditCheckboxes === true && (
                 <div>
