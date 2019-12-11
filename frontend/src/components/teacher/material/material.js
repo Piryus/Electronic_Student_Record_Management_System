@@ -16,7 +16,9 @@ export default class Material extends React.Component {
             selectedDescription: '',
             selectedClass: '',
             selectedSubject: '',
-            requestSatisfied: false
+            success: '',
+            warning: '',
+            error: ''
         }
         this.selectedFilesHandler = this.selectedFilesHandler.bind(this);
     }
@@ -28,7 +30,11 @@ export default class Material extends React.Component {
     async uploadMaterial(event){
         event.preventDefault();
         if(this.state.selectedDescription === ''){
-            alert('Please insert a Description first.');
+            this.setState({
+                error: '',
+                success: '',
+                warning: 'Please insert a Description first.'
+            });
         } else {
             //Prepare payload to send here
             await this.pushMaterialToDb();
@@ -37,7 +43,9 @@ export default class Material extends React.Component {
                 selectedDescription: '',
                 selectedClass: '',
                 selectedSubject: '',
-                requestSatisfied: true
+                success: 'Support material uploaded successfully.',
+                error: '',
+                warning: ''
             });
         }
     }
@@ -60,10 +68,18 @@ export default class Material extends React.Component {
             let response = await fetch(url, options);
             const json = await response.json();
             if (json.error != null) {
-                alert('Ops! Internal error. Please retry!');
+                this.setState({
+                    error: 'Ops! Internal error. Please retry!',
+                    success: '',
+                    warning: ''
+                });
             }
         } catch (err) {
-            alert(err);
+            this.setState({
+                error: err,
+                success: '',
+                warning: ''
+            });
         }
     }
 
@@ -81,10 +97,16 @@ export default class Material extends React.Component {
         return(
             <Container fluid>
                 <SectionHeader>Support material</SectionHeader>
-                {this.state.requestSatisfied === true &&
-                    <Alert variant="success">Support Material uploaded successfully.</Alert>
-                }
                 <p>This section is to be used to upload the <i>Support Material.</i></p><br />
+                {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&
+                    <Alert variant="success">{this.state.success}</Alert>
+                }
+                {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&
+                    <Alert variant="warning">{this.state.warning}</Alert>
+                }
+                {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&
+                    <Alert variant="success">{this.state.error}</Alert>
+                }
                 {this.state.selectedFiles.length !== 0 &&
                     <Button variant="outline-success" onClick={(event) => this.uploadMaterial(event)}>Upload Material</Button>
                 }
