@@ -12,6 +12,7 @@ const Student = require('../models/Student');
 const Parent = require('../models/Parent');
 const Teacher = require('../models/Teacher');
 const SchoolClass = require ('../models/SchoolClass');
+const User = require ('../models/User');
 
 const students = require ('../routes/students/handlers');
 
@@ -83,6 +84,40 @@ suite('students', () => {
         jexpect(a4.attendance).to.equal(j(data));
     });
 
+    test('getNotes', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        // parent not found
+        const n1 = await students.getNotes('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
+        // student not found
+        const n2 = await students.getNotes('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const n3 = await students.getNotes('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
+
+        // ok 1
+        const n4 = await students.getNotes('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d489' }, { notes: [
+            { _id: '5dca7e2bfcc5b52d681804f6', teacherId: '5dca698eed550e4ca4aba7f5', description: 'This is a first notice.', date: new Date('2019-11-10T10:06:04') },
+            { _id: '5dca7e2bfcc5b52d681804f7', teacherId: '5dca6cd5b83a1f3ef03e962b', description: 'The situation is getting worse.', date: new Date('2019-11-18T11:02:19') }
+        ] });
+        
+        // ok 2
+        const n5 = await students.getNotes('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        expect(n1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(n2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(n3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(n4.notes).to.have.length(0);
+        jexpect(n5.notes).to.have.equal(j([
+            { _id: '5dca7e2bfcc5b52d681804f6', teacher: 'Mario Bianchi', description: 'This is a first notice.', date: new Date('2019-11-10T10:06:04') },
+            { _id: '5dca7e2bfcc5b52d681804f7', teacher: 'Peter Posta', description: 'The situation is getting worse.', date: new Date('2019-11-18T11:02:19') }
+        ]));
+    });
+
     test('getStudents', async () => {
         const s1 = await students.getStudents(null);
 
@@ -105,9 +140,43 @@ suite('students', () => {
 
     test('getClasses', async () => {
         await SchoolClass.insertMany(testData.classes);
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
         const all = await students.getClasses();
 
-        jexpect(all.classes).to.equal(testData.classes);
+        jexpect(all.classes).to.equal([
+            { _id: '5dc9c3112d698031f441e1c9', name: '1A', timetable: [
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '0_1' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'History', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '1_0' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '1_1' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '2_0' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '2_1' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'History', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '3_1' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '0_0' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '1_4' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Physics', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '1_5' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '3_2' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '3_3' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Physics', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '4_0' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '4_4' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '0_3' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '0_4' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '2_4' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '4_2' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Art', teacher: { _id: '5dca6cd5b83a1f3ef03e962b', name: 'Peter', ssn: 'SCBGMN21E45O956Q', surname: 'Posta' }, weekhour: '0_2' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Art', teacher: { _id: '5dca6cd5b83a1f3ef03e962b', name: 'Peter', ssn: 'SCBGMN21E45O956Q', surname: 'Posta' }, weekhour: '4_5' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'English', teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', name: 'Federica', ssn: 'PLVCGT02S19R549A', surname: 'Valli' }, weekhour: '1_2' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'English', teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', name: 'Federica', ssn: 'PLVCGT02S19R549A', surname: 'Valli' }, weekhour: '2_2' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'English', teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', name: 'Federica', ssn: 'PLVCGT02S19R549A', surname: 'Valli' }, weekhour: '3_0' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Science', teacher: { _id: '5dca6d0801ea271794cb650e', name: 'Cinzia', ssn: 'LCFTUI58S49G910R', surname: 'Tollo' }, weekhour: '2_3' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Science', teacher: { _id: '5dca6d0801ea271794cb650e', name: 'Cinzia', ssn: 'LCFTUI58S49G910R', surname: 'Tollo' }, weekhour: '4_3' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Gym', teacher: { _id: '5dca6d2038627d0bfc4167b0', name: 'Dario', ssn: 'QASVUM68G45D297P', surname: 'Resti' }, weekhour: '1_3' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Gym', teacher: { _id: '5dca6d2038627d0bfc4167b0', name: 'Dario', ssn: 'QASVUM68G45D297P', surname: 'Resti' }, weekhour: '4_1' },
+                { classId: '5dc9c3112d698031f441e1c9', subject: 'Religion', teacher: { _id: '5dca6d3620607b1e30dea42a', name: 'Nina', ssn: 'NCFTOG69F23B796K', surname: 'Fassio' }, weekhour: '3_4' }
+            ] },
+            { _id: '5dc9cb36ee91b7384cbd7fd7', name: '1B', timetable: [] },
+            { _id: '5dc9cb4b797f6936680521b9', name: '1C', timetable: [] }
+        ]);
     });
 
     test('recordGrades', async () => {
@@ -273,6 +342,30 @@ suite('students', () => {
         expect(s4.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents).to.have.length(0);
         expect(s4.find(s => '5dca711c89bf46419cf5d484' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s4.find(s => '5dca711c89bf46419cf5d484' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:09:00'), event: 'late-entrance' }));
+    });
+    
+    test('recordNotes', async () => {
+        await Student.insertMany(testData.students);
+        await Teacher.insertMany(testData.teachers);
+        
+        // teacher not found
+        const n1 = await students.recordNote('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d48c', 'Some description here.');
+        // student not found
+        const n2 = await students.recordNote('5dca7e2b461dc52d681804f5', 'ffffffffffffffffffffffff', 'Some description here.');
+
+        const s1 = await Student.findById('5dca711c89bf46419cf5d48c');
+        
+        // ok
+        const n3 = await students.recordNote('5dca7e2b461dc52d681804f5', '5dca711c89bf46419cf5d48c', 'A note for this bad student!');
+        
+        const s2 = await Student.findById('5dca711c89bf46419cf5d48c');
+
+        expect(n1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(n2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(s1.notes).to.have.length(0);
+        expect(n3.success).to.be.true();
+        expect(s2.notes).to.have.length(1);
+        jexpect(s2.notes[0]).to.include({ description: 'A note for this bad student!' });
     });
     
     test('addStudent', async () => {

@@ -102,12 +102,12 @@ suite('lectures', () => {
     
     test('getAssignments', async () => {
         const data = [
-            { subject: 'Italian', description: 'Lorem ipsum dolor sit amet', assigned: new Date('2019-10-14T10:00:00'), due: new Date().addDays(1) },
-            { subject: 'Math', description: 'consectetur adipiscing elit', assigned: new Date('2019-11-05T12:00:00'), due: new Date().addDays(-2) },
-            { subject: 'English', description: 'sed do eiusmod tempor incididunt', assigned: new Date('2019-10-01T09:00:00'), due: new Date().addDays(0) },
-            { subject: 'Gym', description: 'ut labore et dolore magna aliqua', assigned: new Date('2019-11-19T11:00:00'), due: new Date().addDays(5) },
-            { subject: 'Art', description: 'Ut enim ad minim veniam', assigned: new Date('2019-11-15T08:00:00'), due: new Date().addDays(3) },
-            { subject: 'Physics', description: 'quis nostrud exercitation ullamco', assigned: new Date('2019-11-20T11:00:00'), due: new Date().addDays(-1) }
+            { subject: 'Italian', description: 'Lorem ipsum dolor sit amet', attachments: [], assigned: new Date('2019-10-14T10:00:00'), due: new Date().addDays(1) },
+            { subject: 'Math', description: 'consectetur adipiscing elit', attachments: [], assigned: new Date('2019-11-05T12:00:00'), due: new Date().addDays(-2) },
+            { subject: 'English', description: 'sed do eiusmod tempor incididunt', attachments: [], assigned: new Date('2019-10-01T09:00:00'), due: new Date().addDays(0) },
+            { subject: 'Gym', description: 'ut labore et dolore magna aliqua', attachments: [], assigned: new Date('2019-11-19T11:00:00'), due: new Date().addDays(5) },
+            { subject: 'Art', description: 'Ut enim ad minim veniam', attachments: [], assigned: new Date('2019-11-15T08:00:00'), due: new Date().addDays(3) },
+            { subject: 'Physics', description: 'quis nostrud exercitation ullamco', attachments: [], assigned: new Date('2019-11-20T11:00:00'), due: new Date().addDays(-1) }
         ];
 
         await Student.insertMany(testData.students);

@@ -37,12 +37,8 @@ const getNotes = async function(parentUId, studentId) {
         return Boom.badRequest();
 
     let decorator = student.notes.map(async n => {
-        const teacher = await Teacher.findOne({ _id: n.teacherId });
-        const user = await User.findOne({ _id: teacher.userId });
-        return Object.assign(
-            { _id: n._id, date: n.date, description: n.description },
-            { teacher: [user.name, user.surname].join(' ') }
-        );
+        const teacher = await Teacher.findOne({ _id: n.teacherId }).populate('userId');
+        return { _id: n._id, date: n.date, description: n.description, teacher: [teacher.userId.name, teacher.userId.surname].join(' ') };
     });
     const teacherDecoratedNotes = await Promise.all(decorator);
 
