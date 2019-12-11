@@ -1,5 +1,6 @@
 'use strict';
 
+const Valid = require('../../validation');
 const teachers = require('./handlers');
 
 const routes = [
@@ -11,6 +12,22 @@ const routes = [
             auth: {
                 strategy: 'session',
                 scope: 'teacher'
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/meetings/availability',
+        handler: async (request, h) => teachers.setMeetingsAvailability(request.auth.credentials.id, request.payload.timeSlots),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    timeSlots: Valid.array.items(Valid.weekhour).required()
+                }
             }
         }
     },

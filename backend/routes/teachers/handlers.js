@@ -21,6 +21,19 @@ const getNotes = async function(teacherUId) {
     return { notes };
 };
 
+const setMeetingsAvailability = async function(teacherUId, timeSlots) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    
+    if(teacher === null || teacher.timetable.some(t => timeSlots.includes(t.weekhour)))
+        return Boom.badRequest();
+
+    teacher.meetingsTimeSlots = timeSlots;
+    await teacher.save();
+
+    return { success: true };
+};
+
 module.exports = {
-    getNotes
+    getNotes,
+    setMeetingsAvailability
 };
