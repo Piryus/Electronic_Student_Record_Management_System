@@ -3,7 +3,7 @@ import HLib from '@emarkk/hlib/index';
 import SectionHeader from '../section-header';
 import EarlyLateTable from '../earlyLateTable/earlyLateTable';
 import Select from 'react-select';
-import {Button, Table, Form, FormControl, InputGroup} from 'react-bootstrap';
+import {Button, Table, Form, FormControl, InputGroup, Alert} from 'react-bootstrap';
 import styles from './styles.module.css';
 
 
@@ -28,7 +28,10 @@ export default class EarlyLateRecordComponent extends React.Component{
             addedStudents: [],
             searchOptions: [],
             wantSeeEvents: false,
-            workingHours: whs
+            workingHours: whs,
+            success: '',
+            error:'',
+            warning: ''
         }
         this.handleWantSeeEvents = this.handleWantSeeEvents.bind(this);
     }
@@ -76,42 +79,91 @@ export default class EarlyLateRecordComponent extends React.Component{
                 classStudents: json.students
             });
         } catch(e){
-            alert(e);
+            this.setState({
+                error: e,
+                warning: '',
+                success: ''
+            });
         }
     }
 
     addStudent(){
         if(this.state.selectedStudent === ''){
-            alert('Please select a student.');
+            this.setState({
+                error: '',
+                warning: 'Please select a student.',
+                success: ''
+            });
+
         } else if(this.state.selectedhh === '' || this.state.selectedmm === ''){
-            alert('Please please insert hour and minutes.');
+            this.setState({
+                error: '',
+                warning: 'Please please insert hour and minutes.',
+                success: ''
+            });
         } else if(isNaN(this.state.selectedhh) || isNaN(this.state.selectedmm)){
-            alert('Please insert valid hour and minutes in the format [hh] and [mm].');
+            this.setState({
+                error: '',
+                warning: 'Please insert valid hour and minutes in the format [hh] and [mm].',
+                success: ''
+            });
         } else if(this.state.selectedhh.length > 2 || this.state.selectedmm.length > 2){
-            alert('Please insert valid hour and minutes in the format [hh] and [mm].');
+            this.setState({
+                error: '',
+                warning: 'Please insert valid hour and minutes in the format [hh] and [mm].',
+                success: ''
+            });
         } else if(parseInt(this.state.selectedhh)<8 || parseInt(this.state.selectedhh)>13){
-            alert('Please insert a valid working hour.');
+            this.setState({
+                error: '',
+                warning: 'Please insert a valid working hour.',
+                success: ''
+            });
         } else if(parseInt(this.state.selectedmm)<0 || parseInt(this.state.selectedmm)>59){
-            alert('Please insert valid minutes.');
+            this.setState({
+                error: '',
+                warning: 'Please insert valid minutes.',
+                success: ''
+            });
         } else{
             let addedStudents = this.state.addedStudents;
             let alreadyExists = addedStudents.find(s => s.student._id.toString() === this.state.selectedStudent.value._id.toString());
             if(alreadyExists !== undefined && alreadyExists !== null){
-                alert('Student already added to list');
+                this.setState({
+                    error: 'Student already added to list.',
+                    warning: '',
+                    success: ''
+                });
             } else {
                 let hh = this.state.selectedhh.length === 1 ? '0'+this.state.selectedhh : this.state.selectedhh;
                 let mm = this.state.selectedmm.length === 1 ? '0'+this.state.selectedmm : this.state.selectedmm;
                 let completeHour = hh + ':' + mm;
                 if(this.props.type === 'early-exit' && !this.state.workingHours.includes(parseInt(hh) - 8)){
-                    alert('Input hour not valid. You can insert hour values included in your working timetable only.');
+                    this.setState({
+                        error: '',
+                        warning: 'Input hour not valid. You can insert hour values included in your working timetable only.',
+                        success: ''
+                    });
                 } else if(this.props.type === 'late-entrance' && !/^(08:(0[1-9]|10))$/.test(completeHour) && this.state.workingHours.includes(0) && !this.state.workingHours.includes(1)) {
                     //First hour teacher
-                    alert('Only Range [ 08:01 - 08:10 ] is allowed for teacher working in the first hour.');
+                    this.setState({
+                        error: '',
+                        warning: 'Only Range [ 08:01 - 08:10 ] is allowed for teacher working in the first hour.',
+                        success: ''
+                    });
                 } else if(this.props.type === 'late-entrance' && !/^(09:00)$/.test(completeHour) && !this.state.workingHours.includes(0) && this.state.workingHours.includes(1)){
                     //Second hour teacher
-                    alert('Only value [ 09:00 ] is allowed for teacher working in the second hour.');
+                    this.setState({
+                        error: '',
+                        warning: 'Only value [ 09:00 ] is allowed for teacher working in the second hour.',
+                        success: ''
+                    });
                 } else if(this.props.type === 'late-entrance' && !/^(08:(0[1-9]|10)|09:00)$/.test(completeHour) && this.state.workingHours.includes(0) && this.state.workingHours.includes(1)){
-                    alert('Only Range [ 08:01 - 08:10 ] and value [ 09:00 ] are allowed for teacher working in the first two hours.');
+                    this.setState({
+                        error: '',
+                        warning: 'Only Range [ 08:01 - 08:10 ] and value [ 09:00 ] are allowed for teacher working in the first two hours.',
+                        success: ''
+                    });
                 } else {
                     addedStudents.push({
                         student: this.state.selectedStudent.value,
@@ -169,14 +221,24 @@ export default class EarlyLateRecordComponent extends React.Component{
             let response = await fetch(url, options);
             const json = await response.json();
             if (json.error != null) {
-                alert('Ops! Internal error. Please retry!');
-                window.location.reload(false);
+                this.setState({
+                    error: 'Ops! Internal error. Please retry!',
+                    warning: '',
+                    success: ''
+                });                
             } else {
-                alert('Event successfully recorded.');
+                this.setState({
+                    error: '',
+                    warning: '',
+                    success: 'Event successfully recorded.'
+                });
             }
         } catch (err) {
-            alert(err);
-            window.location.reload(false);
+            this.setState({
+                error: err,
+                warning: '',
+                success: ''
+            });
         }
     }
 
@@ -207,7 +269,16 @@ export default class EarlyLateRecordComponent extends React.Component{
                 )}
                 {this.state.wantSeeEvents === false &&(
                 <div>
-                <Button variant="outline-primary" onClick={() => this.setState({wantSeeEvents: true})}>Daily Events</Button><br></br>
+                {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&
+                    <Alert variant='success'>{this.state.success}</Alert>
+                }
+                {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&
+                    <Alert variant='warning'>{this.state.warning}</Alert>
+                }
+                {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&
+                    <Alert variant='danger'>{this.state.error}</Alert>
+                }
+                <Button variant="outline-primary" onClick={() => this.setState({wantSeeEvents: true})}>See recorded Daily Events</Button><br></br>
                 <Form >
                     <Form.Group>
                         <Form.Label>Search a Student</Form.Label>
