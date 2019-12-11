@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Table from 'react-bootstrap/Table';
+import {Table, Alert, Button} from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import SectionHeader from "../../utils/section-header";
 
@@ -15,7 +15,10 @@ class EnrolmentForm extends Component {
       ssn: "",
       name: "",
       surname: "",
-      wantEnroll: false
+      wantEnroll: false,
+      warning: '',
+      error: '',
+      success: ''
     };
   }
 
@@ -40,9 +43,14 @@ class EnrolmentForm extends Component {
     });
   }
 
-  async enrollStudent(){
+  async enrollStudent(event){
+    event.preventDefault();
     if(this.state.name === "" || this.state.surname === "" || this.state.ssn === ""){
-      alert('Please fill in all the fields.');
+      this.setState({
+        success: '',
+        warning: 'Please fill all fields!',
+        error: ''
+      });
     } else{
       await this.pushEnrollmentToDB();
       //Update state here
@@ -50,9 +58,7 @@ class EnrolmentForm extends Component {
         name: "",
         surname: "",
         ssn: "",
-        wantEnroll: false
       });
-      window.location.reload(false);
     }
   }
 
@@ -75,9 +81,17 @@ class EnrolmentForm extends Component {
     let response = await fetch(url, options);
     const json = await response.json();
     if(json.error != null){
-        alert('Ops! There was an error. Please try again.');
+        this.setState({
+          success: '',
+          warning: '',
+          error: 'Ops! There was an error. Please try again.'
+        });
     } else{
-        alert('Student enrolled correctly!');
+        this.setState({
+          success: 'Student enrolled correctly!',
+          warning: '',
+          error: ''
+        });
     }
   }
 
@@ -100,8 +114,8 @@ class EnrolmentForm extends Component {
     return (
       <div>
         {this.state.wantEnroll === false && (<div>
-                <SectionHeader>Enroll students</SectionHeader>
-        <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.setState({wantEnroll: true})} role="button">Enroll a Student</p>
+                <SectionHeader>Enrolled students</SectionHeader>
+        <Button variant='primary' onClick={() => this.setState({wantEnroll: true})} >Enroll a Student</Button><br></br><br></br>
         <Table striped bordered hover responsive size="sm">
           <thead>
             <tr>
@@ -121,6 +135,16 @@ class EnrolmentForm extends Component {
         )}
         {this.state.wantEnroll === true && (
           <div>
+          <SectionHeader>Enroll student</SectionHeader>
+          {this.state.warning === '' && this.state.error === '' && this.state.success !== '' &&
+            <Alert variant='success'>{this.state.success}</Alert>
+          }
+          {this.state.error !== '' && this.state.success === '' && this.state.warning === '' &&
+            <Alert variant='danger'>{this.state.error}</Alert>
+          }
+          {this.state.error === '' && this.state.success === '' && this.state.warning !== '' &&
+            <Alert variant='warning'>{this.state.warning}</Alert>
+          }
           <Form>
             <Form.Group controlId="formGroupEmail">
               <Form.Label>Surname</Form.Label>
@@ -134,7 +158,7 @@ class EnrolmentForm extends Component {
               <Form.Label>SSN Code</Form.Label>
               <Form.Control type="text" placeholder="Enter SSN Code" onChange={(e) => this.setState({ssn: e.target.value})}/>
             </Form.Group>
-            <p class="btn btn-primary bg-blue border-blue ml-3" onClick={() => this.enrollStudent()} role="button">Enroll Student</p>
+            <Button variant='primary' onClick={(event) => this.enrollStudent(event)}> Enroll Student</Button>
             </Form>
           </div>
         )}
