@@ -1,8 +1,7 @@
 import React from 'react';
-import {Button, Form, FormControl, InputGroup} from 'react-bootstrap';
+import {Button, Form, Alert} from 'react-bootstrap';
 import Select from 'react-select';
 import styles from './styles.module.css';
-import Alert from "react-bootstrap/Alert";
 import SectionHeader from "../../utils/section-header";
 
 export default class ParentAccountEnabling extends React.Component {
@@ -59,35 +58,40 @@ export default class ParentAccountEnabling extends React.Component {
     }
 
     async handleSubmitForm() {
-        const url = 'http://localhost:3000/parent';
-        const mail = this.state.parentEmail;
-        const name = this.state.parentName;
-        const surname = this.state.parentSurname;
-        const ssnParent = this.state.parentSsn;
-        const ssnChild = this.state.selectedStudent.value.ssn;
-        const options = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                mail,
-                nameParent: name,
-                surnameParent: surname,
-                ssnParent: ssnParent,
-                ssnChild: ssnChild,
-            })
-        };
-        let response = await fetch(url, options);
-        const json = await response.json();
-        if (json.success === true) {
-            const alertDom = <Alert variant={'success'}>Parent account created! An email was sent to the parent with their credentials!</Alert>;
+        if(this.state.selectedStudent.value === undefined || this.state.parentEmail === '' || this.state.parentName === '' || this.state.parentSurname === '' || this.state.parentSsn === ''){
+            const alertDom = <Alert variant={'warning'}>Please fill all fields!</Alert>;
             this.setState({alertDom});
         } else {
-            const alertDom = <Alert variant={'danger'}>Parent account creation failed!</Alert>;
-            this.setState({alertDom});
+            const url = 'http://localhost:3000/parent';
+            const mail = this.state.parentEmail;
+            const name = this.state.parentName;
+            const surname = this.state.parentSurname;
+            const ssnParent = this.state.parentSsn;
+            const ssnChild = this.state.selectedStudent.value.ssn;
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    ssn: ssnParent,
+                    name: name,
+                    surname: surname,
+                    mail: mail,
+                    childSsn: ssnChild,
+                })
+            };
+            let response = await fetch(url, options);
+            const json = await response.json();
+            if (json.success === true) {
+                const alertDom = <Alert variant={'success'}>Parent account created! An email was sent to the parent with their credentials!</Alert>;
+                this.setState({alertDom});
+            } else {
+                const alertDom = <Alert variant={'danger'}>Parent account creation failed!</Alert>;
+                this.setState({alertDom});
+            }
         }
     }
 
