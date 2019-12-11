@@ -15,7 +15,8 @@ const teacherSchema = new Schema({
         ref: 'User'
     },
     subjects: [String],
-    timetable: [timetableEntrySchema]
+    timetable: [timetableEntrySchema],
+    meetingsTimeSlots: [String]
 });
 
 module.exports = mongoose.model('Teacher', teacherSchema);
