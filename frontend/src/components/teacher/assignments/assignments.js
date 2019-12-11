@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Form, Dropdown, Container, Alert, Table} from 'react-bootstrap';
+import {Button, Form, Dropdown, Container, Alert} from 'react-bootstrap';
 import 'moment/locale/it.js';
 import {DatePickerInput} from 'rc-datepicker';
 import 'rc-datepicker/lib/style.css';
@@ -29,6 +29,9 @@ export default class Assignments extends React.Component {
             description: '',
             selectedWeekhour: null,
             selectedFiles: [],
+            success: '',
+            warning: '',
+            error: ''
         }
         this.selectedFilesHandler = this.selectedFilesHandler.bind(this);
     }
@@ -66,12 +69,24 @@ export default class Assignments extends React.Component {
             let response = await fetch(url, options);
             const json = await response.json();
             if (json.error != null) {
-                alert('Ops! Internal error. Please retry!');
+                this.setState({
+                    success: '',
+                    warning: '',
+                    error: 'Ops! Internal error. Please retry!'
+                });
             } else {
-                alert('The Assignment has been successfully recorded.');
+                this.setState({
+                    success: 'The Assignment has been successfully recorded.',
+                    warning: '',
+                    error: ''
+                });
             }
         } catch (err) {
-            alert(err);
+            this.setState({
+                success: '',
+                warning: '',
+                error: err
+            });
         }
 
     }
@@ -80,18 +95,38 @@ export default class Assignments extends React.Component {
     async saveChanges(event) {
         event.preventDefault();
         if (this.state.selectedSubject === 'Select a Subject') {
-            alert('Please select a subject.');
+            this.setState({
+                success: '',
+                warning: 'Please select a subject.',
+                error: ''
+            });
         } else if (this.state.description === '') {
-            alert('Please enter a description');
+            this.setState({
+                success: '',
+                warning: 'Please enter a description.',
+                error: ''
+            });
         } else {
             let currentDay = this.state.currentDay.split('-');
             let chosenDay = this.state.selectedDate.split('-');
             if (parseInt(chosenDay[0]) < parseInt(currentDay[0])) {
-                alert('Please select a date starting tomorrow.');
+                this.setState({
+                    success: '',
+                    warning: 'Please select a date starting tomorrow.',
+                    error: ''
+                });
             } else if (parseInt(chosenDay[1]) < parseInt(currentDay[1]) && parseInt(chosenDay[0]) === parseInt(currentDay[0])) {
-                alert('Please select a date starting tomorrow.');
+                this.setState({
+                    success: '',
+                    warning: 'Please select a date starting tomorrow.',
+                    error: ''
+                });
             } else if (parseInt(chosenDay[2]) <= parseInt(currentDay[2]) && parseInt(chosenDay[1]) === parseInt(currentDay[1])) {
-                alert('Please select a date starting tomorrow.');
+                this.setState({
+                    success: '',
+                    warning: 'Please select a date starting tomorrow.',
+                    error: ''
+                });
             } else {
                 let day = new Date(this.state.selectedDate).getNormalizedDay();
                 let toSplit;
@@ -105,7 +140,11 @@ export default class Assignments extends React.Component {
                     }
                 });
                 if (hour === '') {
-                    alert('Your subject is not scheduled for this day. Please select a valid day.');
+                    this.setState({
+                        success: '',
+                        warning: 'Your subject is not scheduled for this day. Please select a valid day.',
+                        error: ''
+                    });
                 } else {
                     await this.saveAssignmentIntoDb(day, hour);
                     this.setState({
@@ -139,12 +178,21 @@ export default class Assignments extends React.Component {
                 {this.state.wantAddAssignment === false && (
                     <div>
                         <p>In this section you can manage your Assignments</p><br></br>
+                        {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&
+                            <Alert variant='success'>{this.state.success}</Alert>
+                        }
                         <Button variant="primary" onClick={() => this.showFormToAddAssignment()}>Add an Assignment</Button>
                     </div>
                 )}
                 {this.state.wantAddAssignment === true && (
                     <div>
                         <p>Complete the form below to add an Assignment</p>
+                        {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&
+                            <Alert variant='warning'>{this.state.warning}</Alert>
+                        }
+                        {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&
+                            <Alert variant='danger'>{this.state.error}</Alert>
+                        }
                         <Form>
                         <Button onClick={(e) => this.saveChanges(e)} type="primary">Save</Button>
                             <Form.Group>
