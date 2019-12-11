@@ -10,6 +10,7 @@ const testData = require('../test-lib/testData');
 
 const HLib = require('@emarkk/hlib');
 
+const File = require('../models/File');
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');
 const Student = require('../models/Student');
@@ -57,6 +58,60 @@ suite('lectures', () => {
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
         expect(t3.topics).to.be.null();
         expect(t4.topics).to.equal('Test topics');
+    });
+    
+    test('getSupportMaterials', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await SchoolClass.insertMany(testData.classes);
+        await File.insertMany([
+            { _id: '5dc9c3112d698031f882d0c9', filename: 'periodic_table.txt', bytes: 4503, type: 'text/plain' },
+            { _id: '5dc9c3112d698031f882d0ca', filename: 'math_formulas.pdf', bytes: 14039, type: 'application/pdf' },
+            { _id: '5dc9c3112d698031f882d0cb', filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' },
+            { _id: '5dc9c3112d698031f882d0cc', filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
+        ]);
+
+        // parent not found
+        const sm1 = await lectures.getSupportMaterials('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
+        // student not found
+        const sm2 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const sm3 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
+
+        // ok 1
+        const sm4 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { supportMaterials: [
+            { subject: 'Science', description: 'Periodic Table', uploaded: new Date('2019-12-01T14:02:19'), attachments: ['5dc9c3112d698031f882d0c9'] },
+            { subject: 'Math', description: 'Formulas Cheatsheet', uploaded: new Date('2019-12-10T17:27:42'), attachments: ['5dc9c3112d698031f882d0ca'] },
+            { subject: 'Italian', description: 'Divina Commedia', uploaded: new Date('2019-12-16T09:53:50'), attachments: ['5dc9c3112d698031f882d0cb'] },
+            { subject: 'Math', description: 'Formulas Cheatsheet (2)', uploaded: new Date('2019-12-18T11:07:20'), attachments: ['5dc9c3112d698031f882d0cc'] }
+        ] });
+        
+        // ok 2
+        const sm5 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        expect(sm1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm4.supportMaterials).to.have.length(0);
+        expect(sm5.supportMaterials).to.have.length(3);
+        jexpect(sm5.supportMaterials).to.equal(j({
+            Italian: [{ subject: 'Italian', description: 'Divina Commedia', uploaded: new Date('2019-12-16T09:53:50'), attachments: [
+                { _id: '5dc9c3112d698031f882d0cb', __v: 0, filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' }
+            ] }],
+            Math: [
+                { subject: 'Math', description: 'Formulas Cheatsheet', uploaded: new Date('2019-12-10T17:27:42'), attachments: [
+                    { _id: '5dc9c3112d698031f882d0ca', __v: 0, filename: 'math_formulas.pdf', bytes: 14039, type: 'application/pdf' }
+                ] },
+                { subject: 'Math', description: 'Formulas Cheatsheet (2)', uploaded: new Date('2019-12-18T11:07:20'), attachments: [
+                    { _id: '5dc9c3112d698031f882d0cc', __v: 0, filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
+                ] }
+            ],
+            Science: [{ subject: 'Science', description: 'Periodic Table', uploaded: new Date('2019-12-01T14:02:19'), attachments: [
+                { _id: '5dc9c3112d698031f882d0c9', __v: 0, filename: 'periodic_table.txt', bytes: 4503, type: 'text/plain' }
+            ] }]
+        }));
     });
     
     test('recordDailyLectureTopics', async () => {

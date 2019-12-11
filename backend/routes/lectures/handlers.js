@@ -46,7 +46,7 @@ const getSupportMaterials = async function(parentUId, studentId) {
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
         
-    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 }).populate('supportMaterials.attachments');
+    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'supportMaterials._id': 0 }).populate('supportMaterials.attachments');
     const supportMaterials = schoolClass.supportMaterials.reduce((obj, x) => {
         if(obj[x.subject])
             obj[x.subject].push(x);
