@@ -15,12 +15,14 @@ export default class Timetable extends Component {
     }
 
     selectCell = (dayIndex, hourIndex) => {
+        const weekHour = dayIndex + '_' + hourIndex;
+        if (this.props.selectionHandler) {
+            this.props.selectionHandler(weekHour);
+        }
         if (this.props.selectable) {
-            const weekHour = dayIndex + '_' + hourIndex;
             this.setState({
                 selectedWeekHour: weekHour
             });
-            this.props.selectionHandler(weekHour);
         }
     };
 

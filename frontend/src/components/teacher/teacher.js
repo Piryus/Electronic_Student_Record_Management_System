@@ -229,7 +229,7 @@ export default class Teacher extends React.Component {
                                 <Material timetable={this.props.timetable} classes={this.state.allClasses}/>
                             )}
                             {this.state.userRequest === 'meetings' && (
-                                <Meetings/>
+                                <Meetings teacherTimetable={this.props.timetable}/>
                             )}
                             {this.state.userRequest === 'final-grades' && (
                                 <FinalGrades selectedClass={this.state.classSelected}/>
