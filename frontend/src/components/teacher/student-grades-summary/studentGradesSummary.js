@@ -1,6 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
-import {Button, Dropdown, DropdownButton, Card, Accordion, Form, Container} from 'react-bootstrap';
+import {Button, Dropdown, DropdownButton, Card, Accordion, Form, Container, Alert} from 'react-bootstrap';
 import styles from './styles.module.css';
 import SectionHeader from "../../utils/section-header";
 
@@ -23,7 +23,10 @@ export default class StudentGradesSummary extends React.Component{
             students: this.props.students,
             studentsForSelectedClass: [],
             subjects: this.props.subjects,
-            classes: []
+            classes: [],
+            success: '',
+            error: '',
+            warning: ''
         }
     }
 
@@ -104,9 +107,17 @@ export default class StudentGradesSummary extends React.Component{
         let response = await fetch(url, options);
         const json = await response.json();
         if(json.error != null){
-            alert('Internal error occured while saving the grade. Please retry.');
+            this.setState({
+                success: '',
+                warning:'',
+                error: 'Internal error occured while saving the grade. Please retry.'
+            })
         } else{
-            alert('The grade has been recorded successfully!');
+            this.setState({
+                success: 'The grade has been recorded successfully!',
+                warning:'',
+                error: ''
+            })
         }
     }
 
@@ -128,20 +139,40 @@ export default class StudentGradesSummary extends React.Component{
             });
             this.computeSearchOptions();
         } catch(e){
-            alert(e);
+            this.setState({
+                success: '',
+                warning: '',
+                error: e
+            })
         }
     }
 
     async saveGrade(){
         if(this.state.selectedSubject === 'Select a subject' || this.state.selectedSubject === ''){
-            alert('Please select a subject');
+            this.setState({
+                warning: 'Please select a subject',
+                success: '',
+                error: ''
+            });
         } else if(this.state.selectedStudent=== '' ){
-            alert('Please select a student.');
+            this.setState({
+                warning: 'Please select a student.',
+                success: '',
+                error: ''
+            });
         }
         else if(this.state.selectedGrade === 'Select a grade' || this.state.selectedGrade === ''){
-            alert('Please insert a grade.');
+            this.setState({
+                warning: 'Please insert a grade.',
+                success: '',
+                error: ''
+            });
         } else if(/^([0-9]\+?|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude)?)$/.test(this.state.selectedGrade) === false){
-            alert('Grade format not valid. Please insert a correct grade.');
+            this.setState({
+                warning: 'Grade format not valid. Please insert a correct grade.',
+                success: '',
+                error: ''
+            });
         } else{
             //Check if the teacher is inserting the grade in the day he has a lesson for the selected subject for the selected class
             let day = new Date(Date.now()).getNormalizedDay();
@@ -158,7 +189,11 @@ export default class StudentGradesSummary extends React.Component{
                 }
             });
             if(teacherHadLesson === false){
-                alert('Denied action. You have not yet had lessons for this subject this week.');
+                this.setState({
+                    warning: 'Denied action. You have not yet had lessons for this subject this week.',
+                    success: '',
+                    error: ''
+                });
             }  else{
                 //Ok I can save the grade into db
                 await this.storeInDb();
@@ -169,7 +204,6 @@ export default class StudentGradesSummary extends React.Component{
                     selectedSubject: 'Select a subject', 
                     selectedGrade: 'Select a grade',
                 });
-                window.location.reload(false);
             }
         }
     }
@@ -228,6 +262,15 @@ export default class StudentGradesSummary extends React.Component{
         return(
             <Container fluid>
                 <SectionHeader>Student grades</SectionHeader>
+                {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&(
+                    <Alert variant="success">{this.state.success}</Alert>
+                )}
+                {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&(
+                    <Alert variant="warning">{this.state.warning}</Alert>
+                )}
+                {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&(
+                    <Alert variant="danger">{this.state.error}</Alert>
+                )}
                 {this.state.wantAddAGrade === false &&(
                 <div>
                     <Form.Group>
