@@ -197,13 +197,13 @@ export default class StudentGradesSummary extends React.Component{
             }  else{
                 //Ok I can save the grade into db
                 await this.storeInDb();
-
                 //END
                 this.setState({
                     wantAddAGrade: false,
                     selectedSubject: 'Select a subject', 
                     selectedGrade: 'Select a grade',
                 });
+                window.location.reload(false);
             }
         }
     }
