@@ -1,13 +1,58 @@
 import React from "react";
-import {Container} from "react-bootstrap";
+import {Alert, Container} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
+import LoadingSpinner from "../../utils/loading-spinner";
 import Timetable from "../../utils/timetable";
 
 export default class Meetings extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedWeekHours: []
+            selectedWeekHours: [],
+            error: '',
+            loading: true
+        }
+    }
+
+    async componentDidMount() {
+        const selectedWeekHours = await this.fetchMeetingWeekHours();
+        this.setState({selectedWeekHours, loading: false});
+    }
+
+    async fetchMeetingWeekHours() {
+        const url = 'http://localhost:3000/meetings/availability';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+        const rawResponse = await fetch(url, options);
+        const response = await rawResponse.json();
+        return response.timeSlots;
+    }
+
+    async updateMeetingWeekHours(selectedWeekHours) {
+        const url = 'http://localhost:3000/meetings/availability';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                timeSlots: selectedWeekHours,
+            })
+        };
+        const response = await fetch(url, options);
+        const responseJson = await response.json();
+        if (!responseJson.success) {
+            this.setState({error: 'An unknown error occurred when trying to update your meeting hours.'});
+        } else {
+            this.setState({error: ''});
         }
     }
 
@@ -32,6 +77,7 @@ export default class Meetings extends React.Component {
             this.setState({
                 selectedWeekHours
             });
+            this.updateMeetingWeekHours(selectedWeekHours);
         }
     }
 
@@ -61,15 +107,20 @@ export default class Meetings extends React.Component {
 
         this.state.selectedWeekHours.forEach(weekHour => {
             const [dayIndex, hourIndex] = weekHour.split('_');
-            console.log(dayIndex + ' ' + hourIndex);
             data[dayIndex].content[hourIndex].color = 'bg-success';
         });
 
         return (
             <Container fluid>
                 <SectionHeader>Meetings with parents</SectionHeader>
-                <h6>Select the time slots you are available to meet parents</h6>
-                <Timetable data={data} selectionHandler={(weekHour) => this.toggleWeekHour(weekHour)} frequency={60} />
+                {this.state.loading && <LoadingSpinner/>}
+                {!this.state.loading &&
+                <>
+                    <h6>Select the time slots you are available to meet parents</h6>
+                    {this.state.error !== '' && <Alert variant='danger'>{this.state.error}</Alert>}
+                    <Timetable data={data} selectionHandler={(weekHour) => this.toggleWeekHour(weekHour)}
+                               frequency={60}/>
+                </>}
             </Container>
         );
     }
