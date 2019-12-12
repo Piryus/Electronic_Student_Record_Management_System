@@ -10,6 +10,8 @@ const testData = require('../test-lib/testData');
 
 const HLib = require('@emarkk/hlib');
 
+const Utils = require('../utils');
+
 const File = require('../models/File');
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');
@@ -281,6 +283,53 @@ suite('lectures', () => {
         expect(a7.success).to.be.true();
         expect(sc2.assignments).to.have.length(1);
         jexpect(sc2.assignments[0]).to.include(j({ subject: 'English', description: 'New assignments!', due: HLib.weekhourToDate('1_2').addDays(daysDelta) }));
+    });
+    
+    test('addSupportMaterial', async () => {
+        const fakeSaveFile = Sinon.stub(Utils, 'saveFiles');
+        fakeSaveFile.onCall(0).resolves(['5dca7e2b461dc52c4a29be45']);
+        fakeSaveFile.onCall(1).resolves(['5dca7e2b461dc52c4a29be46', '5dca7e2b461dc52c4a29be47']);
+
+        await Teacher.insertMany(testData.teachers);
+        await SchoolClass.insertMany(testData.classes);
+        
+        // teacher not found
+        const sm1 = await lectures.addSupportMaterial('ffffffffffffffffffffffff', '5dc9c3112d698031f441e1c9', 'Science', 'Some support material.', null);
+        // teacher does not teach to class
+        const sm2 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f6', '5dc9cb4b797f6936680521b9', 'Science', 'Some support material.', null);
+        // teacher does not teach this subject to class
+        const sm3 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f6', '5dc9c3112d698031f441e1c9', 'Latin', 'Some support material.', null);
+
+        const sc1 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+
+        // ok 1
+        const sm4 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f6', '5dc9c3112d698031f441e1c9', 'Science', 'Periodic Table', 'fakeFile.txt');
+        
+        const sc2 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+        
+        // ok 2
+        const sm5 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f2', '5dc9c3112d698031f441e1c9', 'Math', 'Formulas', ['1.pdf', '2.pdf']);
+        
+        const sc3 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+        const newMaterial = sc3.supportMaterials.find(sm => !sc2.supportMaterials.some(sm2 => sm2._id.equals(sm._id)));
+        
+        expect(fakeSaveFile.callCount).to.equal(2);
+        expect(fakeSaveFile.calledWithExactly(['fakeFile.txt'])).to.be.true();
+        expect(fakeSaveFile.calledWithExactly(['1.pdf', '2.pdf'])).to.be.true();
+
+        fakeSaveFile.restore();
+
+        expect(sm1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sc1.supportMaterials).to.have.length(0);
+        expect(sm4.success).to.be.true();
+        expect(sc2.supportMaterials).to.have.length(1);
+        expect(Math.abs(sc2.supportMaterials[0].uploaded - new Date())).to.be.lessThan(1000);
+        jexpect(sc2.supportMaterials[0]).to.include({ subject: 'Science', description: 'Periodic Table', attachments: ['5dca7e2b461dc52c4a29be45'] });
+        expect(sm5.success).to.be.true();
+        expect(Math.abs(newMaterial.uploaded - new Date())).to.be.lessThan(1000);
+        jexpect(newMaterial).to.include({ subject: 'Math', description: 'Formulas', attachments: ['5dca7e2b461dc52c4a29be46', '5dca7e2b461dc52c4a29be47'] });
     });
     
     test('rollCall', async () => {
