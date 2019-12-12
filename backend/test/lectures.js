@@ -37,7 +37,6 @@ afterEach(async () => await db.clearDatabase());
 
 after(async () => await db.closeDatabase());
 
-
 suite('lectures', () => {
     
     test('getDailyLectureTopics', async () => {
