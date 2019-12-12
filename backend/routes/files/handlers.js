@@ -10,7 +10,7 @@ const Student = require('../../models/Student');
 const get = async function(h, parentUId, fileId) {
     const parent = await Parent.findOne({ userId: parentUId });
 
-    if(parent === null || !parent.children || parent.children.length === 0)
+    if(parent === null || parent.children.length === 0)
         return Boom.badRequest();
 
     const students = await Student.find({ _id: { $in: parent.children }});

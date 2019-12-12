@@ -68,6 +68,12 @@ const articles = [
     {"_id":"5ddbd4a7881cbd1a30645cef","title":"Read this carefully","content":"Some more information here.","authorId":"5dcc0bb71c9d4400003fffff","date":"2019-10-10T09:32:42.000Z","__v":0},
     {"_id":"5ddbd4a7881cbd1a30645cf0","title":"Not a title","content":"This is a test.","authorId":"5dcc0bb71c9d440000330d45","date":"2019-11-24T12:51:58.000Z","__v":0}
 ];
+const files = [
+    { _id: '5dc9c3112d698031f882d0c9', filename: 'periodic_table.txt', bytes: 4503, type: 'text/plain' },
+    { _id: '5dc9c3112d698031f882d0ca', filename: 'math_formulas.pdf', bytes: 14039, type: 'application/pdf' },
+    { _id: '5dc9c3112d698031f882d0cb', filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' },
+    { _id: '5dc9c3112d698031f882d0cc', filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
+];
     
 module.exports = {
     students,
@@ -75,5 +81,6 @@ module.exports = {
     teachers,
     users,
     classes,
-    articles
+    articles,
+    files
 };
