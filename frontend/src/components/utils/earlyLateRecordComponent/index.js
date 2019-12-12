@@ -3,7 +3,7 @@ import HLib from '@emarkk/hlib/index';
 import SectionHeader from '../section-header';
 import EarlyLateTable from '../earlyLateTable/earlyLateTable';
 import Select from 'react-select';
-import {Button, Table, Form, FormControl, InputGroup, Alert} from 'react-bootstrap';
+import {Button, Table, Form, FormControl, InputGroup, Alert, Row, Container} from 'react-bootstrap';
 import styles from './styles.module.css';
 
 
@@ -260,7 +260,7 @@ export default class EarlyLateRecordComponent extends React.Component{
     render(){
 
         return(
-            <div>
+            <Container fluid>
                 {this.props.type === 'late-entrance' && (
                     <SectionHeader>Late Entrance</SectionHeader>
                 )}
@@ -278,7 +278,15 @@ export default class EarlyLateRecordComponent extends React.Component{
                 {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&
                     <Alert variant='danger'>{this.state.error}</Alert>
                 }
-                <Button variant="outline-primary" onClick={() => this.setState({wantSeeEvents: true})}>See recorded Daily Events</Button><br></br>
+                <Row>
+                <Button variant="outline-primary" onClick={() => this.setState({wantSeeEvents: true})}>See recorded Daily Events</Button>
+                {this.state.addedStudents.length !== 0 && (
+                    <Button variant="success" className={styles.dangerButton} onClick={() => this.saveChanges()}>Save Changes</Button>)}
+                {this.state.addedStudents.length !== 0 && (
+                    <Button variant="danger" className={styles.dangerButton} onClick={() => this.discardChanges()}>Discard</Button>)}
+                </Row>
+                <br></br>
+                <i>Fill all the fields in the form here below to create an event for a student.</i>
                 <Form >
                     <Form.Group>
                         <Form.Label>Search a Student</Form.Label>
@@ -298,15 +306,11 @@ export default class EarlyLateRecordComponent extends React.Component{
                         </InputGroup>
                     </Form.Group>
                     
-                    <Button variant="primary" onClick={() => this.addStudent()}>Add Student</Button><br></br><br></br>
-                    {this.state.addedStudents.length !== 0 && (
-                    <div>
-                    <Button variant="outline-success" onClick={() => this.saveChanges()}>Save</Button>
-                    <Button variant="danger" className={styles.dangerButton} onClick={() => this.discardChanges()}>Discard</Button>
-                    </div>)}
+                    <Button variant="primary" onClick={() => this.addStudent()}>Add Student</Button>
 
 
                 </Form><br></br>
+                <i>In this table here below you can see students whose event you want to record.</i>
                 <Table responsive>
                         <thead>
                             <tr>
@@ -318,6 +322,9 @@ export default class EarlyLateRecordComponent extends React.Component{
                             </tr>
                         </thead>
                         <tbody>
+                            {this.state.addedStudents.length === 0 &&
+                                <i>No students have been added yet.</i>
+                            }
                             {this.state.addedStudents.map((s, idx) => {
                             return (<tr key={idx}>
                                     <td>{this.state.addedStudents[idx].student.surname}</td>
@@ -333,7 +340,7 @@ export default class EarlyLateRecordComponent extends React.Component{
                     {this.state.wantSeeEvents === true && (
                         <EarlyLateTable dontWantSeeEvents={this.handleWantSeeEvents} classStudents={this.state.classStudents} type={this.props.type} whs={this.state.workingHours} now={this.props.now} classId={this.state.classId}/>
                     )}
-            </div>
+            </Container>
         );
     }
 }

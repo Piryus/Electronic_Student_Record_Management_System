@@ -95,7 +95,8 @@ export default class EarlyLateTable extends React.Component{
     render(){
         return(
             <div>
-                <Button variant="outline-primary" onClick={() => this.props.dontWantSeeEvents()}>Add Event</Button><br></br>
+                <Button variant="outline-primary" onClick={() => this.props.dontWantSeeEvents()}>← Back</Button><br></br><br></br>
+                <i>In this table you can see already recorded events.</i>
                 <Table responsive>
                         <thead>
                             <tr>
