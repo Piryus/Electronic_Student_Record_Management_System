@@ -76,7 +76,7 @@ export default class Teacher extends React.Component {
         this.setState({
             students: students,
             classes: classes,
-            classSelected: this.state.userRequest === 'early-late' ?  classes[0] : this.state.allClasses[0],
+            classSelected: classes[0],
             classAttendance: attendance
         });
     }
@@ -150,10 +150,10 @@ export default class Teacher extends React.Component {
         return (
             <div className={styles.root}>
                 <AppNavbar
-                    type={this.state.userRequest === 'early-late' || this.state.userRequest === 'final-grades' ? 'teacher' : 'classic'}
+                    type={this.state.userRequest === 'early-late' ? 'teacher' : 'classic'}
                     onLogout={() => this.props.onLogout()}
                     onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}
-                    classes={this.state.userRequest === 'early-late'? this.state.classes : this.state.allClasses}
+                    classes={this.state.classes}
                     classSelection={(c) => this.selectClass(c)}
                     selectedClass={this.state.classSelected}
                 />
@@ -233,7 +233,7 @@ export default class Teacher extends React.Component {
                                 <Meetings teacherTimetable={this.props.timetable}/>
                             )}
                             {this.state.userRequest === 'final-grades' && (
-                                <FinalGrades selectedClass={this.state.classSelected}/>
+                                <FinalGrades selectedClass={this.state.classSelected} coordinator={this.props.coordinator}/>
                             )}
                         </main>
                     </Row>

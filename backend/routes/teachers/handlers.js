@@ -38,7 +38,7 @@ const getTermGrades = async function(teacherUId) {
     if(teacher === null)
         return Boom.badRequest();
 
-    const schoolClass = await SchoolClass.findOne({ coordinatorTeacher: teacher._id });
+    const schoolClass = await SchoolClass.findOne({ coordinator: teacher._id });
     
     if(schoolClass === null)
         return Boom.badRequest();

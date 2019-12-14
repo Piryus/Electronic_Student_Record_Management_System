@@ -63,7 +63,28 @@ export default class FinalGrades extends React.Component {
 
     isSectionEnabled = async () => {
         //Query to backend here
-        this.setState({enableSection: true});
+        try{
+            const url = 'http://localhost:3000/term/grades';
+            const options = {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            };
+            let response = await fetch(url, options);
+            const json = await response.json();
+            console.log(json);
+        }
+        catch(e){
+            this.setState({
+                enableSection: false,
+                error: 'Ops! Section disabled due to internal error.',
+                success: '',
+                warning:''
+            });
+        }
     }
 
     updateGrade(e, subject, studentId){
@@ -168,6 +189,7 @@ export default class FinalGrades extends React.Component {
                 }
                 {this.state.enableSection === true && this.state.enableProcedure === false &&
                     <div style={{textAlign: 'center'}}>
+                        <p>You can publish Final Grades of the term for class:<h2 style={{color: 'red'}}>{this.props.coordinator.name}</h2></p>
                         <p>By pressing the "Start" button here below the procedure will start.</p>
                         <Button variant="danger" onClick={() => this.setState({enableProcedure: true})}>START</Button>
                     </div>
