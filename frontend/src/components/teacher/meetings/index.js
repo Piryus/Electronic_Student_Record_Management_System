@@ -118,8 +118,11 @@ export default class Meetings extends React.Component {
                 <>
                     <h6>Select the time slots you are available to meet parents</h6>
                     {this.state.error !== '' && <Alert variant='danger'>{this.state.error}</Alert>}
-                    <Timetable data={data} selectionHandler={(weekHour) => this.toggleWeekHour(weekHour)}
-                               frequency={60}/>
+                    <Timetable data={data}
+                               selectionHandler={(weekHour) => this.toggleWeekHour(weekHour)}
+                               frequency={60}
+                               hideDate
+                    />
                 </>}
             </Container>
         );

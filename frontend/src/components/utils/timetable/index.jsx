@@ -40,8 +40,15 @@ export default class Timetable extends Component {
                 <thead>
                 <tr>
                     <th/>
-                    {this.props.data.map((day, index) =>
-                        <th key={index}>{days[index] + ' ' + day.date.getDate() + '/' + (day.date.getMonth() + 1)}</th>)}
+                    {this.props.data.map((day, index) => {
+                        let dayString;
+                        if (this.props.hideDate) {
+                            dayString = days[index];
+                        } else {
+                            dayString = days[index] + ' ' + day.date.getDate() + '/' + (day.date.getMonth() + 1);
+                        }
+                        return <th key={index}>{dayString}</th>
+                    })}
                 </tr>
                 </thead>
                 <tbody>
