@@ -10,56 +10,31 @@ export default class FinalGrades extends React.Component {
         this.state = {
             enableSection: false,
             enableProcedure: false,
-            allClasses: this.props.allClasses === undefined ? [] : this.props.allClasses,
             computedGrades: [],
             satisfiedRequest: false,
             success: '',
             error: '',
-            warning: ''
+            warning: '',
+            classSubjects: [ //HARDCODED
+                "Italian",
+                "History",
+                "Latin",
+                "Math",
+                "English",
+                "Physics",
+                "Art",
+                "Science",
+                "Gym",
+                "Religion"
+            ],
         };
     }
 
     async componentDidMount(){
         //Check if is section enabled first
         await this.isSectionEnabled();
-        if(this.state.enableSection === true){
-            await this.downloadComputedGrades();
-        }
     }
 
-    async componentWillReceiveProps(){
-        //Query to backend here if new class selected needs the grades to be recorded
-        await this.isSectionEnabled();
-        this.setState({
-            enableProcedure: false,
-            allClasses: this.props.allClasses === undefined ? [] : this.props.allClasses,
-            satisfiedRequest: false
-        })
-    }
-
-    async downloadComputedGrades(){
-        //Download grades here by sending classId
-        this.setState({computedGrades:
-            [
-                {
-                    id: "studentId",
-                    name: "studendName",
-                    grades: {
-                            "SubjectName" : "10",
-                            "SubjectName2" : "8"
-                    }
-                },
-                {
-                    id: "studentId2",
-                    name: "studendName2",
-                    grades: {
-                            "SubjectName4" : "7",
-                            "SubjectName25" : "2"
-                    }
-                }
-            ]
-        });
-    }
 
     isSectionEnabled = async () => {
         //Query to backend here
@@ -75,7 +50,46 @@ export default class FinalGrades extends React.Component {
             };
             let response = await fetch(url, options);
             const json = await response.json();
-            console.log(json);
+
+            if(!json.assigned.includes(false)){
+                //Section is disabled
+                this.setState({enableSection: false});
+            }
+            else{
+                var suggestedGrades = [];
+                var found;
+                if(json.assigned[0] === false && json.assigned[1] === false){
+                    //First period
+                    suggestedGrades = json.gradesSuggestions[0];
+                } else if(json.assigned[0] === true && json.assigned[1] === false){
+                    //Second period
+                    suggestedGrades = json.gradesSuggestions[1];
+                }
+                var student;
+                suggestedGrades = suggestedGrades.map(s => {
+                    student = {
+                        id: s.studentId,
+                        name: s.surname + " " + s.name,
+                        grades: Object.entries(s.grades).map((value) => {
+                            return {subjectName: value[0], suggestedGrade: value[1].toString(), integerGrade:  Math.trunc( value[1] ).toString()};
+                        })
+                    }
+                    this.state.classSubjects.forEach(subject => {
+
+                        found = student.grades.find(sbj => sbj.subjectName === subject);
+                        if(found === undefined){
+                            student.grades.push({subjectName: subject, suggestedGrade: "(n. d.)", integerGrade: ""});
+                        }
+                    });
+                    return student;
+                });
+
+                this.setState({
+                    enableSection: true,
+                    computedGrades: suggestedGrades,
+
+                });
+            }
         }
         catch(e){
             this.setState({
@@ -88,17 +102,18 @@ export default class FinalGrades extends React.Component {
     }
 
     updateGrade(e, subject, studentId){
-        let grades = this.state.computedGrades;
-        let index = grades.findIndex(e => e.id === studentId);
-        grades[index].grades[subject] = e.target.value;
-        this.setState({computedGrades: grades});
+        let computedGrades = this.state.computedGrades;
+        let index = computedGrades.findIndex(e => e.id === studentId);
+        let index2 = computedGrades[index].grades.findIndex(g => g.subjectName === subject);
+        computedGrades[index].grades[index2].integerGrade = e.target.value;
+        this.setState({computedGrades: computedGrades});
     }
 
     async postGrades(event){
         event.preventDefault();
         let notValidGrade = undefined;
         for(var i in this.state.computedGrades){
-            notValidGrade = Object.entries(this.state.computedGrades[i].grades).find(grade => grade[1] === '' || isNaN(grade[1]) || grade[1] < 0 || grade[1] >10);
+            notValidGrade = this.state.computedGrades[i].grades.find(grade => grade.integerGrade === '' || isNaN(grade.integerGrade) || parseInt(grade.integerGrade) < 0 || parseInt(grade.integerGrade) >10);
             if(notValidGrade !== undefined){
                 break;
             }
@@ -113,9 +128,9 @@ export default class FinalGrades extends React.Component {
             //Prepare data here
             let data = [];
             await this.sendDataToBackend(data);
+            console.log(this.state.computedGrades);
             this.setState({
                 enableProcedure: false, //Send request again to db for
-                allClasses: this.props.allClasses === undefined ? [] : this.props.allClasses,
                 success: 'Grades have been recorded successfully!',
                 warning: '',
                 error: ''
@@ -125,6 +140,17 @@ export default class FinalGrades extends React.Component {
 
     async sendDataToBackend(data){
         //send data to backend here
+    }
+
+    cancelProcedure(event){
+        event.preventDefault();
+        this.setState({
+            enableProcedure: false, //Send request again to db for
+            isSectionEnabled: false,
+            success: '',
+            warning: 'Procedure canceled.',
+            error: ''
+        });
     }
 
 
@@ -145,22 +171,24 @@ export default class FinalGrades extends React.Component {
                             <tr>
                                 <th>Subject</th>
                                 <th>Grade</th>
+                                <th>Computed</th>
                                 <th/><th/><th/><th/>
                             </tr>
                         </thead>
                         <tbody>
-                            {Object.entries(s.grades).map(grade =>
+                            {s.grades.map(grade =>
                                 <tr>
-                                    <td><i style={{textDecoration: 'underline'}}>{grade[0]}:</i></td>
+                                    <td><i style={{textDecoration: 'underline'}}>{grade.subjectName}:</i></td>
                                     <td>
                                     <InputGroup>
                                         <FormControl
                                             placeholder="Grade is an integer value in the range [0 - 10]"
-                                            value={grade[1]}
-                                            onChange={(e) => this.updateGrade(e, grade[0], s.id)}
+                                            value={grade.integerGrade}
+                                            onChange={(e) => this.updateGrade(e, grade.subjectName, s.id)}
                                         />
                                     </InputGroup>
                                     </td>
+                                    <td>{grade.suggestedGrade}</td>
                                     <td/><td/><td/><td/>
                                 </tr>
                             )}
@@ -189,14 +217,15 @@ export default class FinalGrades extends React.Component {
                 }
                 {this.state.enableSection === true && this.state.enableProcedure === false &&
                     <div style={{textAlign: 'center'}}>
-                        <p>You can publish Final Grades of the term for class:<h2 style={{color: 'red'}}>{this.props.coordinator.name}</h2></p>
+                        <h6>You can publish Final Grades of the term for class:</h6><h2 style={{color: 'red'}}>{this.props.coordinator.name}</h2>
                         <p>By pressing the "Start" button here below the procedure will start.</p>
                         <Button variant="danger" onClick={() => this.setState({enableProcedure: true})}>START</Button>
                     </div>
                 }
                 {this.state.enableProcedure === true &&
                 <div>
-                    <Button variant="outline-success" onClick={(event) => this.postGrades(event)}>Upload Grades</Button>
+                    <Button variant="outline-success" onClick={(event) => this.postGrades(event)}>Publish Grades</Button>
+                    <Button variant="danger" style={{marginLeft: '2%'}} onClick={(event) => this.cancelProcedure(event)}>Cancel procedure</Button>
                     <Accordion className="mt-3" defaultActiveKey="0">
                         {studentsDOM.map(student => student)}
                     </Accordion>
