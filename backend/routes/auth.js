@@ -2,8 +2,10 @@
 
 const Joi = require('@hapi/joi');
 const Boom = require('boom');
+
 const User = require('../models/User');
 const Parent = require('../models/Parent');
+const SchoolClass = require('../models/SchoolClass');
 const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 
@@ -45,12 +47,20 @@ const login = async function (request, h) {
             if (user.scope.includes('teacher')) {
                 // Retrieves the teacher in the DB using the user ID
                 const teacher = await Teacher.findOne({userId: user._id});
+                const schoolClass = await SchoolClass.findOne({ coordinator: teacher._id });
                 // If the teacher isn't found, it shouldn't happen, throw an error
                 if (teacher === null) {
                     return Boom.badRequest();
                 }
                 // Returns successful login, scope and teacher's timetable
-                return { success: true, scope: user.scope, extra: { timetable: teacher.timetable } };
+                return {
+                    success: true,
+                    scope: user.scope,
+                    extra: {
+                        timetable: teacher.timetable,
+                        coordinator: schoolClass ? { classId: schoolClass._id, name: schoolClass.name } : null
+                    }
+                };
             }
             // Returns successful login and scope (admin or teacher)
             return {success: true, scope: user.scope};
