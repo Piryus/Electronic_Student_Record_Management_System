@@ -14,6 +14,15 @@ class EnrolmentForm extends Component {
             ssn: "",
             name: "",
             surname: "",
+            parentOneName: '',
+            parentOneSurname: '',
+            parentOneSsn: '',
+            parentOneEmail: '',
+            parentTwo: false,
+            parentTwoName: '',
+            parentTwoSurname: '',
+            parentTwoSsn: '',
+            parentTwoEmail: '',
             wantEnroll: false,
             warning: '',
             error: '',
@@ -44,7 +53,17 @@ class EnrolmentForm extends Component {
 
     async enrollStudent(event) {
         event.preventDefault();
-        if (this.state.name === "" || this.state.surname === "" || this.state.ssn === "") {
+        if (this.state.name === "" ||
+            this.state.surname === "" ||
+            this.state.ssn === "" ||
+            this.state.parentOneName === '' ||
+            this.state.parentOneSurname === '' ||
+            this.state.parentOneEmail === '' ||
+            this.state.parentOneSsn === '' ||
+            (this.state.parentTwo && (this.state.parentTwoName === '' ||
+                this.state.parentTwoSurname === '' ||
+                this.state.parentTwoEmail === '' ||
+                this.state.parentTwoSsn === ''))) {
             this.setState({
                 success: '',
                 warning: 'Please fill all fields!',
@@ -54,20 +73,50 @@ class EnrolmentForm extends Component {
             await this.pushEnrollmentToDB();
             //Update state here
             this.setState({
+                ssn: "",
                 name: "",
                 surname: "",
-                ssn: "",
+                parentOneName: '',
+                parentOneSurname: '',
+                parentOneSsn: '',
+                parentOneEmail: '',
+                parentTwo: false,
+                parentTwoName: '',
+                parentTwoSurname: '',
+                parentTwoSsn: '',
+                parentTwoEmail: '',
             });
         }
     }
 
     async pushEnrollmentToDB() {
         const url = 'http://localhost:3000/students';
-        const jsonToSend = JSON.stringify({
-            ssn: this.state.ssn,
-            name: this.state.name,
-            surname: this.state.surname
-        });
+        let jsonToSend;
+        if (this.state.parentTwo === true) {
+            jsonToSend = JSON.stringify({
+                ssn: this.state.ssn,
+                name: this.state.name,
+                surname: this.state.surname,
+                parentOneName: this.state.parentOneName,
+                parentOneSurname: this.state.parentOneSurname,
+                parentOneSsn: this.state.parentOneSsn,
+                parentOneEmail: this.state.parentOneEmail,
+                parentTwoName: this.state.parentTwoName,
+                parentTwoSurname: this.state.parentTwoSurname,
+                parentTwoSsn: this.state.parentTwoSsn,
+                parentTwoEmail: this.state.parentTwoEmail
+            });
+        } else {
+            jsonToSend = JSON.stringify({
+                ssn: this.state.ssn,
+                name: this.state.name,
+                surname: this.state.surname,
+                parentOneName: this.state.parentOneName,
+                parentOneSurname: this.state.parentOneSurname,
+                parentOneSsn: this.state.parentOneSsn,
+                parentOneEmail: this.state.parentOneEmail
+            });
+        }
         const options = {
             method: 'POST',
             headers: {
@@ -148,118 +197,114 @@ class EnrolmentForm extends Component {
                             <h6>Student</h6>
                             <Row>
                                 <Col>
-                                    <Form.Group controlId="formGroupEmail">
-                                        <Form.Control type="text" placeholder="Surname"
-                                                      onChange={(e) => this.setState({surname: e.target.value})}/>
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Form.Group controlId="formGroupPassword">
-                                        <Form.Control type="text" placeholder="Name"
+                                    <Form.Group>
+                                        <Form.Control type="text"
+                                                      placeholder="Name"
+                                                      value={this.state.name}
                                                       onChange={(e) => this.setState({name: e.target.value})}/>
                                     </Form.Group>
                                 </Col>
+                                <Col>
+                                    <Form.Group>
+                                        <Form.Control type="text"
+                                                      placeholder="Surname"
+                                                      value={this.state.surname}
+                                                      onChange={(e) => this.setState({surname: e.target.value})}/>
+                                    </Form.Group>
+                                </Col>
                             </Row>
-                            <Form.Group controlId="formGroupPassword">
-                                <Form.Control type="text" placeholder="SSN"
+                            <Form.Group>
+                                <Form.Control type="text"
+                                              placeholder="SSN"
+                                              value={this.state.ssn}
                                               onChange={(e) => this.setState({ssn: e.target.value})}/>
                             </Form.Group>
 
                             <h6>Parent 1</h6>
                             <Row>
                                 <Col>
-                                    <Form.Group controlId="formParentName">
+                                    <Form.Group>
                                         <Form.Control type="string"
                                                       placeholder="Name"
-                                                      value={this.state.parentName}
-                                                      onChange={(e) => this.setState({parentName: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
+                                                      value={this.state.parentOneName}
+                                                      onChange={(e) => this.setState({parentOneName: e.target.value})}/>
                                     </Form.Group>
                                 </Col>
                                 <Col>
-                                    <Form.Group controlId="formParentSurname">
+                                    <Form.Group>
                                         <Form.Control type="string"
                                                       placeholder="Surname"
-                                                      value={this.state.parentSurname}
-                                                      onChange={(e) => this.setState({parentSurname: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
+                                                      value={this.state.parentOneSurname}
+                                                      onChange={(e) => this.setState({parentOneSurname: e.target.value})}/>
                                     </Form.Group>
                                 </Col>
                             </Row>
                             <Row>
                                 <Col>
-                                    <Form.Group controlId="formSSN">
+                                    <Form.Group>
                                         <Form.Control type="string"
                                                       placeholder="SSN"
-                                                      value={this.state.parentSsn}
-                                                      onChange={(e) => this.setState({parentSsn: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
+                                                      value={this.state.parentOneSsn}
+                                                      onChange={(e) => this.setState({parentOneSsn: e.target.value})}/>
                                     </Form.Group>
                                 </Col>
                                 <Col>
-                                    <Form.Group controlId="formEmail">
+                                    <Form.Group>
                                         <Form.Control type="email"
                                                       placeholder="Email"
-                                                      value={this.state.parentEmail}
-                                                      onChange={(e) => this.setState({parentEmail: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
+                                                      value={this.state.parentOneEmail}
+                                                      onChange={(e) => this.setState({parentOneEmail: e.target.value})}/>
                                     </Form.Group>
                                 </Col>
                             </Row>
+
                             <Form.Check custom type="switch" className="mb-1">
-                                <Form.Check.Input type="checkbox" id="parent-2-switch"/>
+                                <Form.Check.Input type="checkbox"
+                                                  id="parent-2-switch"
+                                                  checked={this.state.parentTwo}
+                                                  onChange={(e) => this.setState({parentTwo: e.target.checked})}
+                                />
                                 <Form.Check.Label htmlFor="parent-2-switch"><h6>Parent 2</h6></Form.Check.Label>
                             </Form.Check>
-                            <Row>
-                                <Col>
-                                    <Form.Group controlId="formParentName">
-                                        <Form.Control type="string"
-                                                      placeholder="Name"
-                                                      value={this.state.parentName}
-                                                      onChange={(e) => this.setState({parentName: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Form.Group controlId="formParentSurname">
-                                        <Form.Control type="string"
-                                                      placeholder="Surname"
-                                                      value={this.state.parentSurname}
-                                                      onChange={(e) => this.setState({parentSurname: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col>
-                                    <Form.Group controlId="formSSN">
-                                        <Form.Control type="string"
-                                                      placeholder="SSN"
-                                                      value={this.state.parentSsn}
-                                                      onChange={(e) => this.setState({parentSsn: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Form.Group controlId="formEmail">
-                                        <Form.Control type="email"
-                                                      placeholder="Email"
-                                                      value={this.state.parentEmail}
-                                                      onChange={(e) => this.setState({parentEmail: e.target.value})}/>
-                                        <Form.Text className="text-muted">
-                                        </Form.Text>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-
+                            {this.state.parentTwo &&
+                            <>
+                                <Row>
+                                    <Col>
+                                        <Form.Group>
+                                            <Form.Control type="string"
+                                                          placeholder="Name"
+                                                          value={this.state.parentTwoName}
+                                                          onChange={(e) => this.setState({parentTwoName: e.target.value})}/>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col>
+                                        <Form.Group>
+                                            <Form.Control type="string"
+                                                          placeholder="Surname"
+                                                          value={this.state.parentTwoSurname}
+                                                          onChange={(e) => this.setState({parentTwoSurname: e.target.value})}/>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <Form.Group>
+                                            <Form.Control type="string"
+                                                          placeholder="SSN"
+                                                          value={this.state.parentTwoSsn}
+                                                          onChange={(e) => this.setState({parentTwoSsn: e.target.value})}/>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col>
+                                        <Form.Group>
+                                            <Form.Control type="email"
+                                                          placeholder="Email"
+                                                          value={this.state.parentTwoEmail}
+                                                          onChange={(e) => this.setState({parentTwoEmail: e.target.value})}/>
+                                        </Form.Group>
+                                    </Col>
+                                </Row>
+                            </>}
                             <Button variant='primary' onClick={(event) => this.enrollStudent(event)}> Enroll
                                 Student</Button>
                         </Form>
