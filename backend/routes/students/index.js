@@ -91,7 +91,7 @@ const routes = [
             validate: {
                 payload: {
                     subject: Valid.subject.required(),
-                    grades: Valid.array.items(Valid.gradeInfo).required() 
+                    grades: Valid.array.items(Valid.gradeInfo).required()
                 }
             }
         }
@@ -136,8 +136,28 @@ const routes = [
         method: 'POST',
         path: '/students',
         handler: async (request, h) => {
-            const { ssn, name, surname } = request.payload;
-            return students.addStudent(ssn, name, surname);
+            const {ssn,
+                name,
+                surname,
+                parentOneName,
+                parentOneSurname,
+                parentOneSsn,
+                parentOneEmail,
+                parentTwoName,
+                parentTwoSurname,
+                parentTwoSsn,
+                parentTwoEmail} = request.payload;
+            return students.addStudent(ssn,
+                name,
+                surname,
+                parentOneName,
+                parentOneSurname,
+                parentOneSsn,
+                parentOneEmail,
+                parentTwoName,
+                parentTwoSurname,
+                parentTwoSsn,
+                parentTwoEmail);
         },
         options: {
             auth: {
@@ -148,7 +168,15 @@ const routes = [
                 payload: {
                     ssn: Valid.ssn.required(),
                     name: Valid.name.required(),
-                    surname: Valid.name.required()
+                    surname: Valid.name.required(),
+                    parentOneName: Valid.name.required(),
+                    parentOneSurname: Valid.name.required(),
+                    parentOneSsn: Valid.ssn.required(),
+                    parentOneEmail: Valid.mail.required(),
+                    parentTwoName: Valid.name.optional(),
+                    parentTwoSurname: Valid.name.optional(),
+                    parentTwoSsn: Valid.ssn.optional(),
+                    parentTwoEmail: Valid.mail.optional()
                 }
             }
         }
@@ -157,7 +185,7 @@ const routes = [
         method: 'POST',
         path: '/classes',
         handler: async (request, h) => { //Don't use same name "students" both for imported students.js and for parameter in payload. It will cause an error. (FIXED)
-            const { name, studentIds } = request.payload;
+            const {name, studentIds} = request.payload;
             return students.addSchoolClass(name, studentIds);
         },
         options: {
