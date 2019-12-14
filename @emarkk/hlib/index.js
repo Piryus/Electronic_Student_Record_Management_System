@@ -5,6 +5,10 @@ const day = 24 * hour;
 
 const startHour = 8, numHours = 6;
 
+Number.prototype.roundToTwo = function() {
+    return +(Math.round(this * 100) / 100);
+};
+
 String.prototype.gradify = function() {
     let n = this.replace('+', '.25').replace(/l|L| cum laude/, '').replace(/ 1\/2| and 1\/2/, '.5').replace(/(\d)\/(\d)/, '$1.75');
     return n.indexOf('-') === -1 ? parseFloat(n) : parseFloat(n.replace('-', '')) - 0.25;
@@ -95,6 +99,19 @@ const dateToWeekhour = function(d) {
     return weekdayIndex + '_' + hourIndex;
 };
 
+const getGradesAverages = function(grades) {
+    let data = {};
+    for(let grade of grades) {
+        if(!data[grade.subject])
+            data[grade.subject] = [];
+        data[grade.subject].push(grade.value.gradify());
+    }
+    for(let d in data)
+        data[d] = (data[d].reduce((a, b) => a + b, 0) / data[d].length).roundToTwo();
+
+    return data;
+};
+
 const moveFile = function(src, dst) {
     return new Promise((resolve, reject) => {
         mv(src, dst, { mkdirp: true }, function(err) {
@@ -115,5 +132,6 @@ module.exports = {
     timeToDate,
     weekhourToDate,
     dateToWeekhour,
+    getGradesAverages,
     moveFile
 };

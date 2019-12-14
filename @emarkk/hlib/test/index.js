@@ -225,7 +225,7 @@ suite('HLib', () => {
 
     test('timeToDate', async () => {
         const now = new Date(Date.now());
-        const t = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + 'T';
+        const t = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + 'T';
         const d1 = HLib.timeToDate('16:10');
         const d2 = HLib.timeToDate('12:26');
         const d3 = HLib.timeToDate('10:06');
@@ -297,6 +297,30 @@ suite('HLib', () => {
         expect(wh9).to.equal(null);
         expect(wh10).to.equal('3_0');
         expect(wh11).to.equal(null);
+    });
+
+    test('getGradesAverages', async () => {
+        const ga1 = HLib.getGradesAverages([
+            { value: '6 1/2', subject: 'Italian', date: new Date('2019-11-10T10:00:00') },
+            { value: '8-', subject: 'Italian', date: new Date('2019-11-14T14:00:00') },
+            { value: '10 cum laude', subject: 'Italian', date: new Date('2019-11-29T16:00:00') }
+        ]);
+        const ga2 = HLib.getGradesAverages([
+            { value: '5.5', subject: 'Science', date: new Date('2019-11-10T10:00:00') },
+            { value: '9-', subject: 'Math', date: new Date('2019-11-14T14:00:00') },
+            { value: '7 1/2', subject: 'Science', date: new Date('2019-11-29T16:00:00') },
+            { value: '8', subject: 'Physics', date: new Date('2019-12-01T09:00:00') },
+            { value: '6 and 1/2', subject: 'Math', date: new Date('2019-12-04T11:00:00') },
+            { value: '6+', subject: 'Latin', date: new Date('2019-12-08T09:00:00') }
+        ]);
+        const ga3 = HLib.getGradesAverages([
+            { value: '6', subject: 'Art', date: new Date('2019-11-10T10:00:00') },
+            { value: '8-', subject: 'Art', date: new Date('2019-11-14T14:00:00') },
+            { value: '9/10', subject: 'Art', date: new Date('2019-11-29T16:00:00') }
+        ]);
+        expect(ga1).to.equal({ Italian: 8.08 });
+        expect(ga2).to.equal({ Science: 6.50, Math: 7.63, Physics: 8, Latin: 6.25 });
+        expect(ga3).to.equal({ Art: 7.83 });
     });
 
 });
