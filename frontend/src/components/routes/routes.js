@@ -66,7 +66,7 @@ export default class Routes extends React.Component {
                     {this.state.authenticated && ['admin', 'officer', 'teacher', 'parent'].includes(this.state.role) && (
                         <div>
                             <Route exact path='/'>
-                                <RootComponent children={extra ? extra.children : null} timetable={extra ? extra.timetable : null} onLogout={() => this.logout()} />
+                                <RootComponent children={extra ? extra.children : null} timetable={extra ? extra.timetable : null} coordinator={extra ? extra.coordinator : null} onLogout={() => this.logout()} />
                             </Route>
                             <Redirect to='/' />
                         </div>
