@@ -2,7 +2,7 @@ import React from 'react';
 import {Button, Form, Alert} from 'react-bootstrap';
 import Select from 'react-select';
 import styles from './styles.module.css';
-import SectionHeader from "../../utils/section-header";
+import SectionHeader from "../../../utils/section-header";
 
 export default class ParentAccountEnabling extends React.Component {
 
@@ -101,7 +101,6 @@ export default class ParentAccountEnabling extends React.Component {
                 <SectionHeader>Create a parent account</SectionHeader>
                 {this.state.alertDom}
                 <Form
-                    className={styles.formContainer}
                     onSubmit={event => {
                         event.preventDefault();
                         this.handleSubmitForm();
@@ -151,6 +150,7 @@ export default class ParentAccountEnabling extends React.Component {
                         />
                     </Form.Group>
                     <Button variant="primary" type="submit">Create account</Button>
+                    <Button variant="danger" className="ml-2">Cancel</Button>
                 </Form>
             </div>
         );
