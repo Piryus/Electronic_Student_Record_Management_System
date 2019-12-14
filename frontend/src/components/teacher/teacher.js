@@ -29,7 +29,8 @@ export default class Teacher extends React.Component {
         super(props);
 
         // Create an array containing the teacher's classes of the day
-        const todayDayNumber = new Date(Date.now()).getNormalizedDay();
+        const todayDayNumber = new Date(Date.now()).getNormalizedDay(); //FOR RELEASE
+        //const todayDayNumber = new Date('2019-12-12').getNormalizedDay(); //ONLY FOR DEVELOPMENT AND DEBUG
         const classes = this.props.timetable.reduce((classes, class_) => {
             if (class_.weekhour.split('_')[0] === todayDayNumber.toString()) {
                 classes.push({
@@ -75,7 +76,7 @@ export default class Teacher extends React.Component {
         this.setState({
             students: students,
             classes: classes,
-            classSelected: classes[0],
+            classSelected: this.state.userRequest === 'early-late' ?  classes[0] : this.state.allClasses[0],
             classAttendance: attendance
         });
     }
