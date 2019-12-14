@@ -71,6 +71,25 @@ const routes = [
     },
     {
         method: 'POST',
+        path: '/parents',
+        handler: async (request, h) => {
+            const {parents} = request.payload;
+            return secretary.sendCredentials(parents);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    parents: Valid.array.items(Valid.id).required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
         path: '/timetables',
         handler: async (request, h) => secretary.publishTimetables(request.payload.timetablesFile),
         options: {

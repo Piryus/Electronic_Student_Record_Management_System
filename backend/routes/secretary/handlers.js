@@ -55,6 +55,14 @@ const addParent = async function(ssn, name, surname, mail, childSsn) {
     return { success: true };
 };
 
+const sendCredentials = async function(parents) {
+    for (const parentUserId of parents) {
+        const user = await User.findOne({_id: parentUserId});
+        Utils.sendWelcomeEmail(user.mail, user.name + ' ' + user.surname, user.password);
+    }
+    return { success: true };
+};
+
 const publishTimetables = async function(timetablesFile) {
     const CLASS_SEPARATOR = '@', TEACHER_SUBJECT_SEPARATOR = ':';
     const schoolClasses = await SchoolClass.find();
@@ -106,5 +114,6 @@ module.exports = {
     addArticle,
     addParent,
     getParents,
+    sendCredentials,
     publishTimetables
 };
