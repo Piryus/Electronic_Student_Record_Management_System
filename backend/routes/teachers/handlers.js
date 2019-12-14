@@ -47,7 +47,7 @@ const getTermGrades = async function(teacherUId) {
     const students = await Student.find({ classId: schoolClass._id });
     
     let result = {
-        assigned: schoolClass.termsEndings.map(x => !!x),
+        assigned: [0, 1].map(i => endedTerms > i),
         termGrades: [0, 1].map(i => {
             return endedTerms > i ? students.map(s => {
                 return {
