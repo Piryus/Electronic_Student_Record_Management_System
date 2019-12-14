@@ -36,6 +36,7 @@ const studentSchema = new Schema({
     classId: Schema.Types.ObjectId,
     attendanceEvents: [attendanceEventSchema],
     grades: [gradeSchema],
+    termGrades: [Object],
     notes: [noteSchema]
 });
 

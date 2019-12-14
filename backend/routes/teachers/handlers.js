@@ -1,7 +1,9 @@
 'use strict';
 
 const Boom = require('boom');
+const HLib = require('@emarkk/hlib');
 
+const SchoolClass = require('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
 
@@ -30,6 +32,47 @@ const getMeetingsAvailability = async function(teacherUId) {
     return { timeSlots: teacher.meetingsTimeSlots };
 };
 
+const getTermGrades = async function(teacherUId) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    
+    if(teacher === null)
+        return Boom.badRequest();
+
+    const schoolClass = await SchoolClass.findOne({ coordinatorTeacher: teacher._id });
+    
+    if(schoolClass === null)
+        return Boom.badRequest();
+        
+    const endedTerms = schoolClass.termsEndings.length;
+    const students = await Student.find({ classId: schoolClass._id });
+    
+    let result = {
+        assigned: schoolClass.termsEndings.map(x => !!x),
+        termGrades: [0, 1].map(i => {
+            return endedTerms > i ? students.map(s => {
+                return {
+                    studentId: s._id,
+                    surname: s.surname,
+                    name: s.name,
+                    grades: s.termGrades[i]
+                };
+            }) : null;
+        }),
+        gradesSuggestions: [0, 1].map(i => {
+            return endedTerms === i ? students.map(s => {
+                return {
+                    studentId: s._id,
+                    surname: s.surname,
+                    name: s.name,
+                    grades: HLib.getGradesAverages(s.grades.filter(g => i === 0 || g.date > schoolClass.termsEndings[0]))
+                };
+            }) : null;
+        })
+    };
+
+    return result;
+};
+
 const setMeetingsAvailability = async function(teacherUId, timeSlots) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     
@@ -45,5 +88,6 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
 module.exports = {
     getNotes,
     getMeetingsAvailability,
+    getTermGrades,
     setMeetingsAvailability
 };

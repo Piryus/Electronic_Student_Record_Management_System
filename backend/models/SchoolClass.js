@@ -32,8 +32,13 @@ const supportMaterialSchema = new Schema({
 
 const schoolclassSchema = new Schema({
     name: String,
+    coordinator: {
+        type: Schema.Types.ObjectId,
+        ref: 'Teacher'
+    },
     assignments: [assignmentSchema],
-    supportMaterials: [supportMaterialSchema]
+    supportMaterials: [supportMaterialSchema],
+    termsEndings: [Date]
 });
 
 module.exports = mongoose.model('SchoolClass', schoolclassSchema);
