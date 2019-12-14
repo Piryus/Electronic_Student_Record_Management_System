@@ -1,17 +1,19 @@
 import React from "react";
-import {Button, Container, Table} from "react-bootstrap";
+import {Button, Container, Form, Table} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 
 export default class ParentAccess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            parents: []
+            parents: [],
+            selectedParents: 0
         }
     }
 
     async componentDidMount() {
         const parents = await this.fetchParents();
+        parents.forEach(parent => parent.selected = false);
         this.setState({parents});
     }
 
@@ -30,15 +32,36 @@ export default class ParentAccess extends React.Component {
         return await response.json();
     }
 
+    toggleSelectAll(select) {
+        if (select) {
+            this.state.parents.forEach(parent => parent.selected = true);
+            this.setState({selectedParents: this.state.parents.length});
+        } else {
+            this.state.parents.forEach(parent => parent.selected = false);
+            this.setState({selectedParents: 0});
+        }
+    }
+
+    selectHandler(parent) {
+        parent.selected = !parent.selected;
+        parent.selected ? this.setState({selectedParents: this.state.selectedParents + 1}) : this.setState({selectedParents: this.state.selectedParents - 1});
+    }
+
     render() {
         return (
             <Container fluid>
                 <SectionHeader>Manage parents accesses</SectionHeader>
-                <Button variant="primary">Create a new parent account</Button>
-                <Table responsive striped bordered size="sm">
+                <Button variant="primary" className="m-1">Create a new parent account</Button>
+                <Button variant="primary" className="m-1">Send credentials to selected parents ({this.state.selectedParents})</Button>
+                <Table responsive striped size="sm" className="mt-3">
                     <thead>
                     <tr>
-                        <th>Checkbox</th>
+                        <th className="text-center">
+                            <Form.Check type="checkbox"
+                                        id="selectAll"
+                                        onChange={(e) => this.toggleSelectAll(e.target.checked)}
+                            />
+                        </th>
                         <th>SSN</th>
                         <th>First name</th>
                         <th>Last name</th>
@@ -46,15 +69,20 @@ export default class ParentAccess extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {/*{this.state.filteredUsers.map(user =>*/}
-                    {/*    <tr key={user.ssn}>*/}
-                    {/*        <td className="align-middle">{user.ssn}</td>*/}
-                    {/*        <td className="align-middle">{user.ssn}</td>*/}
-                    {/*        <td className="align-middle">{user.name}</td>*/}
-                    {/*        <td className="align-middle">{user.surname}</td>*/}
-                    {/*        <td className="align-middle">{user.mail}</td>*/}
-                    {/*    </tr>*/}
-                    {/*)}*/}
+                    {this.state.parents.map(parent =>
+                        <tr key={parent.ssn}>
+                            <td className="align-middle text-center">
+                                <Form.Check type="checkbox"
+                                            id="selectAll"
+                                            checked={parent.selected}
+                                            onChange={(e) => this.selectHandler(parent)} />
+                            </td>
+                            <td className="align-middle">{parent.ssn}</td>
+                            <td className="align-middle">{parent.name}</td>
+                            <td className="align-middle">{parent.surname}</td>
+                            <td className="align-middle">{parent.mail}</td>
+                        </tr>
+                    )}
                     </tbody>
                 </Table>
             </Container>
