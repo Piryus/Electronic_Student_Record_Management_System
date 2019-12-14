@@ -152,7 +152,8 @@ const addStudent = async function(ssn,
             surname: parentOneSurname,
             mail: parentOneEmail,
             password,
-            scope: ['parent']
+            scope: ['parent'],
+            firstLogin: true
         });
         await parentOneUser.save();
         const parentOne = new Parent({ userId: parentOneUser._id, children: [newStudent._id] });
@@ -171,7 +172,8 @@ const addStudent = async function(ssn,
             surname: parentTwoSurname,
             mail: parentTwoEmail,
             password,
-            scope: ['parent']
+            scope: ['parent'],
+            firstLogin: true
         });
         await parentTwoUser.save();
         const parentTwo = new Parent({ userId: parentTwoUser._id, children: [newStudent._id] });

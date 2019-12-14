@@ -36,6 +36,17 @@ const routes = [
         }
     },
     {
+        method: 'GET',
+        path: '/parents',
+        handler: async (request, h) => secretary.getParents(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/parent',
         handler: async (request, h) => {
