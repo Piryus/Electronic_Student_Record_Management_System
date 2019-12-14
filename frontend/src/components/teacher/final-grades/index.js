@@ -171,7 +171,7 @@ export default class FinalGrades extends React.Component {
                             <tr>
                                 <th>Subject</th>
                                 <th>Grade</th>
-                                <th>Computed</th>
+                                <th>Average</th>
                                 <th/><th/><th/><th/>
                             </tr>
                         </thead>
