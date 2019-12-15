@@ -1,13 +1,15 @@
 import React from "react";
 import {Button, Container, Form, Table} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
+import ParentAccountEnabling from "./new-parent-account";
 
 export default class ParentAccess extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             parents: [],
-            selectedParents: 0
+            selectedParents: 0,
+            showNewAccountCreation: false
         }
     }
 
@@ -72,9 +74,11 @@ export default class ParentAccess extends React.Component {
 
     render() {
         return (
+            <>
+            {this.state.showNewAccountCreation === false &&
             <Container fluid>
                 <SectionHeader>Manage parents accesses</SectionHeader>
-                <Button variant="primary" className="m-1">Create a new parent account</Button>
+                <Button variant="primary" className="m-1" onClick={() => this.setState({showNewAccountCreation: true})}>Create a new parent account</Button>
                 <Button variant="primary" className="m-1" onClick={() => this.sendCredentials()}>Send credentials to selected parents ({this.state.selectedParents})</Button>
                 <h6 className="mt-2">List of parents who haven't logged in yet:</h6>
                 <Table responsive striped size="sm" className="mt-1">
@@ -109,7 +113,10 @@ export default class ParentAccess extends React.Component {
                     )}
                     </tbody>
                 </Table>
-            </Container>
+            </Container>}
+        {this.state.showNewAccountCreation &&
+        <ParentAccountEnabling handleClose={() => this.setState({showNewAccountCreation: false})}/>}
+        </>
         );
     }
 }

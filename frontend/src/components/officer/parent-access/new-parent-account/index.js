@@ -1,7 +1,6 @@
 import React from 'react';
-import {Button, Form, Alert} from 'react-bootstrap';
+import {Alert, Button, Form} from 'react-bootstrap';
 import Select from 'react-select';
-import styles from './styles.module.css';
 import SectionHeader from "../../../utils/section-header";
 
 export default class ParentAccountEnabling extends React.Component {
@@ -58,7 +57,7 @@ export default class ParentAccountEnabling extends React.Component {
     }
 
     async handleSubmitForm() {
-        if(this.state.selectedStudent.value === undefined || this.state.parentEmail === '' || this.state.parentName === '' || this.state.parentSurname === '' || this.state.parentSsn === ''){
+        if (this.state.selectedStudent.value === undefined || this.state.parentEmail === '' || this.state.parentName === '' || this.state.parentSurname === '' || this.state.parentSsn === '') {
             const alertDom = <Alert variant={'warning'}>Please fill all fields!</Alert>;
             this.setState({alertDom});
         } else {
@@ -86,7 +85,8 @@ export default class ParentAccountEnabling extends React.Component {
             let response = await fetch(url, options);
             const json = await response.json();
             if (json.success === true) {
-                const alertDom = <Alert variant={'success'}>Parent account created! An email was sent to the parent with their credentials!</Alert>;
+                const alertDom = <Alert variant={'success'}>Parent account created! An email was sent to the parent with
+                    their credentials!</Alert>;
                 this.setState({alertDom});
             } else {
                 const alertDom = <Alert variant={'danger'}>Parent account creation failed!</Alert>;
@@ -150,7 +150,7 @@ export default class ParentAccountEnabling extends React.Component {
                         />
                     </Form.Group>
                     <Button variant="primary" type="submit">Create account</Button>
-                    <Button variant="danger" className="ml-2">Cancel</Button>
+                    <Button variant="danger" className="ml-2" onClick={() => this.props.handleClose()}>Cancel</Button>
                 </Form>
             </div>
         );
