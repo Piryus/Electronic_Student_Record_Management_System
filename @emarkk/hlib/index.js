@@ -1,3 +1,7 @@
+'use strict';
+
+const fs = require('fs');
+
 const mv = require('mv');
 
 const hour = 60 * 60 * 1000;
@@ -123,6 +127,50 @@ const moveFile = function(src, dst) {
     });
 };
 
+const parseTimetablesFile = function(inputFile, schoolClasses, teachers) {
+    const CLASS_SEPARATOR = '@', TEACHER_SUBJECT_SEPARATOR = ':';
+
+    if(inputFile.headers['content-type'] !== 'text/csv')
+        return null;
+
+    const inputData = fs.readFileSync(inputFile.path).toString().replace(/\r/g, '');
+
+    if(inputData.indexOf(CLASS_SEPARATOR) !== -1)
+        return null;
+    
+    const timetableData = [];
+    const classes = inputData.replace(/\n(\n)+/, CLASS_SEPARATOR).split(CLASS_SEPARATOR);
+
+    for(let cl of classes) {
+        cl = cl.split('\n').filter(l => l !== '').map(l => l.split('\t'));
+
+        if(![7, 8].includes(cl.length) || cl[0][0] !== 'Class' || cl[1].join() != 'Monday,Tuesday,Wednesday,Thursday,Friday')
+            return null;
+            
+        const classId = (schoolClasses.find(sc => sc.name === cl[0][1]) || {})._id;
+
+        if(classId === undefined)
+            return null;
+
+        for(let i = 2; i < cl.length; i++) {
+            for(let j = 0; j < cl[i].length; j++) {
+                if(cl[i][j] === '')
+                    continue;
+
+                const [subject, teacherSsn] = cl[i][j].split(TEACHER_SUBJECT_SEPARATOR);
+                const t = teachers.findIndex(t => t.userId.ssn === teacherSsn);
+
+                if(t === -1 || !teachers[t].subjects.includes(subject))
+                    return null;
+
+                timetableData.push({ teacherId: teachers[t]._id, classId, subject, weekhour: [j, i-2].join('_') });
+            }
+        }
+
+        return timetableData;
+    }
+};
+
 module.exports = {
     hour,
     day,
@@ -133,5 +181,6 @@ module.exports = {
     weekhourToDate,
     dateToWeekhour,
     getGradesAverages,
-    moveFile
+    moveFile,
+    parseTimetablesFile
 };
