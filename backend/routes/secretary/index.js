@@ -36,6 +36,17 @@ const routes = [
         }
     },
     {
+        method: 'GET',
+        path: '/parents',
+        handler: async (request, h) => secretary.getParents(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/parent',
         handler: async (request, h) => {
@@ -54,6 +65,25 @@ const routes = [
                     surname: Valid.name.required(),
                     mail: Valid.mail.required(),
                     childSsn: Valid.ssn.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/parents',
+        handler: async (request, h) => {
+            const {parents} = request.payload;
+            return secretary.sendCredentials(parents);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    parents: Valid.array.items(Valid.id).required()
                 }
             }
         }

@@ -1,13 +1,13 @@
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
-import ParentAccountEnabling from './parent-access/officer-parent-access';
 import Classes from './classes/classes';
 import EnrolmentForm from './enrolment-form/officer-enrolment-form';
 import {FaCalendarAlt, FaGraduationCap, FaLayerGroup, FaRegNewspaper, FaUserEdit} from 'react-icons/fa';
 import AppNavbar from "../utils/navbar/navbar";
 import News from "../utils/news";
 import TimetablesManager from "./timetables";
+import ParentAccess from "./parent-access";
 
 export default class Officer extends React.Component {
 
@@ -37,7 +37,7 @@ export default class Officer extends React.Component {
                                 onClick={(e) => this.setUserRequest(e, "news")}><FaRegNewspaper/> News</Nav.Link>
                             <Nav.Link
                                 className={this.state.userRequest === 'accounts' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Accounts</Nav.Link>
+                                onClick={(e) => this.setUserRequest(e, "accounts")}><FaUserEdit/> Parents</Nav.Link>
                             <Nav.Link
                                 className={this.state.userRequest === 'classes' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "classes")}><FaLayerGroup/> Classes</Nav.Link>
@@ -50,7 +50,7 @@ export default class Officer extends React.Component {
                         </Nav>
                         <main className={"col-md-10 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'accounts' && (
-                                <ParentAccountEnabling/>
+                                <ParentAccess/>
                             )}
                             {this.state.userRequest === 'classes' && (
                                 <Classes/>
@@ -62,7 +62,7 @@ export default class Officer extends React.Component {
                                 <News isOfficer/>
                             )}
                             {this.state.userRequest === 'timetables' && (
-                                <TimetablesManager />
+                                <TimetablesManager/>
                             )}
                         </main>
                     </Row>

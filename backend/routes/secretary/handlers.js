@@ -30,6 +30,12 @@ const addArticle = async function(officerUId, title, content) {
     return { success: true };
 };
 
+const getParents = async function() {
+    const parents = await User.find({firstLogin: true, scope: 'parent'})
+        .select('ssn name surname mail');
+    return parents;
+};
+
 const addParent = async function(ssn, name, surname, mail, childSsn) {
     const existingUser = await User.findOne({ mail });
     const student = await Student.findOne({ ssn: childSsn });
@@ -39,13 +45,21 @@ const addParent = async function(ssn, name, surname, mail, childSsn) {
     
     const password = HLib.getRandomPassword();
 
-    const user = new User({ ssn, name, surname, mail, password, scope: ['parent'] });
+    const user = new User({ ssn, name, surname, mail, password, scope: ['parent'], firstLogin: true });
     await user.save();
-    const parent = new Parent({ userId: user._id, children: [student._id] });
+    const parent = new Parent({ userId: user._id, children: [student._id], firstLogin: true });
     await parent.save();
 
     Utils.sendWelcomeEmail(mail, name + ' ' + surname, password);
 
+    return { success: true };
+};
+
+const sendCredentials = async function(parents) {
+    for (const parentUserId of parents) {
+        const user = await User.findOne({_id: parentUserId});
+        Utils.sendWelcomeEmail(user.mail, user.name + ' ' + user.surname, user.password);
+    }
     return { success: true };
 };
 
@@ -99,5 +113,7 @@ module.exports = {
     getArticles,
     addArticle,
     addParent,
+    getParents,
+    sendCredentials,
     publishTimetables
 };

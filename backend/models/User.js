@@ -9,7 +9,8 @@ const userSchema = new Schema({
     surname: String,
     mail: String,
     password: String,
-    scope: [String]
+    scope: [String],
+    firstLogin: Boolean
 });
 
 module.exports = mongoose.model('User', userSchema);

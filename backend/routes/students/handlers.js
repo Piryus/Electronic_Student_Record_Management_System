@@ -7,6 +7,7 @@ const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
+const User = require('../../models/User');
 
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
@@ -127,9 +128,59 @@ const recordNote = async function(teacherUId, studentId, description) {
     return { success: true };
 };
 
-const addStudent = async function(ssn, name, surname) {
+const addStudent = async function(ssn,
+                                  name,
+                                  surname,
+                                  parentOneName,
+                                  parentOneSurname,
+                                  parentOneSsn,
+                                  parentOneEmail,
+                                  parentTwoName,
+                                  parentTwoSurname,
+                                  parentTwoSsn,
+                                  parentTwoEmail) {
     const newStudent = new Student({ ssn, name, surname });
     await newStudent.save();
+
+    // Parent one creation
+    let existingUser = await User.findOne({ parentOneEmail });
+    if (existingUser === null) {
+        const password = HLib.getRandomPassword();
+        const parentOneUser = new User({
+            ssn: parentOneSsn,
+            name: parentOneName,
+            surname: parentOneSurname,
+            mail: parentOneEmail,
+            password,
+            scope: ['parent'],
+            firstLogin: true
+        });
+        await parentOneUser.save();
+        const parentOne = new Parent({ userId: parentOneUser._id, children: [newStudent._id] });
+        await parentOne.save();
+    } else {
+        // TODO Add child to found parent
+    }
+
+    // Parent two creation
+    existingUser = await User.findOne({ parentTwoEmail });
+    if (existingUser === null) {
+        const password = HLib.getRandomPassword();
+        const parentTwoUser = new User({
+            ssn: parentTwoSsn,
+            name: parentTwoName,
+            surname: parentTwoSurname,
+            mail: parentTwoEmail,
+            password,
+            scope: ['parent'],
+            firstLogin: true
+        });
+        await parentTwoUser.save();
+        const parentTwo = new Parent({ userId: parentTwoUser._id, children: [newStudent._id] });
+        await parentTwo.save();
+    } else {
+        // TODO Add child to found parent
+    }
 
     return {success: true};
 };
