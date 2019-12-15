@@ -103,6 +103,7 @@ export default class FinalGrades extends React.Component {
             };
             let response = await fetch(url, options);
             var json = await response.json();
+            console.log(json);
             // json = { //TO BE USED ONLY FOR DEMO and DEBUG
             //     assigned: [false, true],
             //     termGrades: [[{studentId: "ddcdc", name: "kdcc", surname: "dcdic", grades: {"italian" : 10}}], [{studentId: "ddcdc", name: "kdcc", surname: "dcdic", grades: {"history" : 2}}]],
@@ -161,23 +162,31 @@ export default class FinalGrades extends React.Component {
         event.preventDefault();
         let notValidGrade = undefined;
         for(var i in this.state.computedGrades){
-            notValidGrade = this.state.computedGrades[i].grades.find(grade => grade.integerGrade === '' || isNaN(grade.integerGrade) || parseInt(grade.integerGrade) < 0 || parseInt(grade.integerGrade) >10);
+            notValidGrade = this.state.computedGrades[i].grades.find(grade => grade.integerGrade === '' || isNaN(grade.integerGrade) || grade.integerGrade.includes('.') || parseInt(grade.integerGrade) < 0 || parseInt(grade.integerGrade) >10);
             if(notValidGrade !== undefined){
                 break;
             }
         }
         if(notValidGrade !== undefined){
             this.setState({
-                warning: 'Please insert a grade in the range [0 - 10] for each subject and for each student.',
+                warning: 'Please insert all grades as integer numbers in the range [0 - 10] for each subject and for each student.',
                 success: '',
                 error: ''
             });
         } else {
             //Prepare data here
             let data = [];
+            let grades;
+            data = this.state.computedGrades.map(student => {
+                grades = {};
+                student.grades.forEach(grade => grades[grade.subjectName] = parseInt(grade.integerGrade));
+                return {
+                    studentId: student.id,
+                    grades: grades
+                };
+            });
+            console.log(data);
             await this.sendDataToBackend(data);
-            console.log(this.state.computedGrades);
-            let newJson = this.state.json;
             this.setState({
                 enableProcedure: false, //Send request again to db for
                 success: 'Grades have been recorded successfully!',
@@ -190,12 +199,43 @@ export default class FinalGrades extends React.Component {
 
     async sendDataToBackend(data){
         //send data to backend here
+        try{
+            const url = 'http://localhost:3000/term/grades';
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    grades: data
+                }),
+            };
+            const response = await fetch(url, options);
+            if(response.error !== null){
+                this.setState({
+                    enableProcedure: false,
+                    success: '',
+                    warning: '',
+                    error: 'Ops! Internal error. Please retry.',
+                });
+            }
+        }
+        catch(e){
+            this.setState({
+                enableProcedure: false,
+                success: '',
+                warning: '',
+                error: 'Ops! Internal error. Please retry.',
+            });
+        }
     }
 
     cancelProcedure(event){
         event.preventDefault();
         this.setState({
-            enableProcedure: false, //Send request again to db for
+            enableProcedure: false,
             isSectionEnabled: false,
             success: '',
             warning: 'Procedure canceled.',
