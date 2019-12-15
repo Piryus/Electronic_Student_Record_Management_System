@@ -1,6 +1,6 @@
 import React from 'react';
 import SectionHeader from '../../utils/section-header';
-import {Container, Button, Card, Accordion, Table, InputGroup, FormControl, Alert} from 'react-bootstrap';
+import {Container, Button, Card, Accordion, Table, InputGroup, FormControl, Alert, Pagination} from 'react-bootstrap';
 
 
 export default class FinalGrades extends React.Component {
@@ -12,6 +12,9 @@ export default class FinalGrades extends React.Component {
             enableProcedure: false,
             computedGrades: [],
             satisfiedRequest: false,
+            selectedPeriod: 1,
+            effectivePeriod: 1,
+            periods: [1],
             success: '',
             error: '',
             warning: '',
@@ -27,6 +30,7 @@ export default class FinalGrades extends React.Component {
                 "Gym",
                 "Religion"
             ],
+            json: []
         };
     }
 
@@ -35,6 +39,55 @@ export default class FinalGrades extends React.Component {
         await this.isSectionEnabled();
     }
 
+    loadDataByPeriod(){
+        var suggestedGrades = [];
+        var found;
+
+        if(this.state.selectedPeriod === 1 && this.state.effectivePeriod === 1){
+            suggestedGrades = this.state.json.gradesSuggestions[0]; //Show suggested grades for first
+        } else if(this.state.selectedPeriod === 1 && this.state.effectivePeriod === 2){
+            suggestedGrades = this.state.json.termGrades[0]; //Show recorded grades for first period
+        } else if(this.state.selectedPeriod === 2 && this.state.effectivePeriod === 2){
+            suggestedGrades = this.state.json.gradesSuggestions[1]; //Show suggested grades for second period
+        } else if(this.state.selectedPeriod === 1 && this.state.effectivePeriod === 3){
+            suggestedGrades = this.state.json.termGrades[0]; //Show recorded grades for first period
+        } else if(this.state.selectedPeriod === 2 && this.state.effectivePeriod === 3){
+            suggestedGrades = this.state.json.termGrades[1]; //Show recorded grades for second period
+        }
+        var student;
+        suggestedGrades = suggestedGrades.map(s => {
+            student = {
+                id: s.studentId,
+                name: s.surname + " " + s.name,
+                grades: Object.entries(s.grades).map((value) => {
+                    return {subjectName: value[0], suggestedGrade: value[1].toString(), integerGrade:  Math.trunc( value[1] ).toString()};
+                })
+            }
+            this.state.classSubjects.forEach(subject => {
+
+                found = student.grades.find(sbj => sbj.subjectName === subject);
+                if(found === undefined){
+                    student.grades.push({subjectName: subject, suggestedGrade: "(n. d.)", integerGrade: ""});
+                }
+            });
+
+            return student;
+        });
+
+        this.setState({
+            enableSection: true,
+            computedGrades: suggestedGrades,
+        });
+    }
+
+    changePeriod(period){
+        this.setState({
+            selectedPeriod: period,
+            warning: '',
+            success: '',
+            error: ''
+        }, () => this.loadDataByPeriod());
+    }
 
     isSectionEnabled = async () => {
         //Query to backend here
@@ -49,47 +102,42 @@ export default class FinalGrades extends React.Component {
                 credentials: 'include',
             };
             let response = await fetch(url, options);
-            const json = await response.json();
-
+            var json = await response.json();
+            // json = { //TO BE USED ONLY FOR DEMO and DEBUG
+            //     assigned: [false, true],
+            //     termGrades: [[{studentId: "ddcdc", name: "kdcc", surname: "dcdic", grades: {"italian" : 10}}], [{studentId: "ddcdc", name: "kdcc", surname: "dcdic", grades: {"history" : 2}}]],
+            //     gradesSuggestions: [json.gradesSuggestions[0], json.gradesSuggestions[0]]
+            // }
             if(!json.assigned.includes(false)){
-                //Section is disabled
-                this.setState({enableSection: false});
-            }
-            else{
-                var suggestedGrades = [];
-                var found;
-                if(json.assigned[0] === false && json.assigned[1] === false){
-                    //First period
-                    suggestedGrades = json.gradesSuggestions[0];
-                } else if(json.assigned[0] === true && json.assigned[1] === false){
-                    //Second period
-                    suggestedGrades = json.gradesSuggestions[1];
-                }
-                var student;
-                suggestedGrades = suggestedGrades.map(s => {
-                    student = {
-                        id: s.studentId,
-                        name: s.surname + " " + s.name,
-                        grades: Object.entries(s.grades).map((value) => {
-                            return {subjectName: value[0], suggestedGrade: value[1].toString(), integerGrade:  Math.trunc( value[1] ).toString()};
-                        })
-                    }
-                    this.state.classSubjects.forEach(subject => {
-
-                        found = student.grades.find(sbj => sbj.subjectName === subject);
-                        if(found === undefined){
-                            student.grades.push({subjectName: subject, suggestedGrade: "(n. d.)", integerGrade: ""});
-                        }
-                    });
-                    return student;
-                });
-
+                //After second period
                 this.setState({
-                    enableSection: true,
-                    computedGrades: suggestedGrades,
-
+                    enableSection: false,
+                    effectivePeriod: 3,
+                    periods: [1, 2],
+                    selectedPeriod: 2,
+                    json: json
                 });
             }
+            else if(json.assigned[0] === false){
+                //It's first period
+                this.setState({
+                    enableSection: false,
+                    effectivePeriod: 1,
+                    periods: [1],
+                    selectedPeriod: 1,
+                    json: json
+                });
+            } else if(json.assigned[0] === true && json.assigned[1] === false){
+                //It's second period
+                this.setState({
+                    enableSection: false,
+                    effectivePeriod: 2,
+                    periods: [1, 2],
+                    selectedPeriod: 2,
+                    json: json
+                });
+            }
+            this.loadDataByPeriod();
         }
         catch(e){
             this.setState({
@@ -129,12 +177,14 @@ export default class FinalGrades extends React.Component {
             let data = [];
             await this.sendDataToBackend(data);
             console.log(this.state.computedGrades);
+            let newJson = this.state.json;
             this.setState({
                 enableProcedure: false, //Send request again to db for
                 success: 'Grades have been recorded successfully!',
                 warning: '',
-                error: ''
+                error: '',
             });
+            await this.isSectionEnabled();
         }
     }
 
@@ -171,7 +221,7 @@ export default class FinalGrades extends React.Component {
                             <tr>
                                 <th>Subject</th>
                                 <th>Grade</th>
-                                <th>Average</th>
+                                {this.state.selectedPeriod === this.state.effectivePeriod && <th>Average</th>}
                                 <th/><th/><th/><th/>
                             </tr>
                         </thead>
@@ -185,10 +235,11 @@ export default class FinalGrades extends React.Component {
                                             placeholder="Grade is an integer value in the range [0 - 10]"
                                             value={grade.integerGrade}
                                             onChange={(e) => this.updateGrade(e, grade.subjectName, s.id)}
+                                            disabled={this.state.selectedPeriod !== this.state.effectivePeriod}
                                         />
                                     </InputGroup>
                                     </td>
-                                    <td>{grade.suggestedGrade}</td>
+                                    {this.state.selectedPeriod === this.state.effectivePeriod && <td>{grade.suggestedGrade}</td>}
                                     <td/><td/><td/><td/>
                                 </tr>
                             )}
@@ -217,15 +268,22 @@ export default class FinalGrades extends React.Component {
                 }
                 {this.state.enableSection === true && this.state.enableProcedure === false &&
                     <div style={{textAlign: 'center'}}>
-                        <h6>You can publish Final Grades of the term for class:</h6><h2 style={{color: 'red'}}>{this.props.coordinator.name}</h2>
+                        <h6>You can publish or view Final Grades of the term for class:</h6><h2 style={{color: 'red'}}>{this.props.coordinator.name}</h2>
                         <p>By pressing the "Start" button here below the procedure will start.</p>
-                        <Button variant="danger" onClick={() => this.setState({enableProcedure: true})}>START</Button>
+                        <Button variant="danger" onClick={() => this.setState({enableProcedure: true, success: '', error: '', warning: ''})}>START</Button>
                     </div>
                 }
                 {this.state.enableProcedure === true &&
                 <div>
-                    <Button variant="outline-success" onClick={(event) => this.postGrades(event)}>Publish Grades</Button>
-                    <Button variant="danger" style={{marginLeft: '2%'}} onClick={(event) => this.cancelProcedure(event)}>Cancel procedure</Button>
+                    <Pagination>
+                        {this.state.selectedPeriod === this.state.effectivePeriod && <Button variant="outline-success" onClick={(event) => this.postGrades(event)}>Publish</Button>}
+                        {this.state.selectedPeriod === this.state.effectivePeriod && <Button variant="danger" style={{marginLeft: '1%'}} onClick={(event) => this.cancelProcedure(event)}>Cancel procedure</Button>}
+                        <Pagination style = {{marginLeft: '1%'}}>
+                            {this.state.periods.map(period =>
+                                <Pagination.Item  key={period} active={ period === this.state.selectedPeriod} disabled={this.state.periods.length === 1} onClick={() => this.changePeriod(period)}>Period {period}</Pagination.Item>
+                            )}
+                        </Pagination>
+                    </Pagination>
                     <Accordion className="mt-3" defaultActiveKey="0">
                         {studentsDOM.map(student => student)}
                     </Accordion>
