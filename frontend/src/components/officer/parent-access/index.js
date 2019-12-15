@@ -32,6 +32,29 @@ export default class ParentAccess extends React.Component {
         return await response.json();
     }
 
+    async sendCredentials() {
+        let parents = [];
+        this.state.parents.forEach(parent => {
+            if (parent.selected) {
+                parents.push(parent._id);
+            }
+        });
+        const url = 'http://localhost:3000/parents';
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                parents
+            })
+        };
+        let response = await fetch(url, options);
+        return await response.json();
+    }
+
     toggleSelectAll(select) {
         if (select) {
             this.state.parents.forEach(parent => parent.selected = true);
@@ -52,8 +75,9 @@ export default class ParentAccess extends React.Component {
             <Container fluid>
                 <SectionHeader>Manage parents accesses</SectionHeader>
                 <Button variant="primary" className="m-1">Create a new parent account</Button>
-                <Button variant="primary" className="m-1">Send credentials to selected parents ({this.state.selectedParents})</Button>
-                <Table responsive striped size="sm" className="mt-3">
+                <Button variant="primary" className="m-1" onClick={() => this.sendCredentials()}>Send credentials to selected parents ({this.state.selectedParents})</Button>
+                <h6 className="mt-2">List of parents who haven't logged in yet:</h6>
+                <Table responsive striped size="sm" className="mt-1">
                     <thead>
                     <tr>
                         <th className="text-center">
