@@ -98,7 +98,7 @@ const publishTermGrades = async function(teacherUId, gradesInfo) {
 
     let students = await Student.find({ classId: schoolClass._id });
 
-    if(students.length !== gradesInfo.length || students.map(s => s._id.toString).some(s => !gradesInfo.map(g => g.studentId).includes(s)))
+    if(students.length !== gradesInfo.length || students.map(s => s._id.toString()).some(s => !gradesInfo.map(g => g.studentId).includes(s)))
         return Boom.badRequest();
 
     students = students.map(s => {
