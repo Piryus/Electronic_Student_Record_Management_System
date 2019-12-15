@@ -68,7 +68,7 @@ const publishTimetables = async function(timetablesFile) {
     const timetableEntries = HLib.parseTimetablesFile(timetablesFile, schoolClasses, teachers);
 
     teachers = teachers.map(t => {
-        t.timetable = timetableEntries.filter(e => e.teacherId.equals(t._id)).map(e => {
+        t.timetable = timetableEntries.filter(e => t._id.equals(e.teacherId)).map(e => {
             return { classId: e.classId, subject: e.subject, weekhour: e.weekhour };
         })
         return t;

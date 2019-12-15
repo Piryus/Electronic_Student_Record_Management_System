@@ -14,7 +14,9 @@ const Utils = require('../utils');
 
 const Article = require('../models/Article');
 const Parent = require('../models/Parent');
+const SchoolClass = require('../models/SchoolClass');
 const Student = require('../models/Student');
+const Teacher = require('../models/Teacher');
 const User = require('../models/User');
 
 const secretary = require ('../routes/secretary/handlers');
@@ -117,6 +119,100 @@ suite('secretary', () => {
 
         getRandomPassword.restore();
         sendWelcomeEmail.restore();
+    });
+    
+    test('publishTimetables', async () => {
+        const data = [
+            { teacherId: '5dca6d2038627d0bfc4167b0', classId: '5dc9c3112d698031f441e1c9', subject: 'Gym', weekhour: '0_0' },
+            { teacherId: '5dca6d2038627d0bfc4167b0', classId: '5dc9c3112d698031f441e1c9', subject: 'Gym', weekhour: '0_1' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Physics', weekhour: '0_2' },
+            { teacherId: '5dca698eed550e4ca4aba7f5', classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '0_3' },
+            { teacherId: '5dca6cbe7adca3346c5983cb', classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '0_4' },
+            { teacherId: '5dca6cd5b83a1f3ef03e962b', classId: '5dc9c3112d698031f441e1c9', subject: 'Art', weekhour: '1_0' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '1_1' },
+            { teacherId: '5dca698eed550e4ca4aba7f5', classId: '5dc9c3112d698031f441e1c9', subject: 'History', weekhour: '1_2' },
+            { teacherId: '5dca6d3620607b1e30dea42a', classId: '5dc9c3112d698031f441e1c9', subject: 'Religion', weekhour: '1_3' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Physics', weekhour: '1_4' },
+            { teacherId: '5dca6cf0a92bbb4dd8c0e817', classId: '5dc9c3112d698031f441e1c9', subject: 'English', weekhour: '1_5' },
+            { teacherId: '5dca6cbe7adca3346c5983cb', classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '2_0' },
+            { teacherId: '5dca6cbe7adca3346c5983cb', classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '2_1' },
+            { teacherId: '5dca698eed550e4ca4aba7f5', classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '2_2' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '2_3' },
+            { teacherId: '5dca6d0801ea271794cb650e', classId: '5dc9c3112d698031f441e1c9', subject: 'Science', weekhour: '2_4' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '3_0' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '3_1' },
+            { teacherId: '5dca6cf0a92bbb4dd8c0e817', classId: '5dc9c3112d698031f441e1c9', subject: 'English', weekhour: '3_2' },
+            { teacherId: '5dca698eed550e4ca4aba7f5', classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '3_3' },
+            { teacherId: '5dca698eed550e4ca4aba7f5', classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '3_4' },
+            { teacherId: '5dca6cf0a92bbb4dd8c0e817', classId: '5dc9c3112d698031f441e1c9', subject: 'English', weekhour: '4_0' },
+            { teacherId: '5dca6cd5b83a1f3ef03e962b', classId: '5dc9c3112d698031f441e1c9', subject: 'Art', weekhour: '4_1' },
+            { teacherId: '5dca6cbe7adca3346c5983cb', classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '4_2' },
+            { teacherId: '5dca698eed550e4ca4aba7f5', classId: '5dc9c3112d698031f441e1c9', subject: 'History', weekhour: '4_3' },
+            { teacherId: '5dca6d0801ea271794cb650e', classId: '5dc9c3112d698031f441e1c9', subject: 'Science', weekhour: '4_4' },
+            { teacherId: '5dca69cf048e8e40d434017f', classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '4_5' },
+        ];
+
+        const timetable = (all, id) => all.find(t => t._id.equals(id)).timetable.map(w => {
+            return { classId: w.classId, subject: w.subject, weekhour: w.weekhour };
+        });
+        const fakeParseTimetablesFile = Sinon.stub(HLib, 'parseTimetablesFile').returns(data);
+
+        await SchoolClass.insertMany(testData.classes);
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        const pt1 = await secretary.publishTimetables('somefile');
+
+        const t1 = await Teacher.find();
+
+        expect(fakeParseTimetablesFile.callCount).to.equal(1);
+
+        fakeParseTimetablesFile.restore();
+        
+        expect(pt1.success).to.be.true();
+        jexpect(timetable(t1, '5dca698eed550e4ca4aba7f5')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '0_3' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'History', weekhour: '1_2' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '2_2' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '3_3' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '3_4' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'History', weekhour: '4_3' }
+        ]);
+        jexpect(timetable(t1, '5dca69cf048e8e40d434017f')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Physics', weekhour: '0_2' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '1_1' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Physics', weekhour: '1_4' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '2_3' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '3_0' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '3_1' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Math', weekhour: '4_5' },
+        ]);
+        jexpect(timetable(t1, '5dca6cbe7adca3346c5983cb')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '0_4' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '2_0' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '2_1' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Latin', weekhour: '4_2' }
+        ]);
+        jexpect(timetable(t1, '5dca6cd5b83a1f3ef03e962b')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Art', weekhour: '1_0' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Art', weekhour: '4_1' }
+        ]);
+        jexpect(timetable(t1, '5dca6cf0a92bbb4dd8c0e817')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'English', weekhour: '1_5' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'English', weekhour: '3_2' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'English', weekhour: '4_0' }
+        ]);
+        jexpect(timetable(t1, '5dca6d0801ea271794cb650e')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Science', weekhour: '2_4' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Science', weekhour: '4_4' }
+        ]);
+        jexpect(timetable(t1, '5dca6d2038627d0bfc4167b0')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Gym', weekhour: '0_0' },
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Gym', weekhour: '0_1' }
+        ]);
+        jexpect(timetable(t1, '5dca6d3620607b1e30dea42a')).to.equal([
+            { classId: '5dc9c3112d698031f441e1c9', subject: 'Religion', weekhour: '1_3' }
+        ]);
     });
 
 });
