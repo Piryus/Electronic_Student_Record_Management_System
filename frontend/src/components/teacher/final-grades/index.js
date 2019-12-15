@@ -315,8 +315,8 @@ export default class FinalGrades extends React.Component {
                 {this.state.enableProcedure === true &&
                 <div>
                     <Pagination>
-                        {this.state.selectedPeriod === this.state.effectivePeriod && <Button variant="outline-success" onClick={(event) => this.postGrades(event)}>Publish</Button>}
-                        {this.state.selectedPeriod === this.state.effectivePeriod && <Button variant="danger" style={{marginLeft: '1%'}} onClick={(event) => this.cancelProcedure(event)}>Cancel procedure</Button>}
+                        <Button variant={this.state.selectedPeriod !== this.state.effectivePeriod ? 'outline-secondary' : 'outline-success'} onClick={(event) => this.postGrades(event)} disabled={this.state.selectedPeriod !== this.state.effectivePeriod}>Publish</Button>
+                        <Button variant={this.state.selectedPeriod !== this.state.effectivePeriod ? 'secondary' : 'danger'} style={{marginLeft: '1%'}} onClick={(event) => this.cancelProcedure(event)} disabled={this.state.selectedPeriod !== this.state.effectivePeriod}>Cancel procedure</Button>
                         <Pagination style = {{marginLeft: '1%'}}>
                             {this.state.periods.map(period =>
                                 <Pagination.Item  key={period} active={ period === this.state.selectedPeriod} disabled={this.state.periods.length === 1} onClick={() => this.changePeriod(period)}>Period {period}</Pagination.Item>
