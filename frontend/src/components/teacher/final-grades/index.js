@@ -103,7 +103,6 @@ export default class FinalGrades extends React.Component {
             };
             let response = await fetch(url, options);
             var json = await response.json();
-            console.log(json);
             // json = { //TO BE USED ONLY FOR DEMO and DEBUG
             //     assigned: [false, true],
             //     termGrades: [[{studentId: "ddcdc", name: "kdcc", surname: "dcdic", grades: {"italian" : 10}}], [{studentId: "ddcdc", name: "kdcc", surname: "dcdic", grades: {"history" : 2}}]],
@@ -206,15 +205,14 @@ export default class FinalGrades extends React.Component {
                 }),
             };
             const response = await fetch(url, options);
-            if(response.error !== null){
+            if(response.error != null){
                 this.setState({
                     enableProcedure: false,
                     success: '',
                     warning: '',
                     error: 'Ops! Internal error. Please retry.',
                 });
-            }
-            else{
+            } else {
                 this.setState({
                     enableProcedure: false, //Send request again to db for
                     success: 'Grades have been recorded successfully!',
