@@ -185,14 +185,7 @@ export default class FinalGrades extends React.Component {
                     grades: grades
                 };
             });
-            console.log(data);
             await this.sendDataToBackend(data);
-            this.setState({
-                enableProcedure: false, //Send request again to db for
-                success: 'Grades have been recorded successfully!',
-                warning: '',
-                error: '',
-            });
             await this.isSectionEnabled();
         }
     }
@@ -219,6 +212,14 @@ export default class FinalGrades extends React.Component {
                     success: '',
                     warning: '',
                     error: 'Ops! Internal error. Please retry.',
+                });
+            }
+            else{
+                this.setState({
+                    enableProcedure: false, //Send request again to db for
+                    success: 'Grades have been recorded successfully!',
+                    warning: '',
+                    error: '',
                 });
             }
         }
