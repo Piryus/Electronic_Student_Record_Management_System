@@ -11,7 +11,6 @@ export default class FinalGrades extends React.Component {
             enableSection: false,
             enableProcedure: false,
             computedGrades: [],
-            satisfiedRequest: false,
             selectedPeriod: 1,
             effectivePeriod: 1,
             periods: [1],
