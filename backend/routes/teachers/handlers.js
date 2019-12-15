@@ -85,9 +85,39 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
     return { success: true };
 };
 
+const publishTermGrades = async function(teacherUId, gradesInfo) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    
+    if(teacher === null)
+        return Boom.badRequest();
+
+    const schoolClass = await SchoolClass.findOne({ coordinator: teacher._id });
+    
+    if(schoolClass === null || schoolClass.termsEndings.length === 2)
+        return Boom.badRequest();
+
+    let students = await Student.find({ classId: schoolClass._id });
+
+    if(students.length !== gradesInfo.length || students.map(s => s._id.toString).some(s => !gradesInfo.map(g => g.studentId).includes(s)))
+        return Boom.badRequest();
+
+    students = students.map(s => {
+        s.termGrades.push(gradesInfo.find(g => s._id.equals(g.studentId)).grades);
+        return s;
+    });
+
+    schoolClass.termsEndings.push(new Date());
+    await schoolClass.save();
+    
+    await Promise.all(students.map(s => s.save()));
+            
+    return { success: true };
+};
+
 module.exports = {
     getNotes,
     getMeetingsAvailability,
     getTermGrades,
-    setMeetingsAvailability
+    setMeetingsAvailability,
+    publishTermGrades
 };

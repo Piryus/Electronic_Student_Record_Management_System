@@ -52,6 +52,22 @@ const routes = [
                 }
             }
         }
+    },
+    {
+        method: 'POST',
+        path: '/term/grades',
+        handler: async (request, h) => teachers.publishTermGrades(request.auth.credentials.id, request.payload.grades),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    grades: Valid.array.items(Valid.studentGrades).required()
+                }
+            }
+        }
     }
 ];
 

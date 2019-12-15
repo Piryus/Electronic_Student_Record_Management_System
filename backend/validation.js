@@ -15,6 +15,7 @@ let schema = {
     shortText: Joi.string().min(1).max(64),
     longText: Joi.string().min(1).max(4096),
     mail: Joi.string().email(),
+    intGrade: Joi.number().integer().min(0).max(10),
     grade: Joi.string().regex(/^([0-9]\+?|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude)?)$/),
     attendanceEvent: Joi.string().valid('late-entrance', 'early-exit'),
     articleTitle: Joi.string(),
@@ -27,10 +28,14 @@ schema.gradeInfo = {
     studentId: schema.id,
     grade: schema.grade
 };
+schema.studentGrades = {
+    studentId: schema.id,
+    grades: Joi.object().pattern(schema.subject, schema.intGrade.required())
+};
 schema.rollCall = schema.array.items({
     studentId: schema.id,
     present: schema.boolean
-})
+});
 schema.attendanceInfo = {
     studentId: schema.id,
     time: schema.hmTime.allow(null),
