@@ -38,16 +38,12 @@ export default class TimetablesManager extends React.Component {
 
     async uploadTimetable(file) {
         const url = 'http://localhost:3000/timetables';
+        const formData = new FormData();
+        formData.append('timetablesFile', file);
         const options = {
             method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
             credentials: 'include',
-            body: {
-                file
-            }
+            body: formData
         };
         const response = await fetch(url, options);
         const json = await response.json();
@@ -120,19 +116,17 @@ export default class TimetablesManager extends React.Component {
                             onClick={async () => await this.selectClass(class_)}>{class_.name}</Dropdown.Item>
                     )}
                 </DropdownButton>
-                {this.state.selectedClass !== null && this.state.selectedClass.timetable.length > 0 &&
-                <Timetable data={timetableData} frequency={60} hideDate />}
                 {this.state.selectedClass !== null && this.state.selectedClass.timetable.length === 0 &&
-                <>
-                    <h6>{this.state.selectedClass.name} doesn't have a timetable yet!</h6>
-                    <div className="custom-file col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
-                        <input type="file" className="custom-file-input" id="customFile"
-                               onChange={(e) => this.uploadTimetable(e.target.value)}
-                               accept=".csv" />
-                        <label className="custom-file-label" htmlFor="customFile">Import a timetable...</label>
-                    </div>
-                </>
-                }
+                <h6>{this.state.selectedClass.name} doesn't have a timetable yet!</h6>}
+                {this.state.selectedClass !== null &&
+                <div className="custom-file mb-2 col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+                    <input type="file" className="custom-file-input" id="customFile"
+                           onChange={(e) => this.uploadTimetable(e.target.files[0])}
+                           accept=".csv"/>
+                    <label className="custom-file-label" htmlFor="customFile">Import a timetable...</label>
+                </div>}
+                {this.state.selectedClass !== null && this.state.selectedClass.timetable.length > 0 &&
+                <Timetable data={timetableData} frequency={60} hideDate/>}
             </Container>
         );
     }
