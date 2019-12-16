@@ -56,7 +56,7 @@ const users = [
     {"_id":"5dcc0bb71c9d440000330d45","ssn":"XYEIBL20D49T545W","name":"Massimo","surname":"Corsi","scope":["officer"],"mail":"officer3@officer.com","password":"officerofficer","__v":"0"},
 ];
 const classes = [
-    {"_id":"5dc9c3112d698031f441e1c9","assignments":[],"name":"1A","__v":0},
+    {"_id":"5dc9c3112d698031f441e1c9","assignments":[],"name":"1A","coordinator":"5dca698eed550e4ca4aba7f5","__v":0},
     {"_id":"5dc9cb36ee91b7384cbd7fd7","assignments":[],"name":"1B","__v":0},
     {"_id":"5dc9cb4b797f6936680521b9","assignments":[],"name":"1C","__v":0}
 ];

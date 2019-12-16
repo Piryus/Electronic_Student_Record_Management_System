@@ -7,6 +7,7 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
+const SchoolClass = require('../models/SchoolClass');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
 const Teacher = require('../models/Teacher');
@@ -125,6 +126,139 @@ suite('teachers', () => {
         expect(ma5.success).to.be.true();
         expect(t4.meetingsTimeSlots).to.have.length(3);
         expect(t4.meetingsTimeSlots).to.equal(['2_0', '3_3', '4_1']);
+    });
+
+    test('publishTermGrades', async () => {
+        let data1 = [], data2 = [];
+        for(let student of testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9')) {
+            let grades1 = {}, grades2 = {};
+            for(let subject of ['Italian', 'History', 'Math', 'Physics', 'Latin', 'Art', 'English', 'Science', 'Gym', 'Religion']) {
+                grades1[subject] = Math.floor(Math.random() * 10);
+                grades2[subject] = Math.floor(Math.random() * 10);
+            }
+            data1.push({ studentId: student._id, grades: grades1 });
+            data2.push({ studentId: student._id, grades: grades2 });
+        }
+
+        await Teacher.insertMany(testData.teachers);
+        await SchoolClass.insertMany(testData.classes);
+        await Student.insertMany(testData.students);
+
+        // teacher not found
+        const ptg1 = await teachers.publishTermGrades('ffffffffffffffffffffffff', data1);
+        // teacher is not coordinator of any class
+        const ptg2 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f5', data1);
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date(), new Date()] });
+
+        // term grades for this class have already been published (for both terms)
+        const ptg3 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', data1);
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [] });
+        
+        // term grades missing for some students
+        const ptg4 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', [{
+            studentId: '5dca711c89bf46419cf5d487',
+            grades: { Italian: 6 }
+        }]);
+        // term grades with some students from other classes
+        const ptg5 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', [
+            { studentId: '5dca711c89bf46419cf5d483', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d484', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48a', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d487', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d488', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d489', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48b', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48c', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48e', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48f', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d491', grades: { Italian: 6 } }
+        ]);
+        // term grades with some duplicated students
+        const ptg6 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', [
+            { studentId: '5dca711c89bf46419cf5d483', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d484', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d485', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d487', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d488', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d489', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48b', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d488', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d483', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48f', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d491', grades: { Italian: 6 } }
+        ]);
+        // grades for all subjects not provided
+        const ptg7 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', [
+            { studentId: '5dca711c89bf46419cf5d483', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d484', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d485', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d487', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d488', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d489', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48b', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48c', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48e', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48f', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d491', grades: { Italian: 6 } }
+        ]);
+        // grades for unknown subjects provided
+        const ptg8 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', [
+            { studentId: '5dca711c89bf46419cf5d483', grades: { Hawaii: 6, Brazil: 7, Denmark: 4, Poland: 1, Germany: 8, Canada: 9, Turkey: 7, China: 2, Finland: 3, Iceland: 10 } },
+            { studentId: '5dca711c89bf46419cf5d484', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d485', grades: { Ecuador: 6 } },
+            { studentId: '5dca711c89bf46419cf5d487', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d488', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d489', grades: { Moon: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48b', grades: { Africa: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48c', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48e', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d48f', grades: { Italian: 6 } },
+            { studentId: '5dca711c89bf46419cf5d491', grades: { China: 6 } }
+        ]);
+
+        const s1 = await Student.find();
+        const sc1 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+
+        // ok 1
+        const ptg9 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', data1);
+        
+        const s2 = await Student.find();
+        const sc2 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+
+        // ok 2
+        const ptg10 = await teachers.publishTermGrades('5dca7e2b461dc52d681804f1', data2);
+        
+        const s3 = await Student.find();
+        const sc3 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+        
+        expect(ptg1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg5.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg6.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg7.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ptg8.output.statusCode).to.equal(BAD_REQUEST);
+        s1.filter(s => s.classId.equals('5dc9c3112d698031f441e1c9')).forEach(s => expect(s.termGrades).to.have.length(0));
+        expect(sc1.termsEndings).to.have.length(0);
+        expect(ptg9.success).to.be.true();
+        s2.filter(s => s.classId.equals('5dc9c3112d698031f441e1c9')).forEach(s => {
+            expect(s.termGrades).to.have.length(1);
+            expect(s.termGrades[0]).to.equal(data1.find(d => s._id.equals(d.studentId)).grades);
+        });
+        expect(sc2.termsEndings).to.have.length(1);
+        expect(Math.abs(sc2.termsEndings[0] - new Date())).to.be.lessThan(1000);
+        expect(ptg10.success).to.be.true();
+        s3.filter(s => s.classId.equals('5dc9c3112d698031f441e1c9')).forEach(s => {
+            expect(s.termGrades).to.have.length(2);
+            expect(s.termGrades[0]).to.equal(data1.find(d => s._id.equals(d.studentId)).grades);
+            expect(s.termGrades[1]).to.equal(data2.find(d => s._id.equals(d.studentId)).grades);
+        });
+        expect(sc3.termsEndings).to.have.length(2);
+        expect(Math.abs(sc3.termsEndings[0] - new Date())).to.be.lessThan(1000);
+        expect(Math.abs(sc3.termsEndings[1] - new Date())).to.be.lessThan(1000);
     });
 
 });

@@ -101,16 +101,24 @@ const publishTermGrades = async function(teacherUId, gradesInfo) {
     if(students.length !== gradesInfo.length || students.map(s => s._id.toString()).some(s => !gradesInfo.map(g => g.studentId).includes(s)))
         return Boom.badRequest();
 
+    const teachers = await Teacher.find();
+    const schoolClassSubjects = [...new Set(teachers.flatMap(t => t.timetable).filter(w => schoolClass._id.equals(w.classId)).map(w => w.subject))];
+
+    for(let g of gradesInfo) {
+        if(Object.keys(g.grades).length !== schoolClassSubjects.length || Object.keys(g.grades).some(s => !schoolClassSubjects.includes(s)))
+            return Boom.badRequest();
+    }
+
     students = students.map(s => {
         s.termGrades.push(gradesInfo.find(g => s._id.equals(g.studentId)).grades);
         return s;
     });
 
-    schoolClass.termsEndings.push(new Date());
+    schoolClass.termsEndings.push(new Date(Date.now()));
     await schoolClass.save();
     
     await Promise.all(students.map(s => s.save()));
-            
+
     return { success: true };
 };
 
