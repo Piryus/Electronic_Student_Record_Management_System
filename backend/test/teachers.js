@@ -7,6 +7,8 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
+const HLib = require('@emarkk/hlib');
+
 const SchoolClass = require('../models/SchoolClass');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
@@ -88,6 +90,80 @@ suite('teachers', () => {
         expect(ma2.timeSlots).to.have.length(0);
         expect(ma3.timeSlots).to.have.length(3);
         expect(ma3.timeSlots).to.equal(data);
+    });
+
+    test('getTermGrades', async () => {
+        const subjects = ['Italian', 'History', 'Math', 'Physics', 'Latin', 'Art', 'English', 'Science', 'Gym', 'Religion'];
+
+        let data1 = [], data2 = [];
+        for(let student of testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9')) {
+            let grades1 = {}, grades2 = {};
+            for(let subject of subjects) {
+                grades1[subject] = Math.floor(Math.random() * 10);
+                grades2[subject] = Math.floor(Math.random() * 10);
+            }
+            data1.push({ studentId: student._id, surname: student.surname, name: student.name, grades: grades1 });
+            data2.push({ studentId: student._id, surname: student.surname, name: student.name, grades: grades2 });
+        }
+
+        let data3 = [], data4 = [];
+        for(let student of testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9')) {
+            let grades1 = [], grades2 = [];
+            for(let subject of subjects) {
+                grades1 = grades1.concat([...Array(4)].map(_ => {
+                    return { value: Math.floor(Math.random() * 10).toString(), subject, date: new Date('2019-09-15T16:00:00').addDays(Math.floor(Math.random() * 133)) };
+                }));
+                grades2 = grades2.concat([...Array(4)].map(_ => {
+                    return { value: Math.floor(Math.random() * 10).toString(), subject, date: new Date('2020-01-29T16:00:00').addDays(Math.floor(Math.random() * 133)) };
+                }));
+            }
+            data3.push({ studentId: student._id, surname: student.surname, name: student.name, grades: grades1 });
+            data4.push({ studentId: student._id, surname: student.surname, name: student.name, grades: grades2 });
+        }
+
+        await Teacher.insertMany(testData.teachers);
+        await SchoolClass.insertMany(testData.classes);
+        await Student.insertMany(testData.students);
+
+        // teacher not found
+        const tg1 = await teachers.getTermGrades('ffffffffffffffffffffffff');
+        // teacher is not coordinator of any class
+        const tg2 = await teachers.getTermGrades('5dca7e2b461dc52d681804f5');
+        
+        await Promise.all(data3.map(d => Student.updateOne({ _id: d.studentId }, { grades: d.grades })));
+        
+        // ok 1
+        const tg3 = await teachers.getTermGrades('5dca7e2b461dc52d681804f1');
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date('2020-01-28T16:00:00')] });
+        await Promise.all(data1.map(d => Student.updateOne({ _id: d.studentId }, { termGrades: [d.grades] })));
+        
+        await Promise.all(data4.map(d => Student.updateOne({ _id: d.studentId }, { grades: d.grades.concat(data3.find(d3 => d3.studentId === d.studentId).grades) })));
+
+        // ok 2
+        const tg4 = await teachers.getTermGrades('5dca7e2b461dc52d681804f1');
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date('2020-01-28T16:00:00'), new Date('2020-06-12T15:00:00')] });
+        await Promise.all(data1.map(d => Student.updateOne({ _id: d.studentId }, { termGrades: [d.grades, data2.find(d2 => d2.studentId === d.studentId).grades] })));
+
+        // ok 3
+        const tg5 = await teachers.getTermGrades('5dca7e2b461dc52d681804f1');
+        
+        expect(tg1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg3.assigned).to.equal([false, false]);
+        expect(tg3.termGrades).to.equal([null, null]);
+        jexpect(tg3.gradesSuggestions).to.equal([data3.map(d => {
+            return { studentId: d.studentId, surname: d.surname, name: d.name, grades: HLib.getGradesAverages(d.grades) };
+        }), null]);
+        expect(tg4.assigned).to.equal([true, false]);
+        jexpect(tg4.termGrades).to.equal([data1, null]);
+        jexpect(tg4.gradesSuggestions).to.equal([null, data4.map(d => {
+            return { studentId: d.studentId, surname: d.surname, name: d.name, grades: HLib.getGradesAverages(d.grades) };
+        })]);
+        expect(tg5.assigned).to.equal([true, true]);
+        jexpect(tg5.termGrades).to.equal([data1, data2]);
+        expect(tg5.gradesSuggestions).to.equal([null, null]);
     });
 
     test('setMeetingsAvailability', async () => {
