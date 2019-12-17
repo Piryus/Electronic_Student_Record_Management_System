@@ -130,9 +130,6 @@ const moveFile = function(src, dst) {
 const parseTimetablesFile = function(inputFile, schoolClasses, teachers) {
     const CLASS_SEPARATOR = '@', TEACHER_SUBJECT_SEPARATOR = ':';
 
-    if(inputFile.headers['content-type'] !== 'text/csv')
-        return null;
-
     const inputData = fs.readFileSync(inputFile.path).toString().replace(/\r/g, '');
 
     if(inputData.indexOf(CLASS_SEPARATOR) !== -1)

@@ -1,6 +1,6 @@
 {
   "name": "@emarkk/hlib",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Group H Library",
   "main": "index.js",
   "scripts": {
