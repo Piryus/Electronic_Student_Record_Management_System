@@ -7,6 +7,7 @@ const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
+const User = require('../../models/User');
 
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
@@ -28,6 +29,22 @@ const getAttendance = async function(parentUId, studentId) {
     return { attendance: student.attendanceEvents };
 };
 
+const getNotes = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    let decorator = student.notes.map(async n => {
+        const teacher = await Teacher.findOne({ _id: n.teacherId }).populate('userId');
+        return { _id: n._id, date: n.date, description: n.description, teacher: [teacher.userId.name, teacher.userId.surname].join(' ') };
+    });
+    const teacherDecoratedNotes = await Promise.all(decorator);
+
+    return { notes: teacherDecoratedNotes };
+};
+
 const getStudents = async function(classId) {
     const filter = classId !== null ? { classId } : {};
     const students = await Student.find(filter, { 'grades._id': 0 });
@@ -35,7 +52,20 @@ const getStudents = async function(classId) {
 };
 
 const getClasses = async function() {
-    const classes = await SchoolClass.find({});
+    let classes = await SchoolClass.find();
+    const teachers = await Teacher.find().populate('userId');
+
+    const timetableInfo = teachers.flatMap(t => {
+        const teacherInfo = { _id: t._id, ssn: t.userId.ssn, surname: t.userId.surname, name: t.userId.name };
+        return t.timetable.map(w => {
+            return { weekhour: w.weekhour, subject: w.subject, classId: w.classId, teacher: teacherInfo };
+        });
+    });
+    classes = classes.map(c => {
+        const timetable = timetableInfo.filter(w => w.classId.equals(c._id));
+        return { _id: c._id, name: c.name, timetable };
+    })
+
     return { classes };
 };
 
@@ -82,9 +112,75 @@ const recordAttendance = async function(teacherUId, classId, info) {
     return { success: true };
 };
 
-const addStudent = async function(ssn, name, surname) {
+const recordNote = async function(teacherUId, studentId, description) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+    const student = await Student.findById(studentId);
+
+    if(teacher === null || student === null)
+        return Boom.badRequest();
+
+    student.notes.push({
+        teacherId: teacher._id,
+        description
+    });
+    await student.save();
+
+    return { success: true };
+};
+
+const addStudent = async function(ssn,
+                                  name,
+                                  surname,
+                                  parentOneName,
+                                  parentOneSurname,
+                                  parentOneSsn,
+                                  parentOneEmail,
+                                  parentTwoName,
+                                  parentTwoSurname,
+                                  parentTwoSsn,
+                                  parentTwoEmail) {
     const newStudent = new Student({ ssn, name, surname });
     await newStudent.save();
+
+    // Parent one creation
+    let existingUser = await User.findOne({ parentOneEmail });
+    if (existingUser === null) {
+        const password = HLib.getRandomPassword();
+        const parentOneUser = new User({
+            ssn: parentOneSsn,
+            name: parentOneName,
+            surname: parentOneSurname,
+            mail: parentOneEmail,
+            password,
+            scope: ['parent'],
+            firstLogin: true
+        });
+        await parentOneUser.save();
+        const parentOne = new Parent({ userId: parentOneUser._id, children: [newStudent._id] });
+        await parentOne.save();
+    } else {
+        // TODO Add child to found parent
+    }
+
+    // Parent two creation
+    existingUser = await User.findOne({ parentTwoEmail });
+    if (existingUser === null) {
+        const password = HLib.getRandomPassword();
+        const parentTwoUser = new User({
+            ssn: parentTwoSsn,
+            name: parentTwoName,
+            surname: parentTwoSurname,
+            mail: parentTwoEmail,
+            password,
+            scope: ['parent'],
+            firstLogin: true
+        });
+        await parentTwoUser.save();
+        const parentTwo = new Parent({ userId: parentTwoUser._id, children: [newStudent._id] });
+        await parentTwo.save();
+    } else {
+        // TODO Add child to found parent
+    }
 
     return {success: true};
 };
@@ -100,10 +196,12 @@ const addSchoolClass = async function(name, students) {
 module.exports = {
     getGrades,
     getAttendance,
+    getNotes,
     getStudents,
     getClasses,
     recordGrades,
     recordAttendance,
+    recordNote,
     addStudent,
     addSchoolClass
 };

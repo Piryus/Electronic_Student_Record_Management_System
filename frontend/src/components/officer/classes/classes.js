@@ -84,12 +84,12 @@ class Classes extends React.Component {
                                 </Card>)
                         })
                     }
-                    <Card>
+                    <Card key={'no_class'}>
                         <Accordion.Toggle as={Card.Header} eventKey={'no_class'}>
                             Students without assigned class
                         </Accordion.Toggle>
                         {this.state.students.map((student) => {
-                            if (student.classId === null) {
+                            if (student.classId === undefined || student.classId === null) {
                                 return (
                                     <Accordion.Collapse eventKey={'no_class'} key={student._id}>
                                         <Card.Body>{student.surname} {student.name} SSN: {student.ssn} </Card.Body>

@@ -1,21 +1,21 @@
 'use strict';
 
 const students = [
-    {"_id":"5dca711c89bf46419cf5d483","ssn":"MDFGKO06L02F082G","name":"Marco","surname":"Cremonesi","attendanceEvents":[],"grades":[{"date": "2019-10-16T07:58:00.000Z","value":"5","subject":"Art"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d484","ssn":"FCEEHG02B04N054D","name":"Luca","surname":"Longo","attendanceEvents":[],"grades":[{"date": "2019-02-13T07:30:00.000Z","value":"3","subject":"English"},{"date": "2019-12-03T09:14:00.000Z","value":"9.75","subject":"Science"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d485","ssn":"JPCOME07O02C034H","name":"Alice","surname":"Capon","attendanceEvents":[],"grades":[{"date": "2019-04-08T07:57:00.000Z","value":"6","subject":"Latin"},{"date": "2019-06-23T11:50:00.000Z","value":"6.5","subject":"English"},{"date": "2019-12-14T12:49:00.000Z","value":"8.75","subject":"Art"},{"date": "2019-12-30T11:27:00.000Z","value":"7","subject":"Science"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d486","ssn":"JLMLBH00B07K064G","name":"Alessio","surname":"Mazzi","attendanceEvents":[],"grades":[{"date": "2019-05-13T06:22:00.000Z","value":"4.25","subject":"English"},{"date": "2019-09-26T10:03:00.000Z","value":"3","subject":"Science"},{"date": "2019-03-06T11:48:00.000Z","value":"6.25","subject":"Religion"},{"date": "2019-07-09T11:21:00.000Z","value":"5.75","subject":"History"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
-    {"_id":"5dca711c89bf46419cf5d487","ssn":"CCJNJM09K01P046D","name":"Maria","surname":"Palermo","attendanceEvents":[],"grades":[{"date": "2019-06-23T08:08:00.000Z","value":"4.75","subject":"Gym"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d488","ssn":"LMNNML01B05F051C","name":"Silvia","surname":"Ferrari","attendanceEvents":[],"grades":[],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d489","ssn":"MGOAAP05I08P020M","name":"Enzo","surname":"Cremonesi","attendanceEvents":[],"grades":[{"date": "2019-03-26T07:55:00.000Z","value":"4.75","subject":"Math"},{"date": "2019-10-23T08:15:00.000Z","value":"4.5","subject":"English"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d48a","ssn":"NAMAKH06I03P070A","name":"Francesca","surname":"Trentino","attendanceEvents":[],"grades":[{"date": "2019-01-25T09:00:00.000Z","value":"8.5","subject":"English"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
-    {"_id":"5dca711c89bf46419cf5d48b","ssn":"OJCHFE07F05M064L","name":"Myriam","surname":"Manfrino","attendanceEvents":[],"grades":[{"date": "2019-01-10T10:55:00.000Z","value":"3.75","subject":"Science"},{"date": "2019-12-12T11:19:00.000Z","value":"5.75","subject":"Religion"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d48c","ssn":"IFHMHK01L07L058D","name":"Giacomo","surname":"Lori","attendanceEvents":[],"grades":[{"date": "2019-03-27T07:09:00.000Z","value":"4","subject":"Physics"},{"date": "2019-06-30T06:24:00.000Z","value":"8","subject":"Math"},{"date": "2019-03-30T10:02:00.000Z","value":"7","subject":"Physics"},{"date": "2019-11-24T10:39:00.000Z","value":"3.5","subject":"Physics"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d48d","ssn":"KDKNJL01L05F034A","name":"Paolo","surname":"Pirozzi","attendanceEvents":[],"grades":[{"date": "2019-12-10T07:49:00.000Z","value":"5.5","subject":"Physics"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
-    {"_id":"5dca711c89bf46419cf5d48e","ssn":"PBFNDJ01E04O002B","name":"Anna","surname":"Bianchi","attendanceEvents":[],"grades":[{"date": "2019-12-23T08:15:00.000Z","value":"8.5","subject":"Art"},{"date": "2019-08-11T06:09:00.000Z","value":"7.75","subject":"Gym"},{"date": "2019-02-02T10:20:00.000Z","value":"6.5","subject":"History"},{"date": "2019-03-25T12:01:00.000Z","value":"4.25","subject":"Gym"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d48f","ssn":"AKFKCL03M05K075K","name":"Geremia","surname":"Costa","attendanceEvents":[],"grades":[],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
-    {"_id":"5dca711c89bf46419cf5d490","ssn":"GPNCID08N09N089B","name":"Riccardo","surname":"Cocci","attendanceEvents":[],"grades":[{"date": "2019-11-13T11:55:00.000Z","value":"3.75","subject":"Religion"},{"date": "2019-03-30T09:48:00.000Z","value":"6.5","subject":"Physics"},{"date": "2019-12-27T12:08:00.000Z","value":"8.5","subject":"Art"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
-    {"_id":"5dca711c89bf46419cf5d491","ssn":"EOANEJ00J04K037K","name":"Vittoria","surname":"Bianchi","attendanceEvents":[],"grades":[{"date": "2019-11-16T10:47:00.000Z","value":"7.5","subject":"Italian"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"}
+    {"_id":"5dca711c89bf46419cf5d483","ssn":"MDFGKO06L02F082G","name":"Marco","surname":"Cremonesi","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-10-16T07:58:00.000Z","value":"5","subject":"Art"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d484","ssn":"FCEEHG02B04N054D","name":"Luca","surname":"Longo","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-02-13T07:30:00.000Z","value":"3","subject":"English"},{"date": "2019-12-03T09:14:00.000Z","value":"9.75","subject":"Science"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d485","ssn":"JPCOME07O02C034H","name":"Alice","surname":"Capon","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-04-08T07:57:00.000Z","value":"6","subject":"Latin"},{"date": "2019-06-23T11:50:00.000Z","value":"6.5","subject":"English"},{"date": "2019-12-14T12:49:00.000Z","value":"8.75","subject":"Art"},{"date": "2019-12-30T11:27:00.000Z","value":"7","subject":"Science"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d486","ssn":"JLMLBH00B07K064G","name":"Alessio","surname":"Mazzi","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-05-13T06:22:00.000Z","value":"4.25","subject":"English"},{"date": "2019-09-26T10:03:00.000Z","value":"3","subject":"Science"},{"date": "2019-03-06T11:48:00.000Z","value":"6.25","subject":"Religion"},{"date": "2019-07-09T11:21:00.000Z","value":"5.75","subject":"History"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
+    {"_id":"5dca711c89bf46419cf5d487","ssn":"CCJNJM09K01P046D","name":"Maria","surname":"Palermo","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-06-23T08:08:00.000Z","value":"4.75","subject":"Gym"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d488","ssn":"LMNNML01B05F051C","name":"Silvia","surname":"Ferrari","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d489","ssn":"MGOAAP05I08P020M","name":"Enzo","surname":"Cremonesi","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-03-26T07:55:00.000Z","value":"4.75","subject":"Math"},{"date": "2019-10-23T08:15:00.000Z","value":"4.5","subject":"English"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d48a","ssn":"NAMAKH06I03P070A","name":"Francesca","surname":"Trentino","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-01-25T09:00:00.000Z","value":"8.5","subject":"English"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
+    {"_id":"5dca711c89bf46419cf5d48b","ssn":"OJCHFE07F05M064L","name":"Myriam","surname":"Manfrino","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-01-10T10:55:00.000Z","value":"3.75","subject":"Science"},{"date": "2019-12-12T11:19:00.000Z","value":"5.75","subject":"Religion"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d48c","ssn":"IFHMHK01L07L058D","name":"Giacomo","surname":"Lori","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-03-27T07:09:00.000Z","value":"4","subject":"Physics"},{"date": "2019-06-30T06:24:00.000Z","value":"8","subject":"Math"},{"date": "2019-03-30T10:02:00.000Z","value":"7","subject":"Physics"},{"date": "2019-11-24T10:39:00.000Z","value":"3.5","subject":"Physics"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d48d","ssn":"KDKNJL01L05F034A","name":"Paolo","surname":"Pirozzi","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-12-10T07:49:00.000Z","value":"5.5","subject":"Physics"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
+    {"_id":"5dca711c89bf46419cf5d48e","ssn":"PBFNDJ01E04O002B","name":"Anna","surname":"Bianchi","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-12-23T08:15:00.000Z","value":"8.5","subject":"Art"},{"date": "2019-08-11T06:09:00.000Z","value":"7.75","subject":"Gym"},{"date": "2019-02-02T10:20:00.000Z","value":"6.5","subject":"History"},{"date": "2019-03-25T12:01:00.000Z","value":"4.25","subject":"Gym"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d48f","ssn":"AKFKCL03M05K075K","name":"Geremia","surname":"Costa","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[],"__v":0,"classId":"5dc9c3112d698031f441e1c9"},
+    {"_id":"5dca711c89bf46419cf5d490","ssn":"GPNCID08N09N089B","name":"Riccardo","surname":"Cocci","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-11-13T11:55:00.000Z","value":"3.75","subject":"Religion"},{"date": "2019-03-30T09:48:00.000Z","value":"6.5","subject":"Physics"},{"date": "2019-12-27T12:08:00.000Z","value":"8.5","subject":"Art"}],"__v":0,"classId":"5dc9cb4b797f6936680521b9"},
+    {"_id":"5dca711c89bf46419cf5d491","ssn":"EOANEJ00J04K037K","name":"Vittoria","surname":"Bianchi","attendanceEvents":[],"notes":[],"termGrades":[],"grades":[{"date": "2019-11-16T10:47:00.000Z","value":"7.5","subject":"Italian"}],"__v":0,"classId":"5dc9c3112d698031f441e1c9"}
 ];
 const parents = [
     {"children":["5dca711c89bf46419cf5d485","5dca711c89bf46419cf5d48b"],"_id":"5dca77de05972e0898e9c68d","userId":"5dca7e2b461dc52d681804f9","__v":0},
@@ -56,7 +56,7 @@ const users = [
     {"_id":"5dcc0bb71c9d440000330d45","ssn":"XYEIBL20D49T545W","name":"Massimo","surname":"Corsi","scope":["officer"],"mail":"officer3@officer.com","password":"officerofficer","__v":"0"},
 ];
 const classes = [
-    {"_id":"5dc9c3112d698031f441e1c9","assignments":[],"name":"1A","__v":0},
+    {"_id":"5dc9c3112d698031f441e1c9","assignments":[],"name":"1A","coordinator":"5dca698eed550e4ca4aba7f5","__v":0},
     {"_id":"5dc9cb36ee91b7384cbd7fd7","assignments":[],"name":"1B","__v":0},
     {"_id":"5dc9cb4b797f6936680521b9","assignments":[],"name":"1C","__v":0}
 ];
@@ -68,6 +68,12 @@ const articles = [
     {"_id":"5ddbd4a7881cbd1a30645cef","title":"Read this carefully","content":"Some more information here.","authorId":"5dcc0bb71c9d4400003fffff","date":"2019-10-10T09:32:42.000Z","__v":0},
     {"_id":"5ddbd4a7881cbd1a30645cf0","title":"Not a title","content":"This is a test.","authorId":"5dcc0bb71c9d440000330d45","date":"2019-11-24T12:51:58.000Z","__v":0}
 ];
+const files = [
+    { _id: '5dc9c3112d698031f882d0c9', filename: 'periodic_table.txt', bytes: 4503, type: 'text/plain' },
+    { _id: '5dc9c3112d698031f882d0ca', filename: 'math_formulas.pdf', bytes: 14039, type: 'application/pdf' },
+    { _id: '5dc9c3112d698031f882d0cb', filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' },
+    { _id: '5dc9c3112d698031f882d0cc', filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
+];
     
 module.exports = {
     students,
@@ -75,5 +81,6 @@ module.exports = {
     teachers,
     users,
     classes,
-    articles
+    articles,
+    files
 };

@@ -10,6 +10,9 @@ const testData = require('../test-lib/testData');
 
 const HLib = require('@emarkk/hlib');
 
+const Utils = require('../utils');
+
+const File = require('../models/File');
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');
 const Student = require('../models/Student');
@@ -34,7 +37,6 @@ afterEach(async () => await db.clearDatabase());
 
 after(async () => await db.closeDatabase());
 
-
 suite('lectures', () => {
     
     test('getDailyLectureTopics', async () => {
@@ -57,6 +59,60 @@ suite('lectures', () => {
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
         expect(t3.topics).to.be.null();
         expect(t4.topics).to.equal('Test topics');
+    });
+    
+    test('getSupportMaterials', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await SchoolClass.insertMany(testData.classes);
+        await File.insertMany([
+            { _id: '5dc9c3112d698031f882d0c9', filename: 'periodic_table.txt', bytes: 4503, type: 'text/plain' },
+            { _id: '5dc9c3112d698031f882d0ca', filename: 'math_formulas.pdf', bytes: 14039, type: 'application/pdf' },
+            { _id: '5dc9c3112d698031f882d0cb', filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' },
+            { _id: '5dc9c3112d698031f882d0cc', filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
+        ]);
+
+        // parent not found
+        const sm1 = await lectures.getSupportMaterials('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
+        // student not found
+        const sm2 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const sm3 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
+
+        // ok 1
+        const sm4 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { supportMaterials: [
+            { subject: 'Science', description: 'Periodic Table', uploaded: new Date('2019-12-01T14:02:19'), attachments: ['5dc9c3112d698031f882d0c9'] },
+            { subject: 'Math', description: 'Formulas Cheatsheet', uploaded: new Date('2019-12-10T17:27:42'), attachments: ['5dc9c3112d698031f882d0ca'] },
+            { subject: 'Italian', description: 'Divina Commedia', uploaded: new Date('2019-12-16T09:53:50'), attachments: ['5dc9c3112d698031f882d0cb'] },
+            { subject: 'Math', description: 'Formulas Cheatsheet (2)', uploaded: new Date('2019-12-18T11:07:20'), attachments: ['5dc9c3112d698031f882d0cc'] }
+        ] });
+        
+        // ok 2
+        const sm5 = await lectures.getSupportMaterials('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        expect(sm1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm4.supportMaterials).to.have.length(0);
+        expect(sm5.supportMaterials).to.have.length(3);
+        jexpect(sm5.supportMaterials).to.equal(j({
+            Italian: [{ subject: 'Italian', description: 'Divina Commedia', uploaded: new Date('2019-12-16T09:53:50'), attachments: [
+                { _id: '5dc9c3112d698031f882d0cb', __v: 0, filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' }
+            ] }],
+            Math: [
+                { subject: 'Math', description: 'Formulas Cheatsheet', uploaded: new Date('2019-12-10T17:27:42'), attachments: [
+                    { _id: '5dc9c3112d698031f882d0ca', __v: 0, filename: 'math_formulas.pdf', bytes: 14039, type: 'application/pdf' }
+                ] },
+                { subject: 'Math', description: 'Formulas Cheatsheet (2)', uploaded: new Date('2019-12-18T11:07:20'), attachments: [
+                    { _id: '5dc9c3112d698031f882d0cc', __v: 0, filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
+                ] }
+            ],
+            Science: [{ subject: 'Science', description: 'Periodic Table', uploaded: new Date('2019-12-01T14:02:19'), attachments: [
+                { _id: '5dc9c3112d698031f882d0c9', __v: 0, filename: 'periodic_table.txt', bytes: 4503, type: 'text/plain' }
+            ] }]
+        }));
     });
     
     test('recordDailyLectureTopics', async () => {
@@ -102,12 +158,12 @@ suite('lectures', () => {
     
     test('getAssignments', async () => {
         const data = [
-            { subject: 'Italian', description: 'Lorem ipsum dolor sit amet', assigned: new Date('2019-10-14T10:00:00'), due: new Date().addDays(1) },
-            { subject: 'Math', description: 'consectetur adipiscing elit', assigned: new Date('2019-11-05T12:00:00'), due: new Date().addDays(-2) },
-            { subject: 'English', description: 'sed do eiusmod tempor incididunt', assigned: new Date('2019-10-01T09:00:00'), due: new Date().addDays(0) },
-            { subject: 'Gym', description: 'ut labore et dolore magna aliqua', assigned: new Date('2019-11-19T11:00:00'), due: new Date().addDays(5) },
-            { subject: 'Art', description: 'Ut enim ad minim veniam', assigned: new Date('2019-11-15T08:00:00'), due: new Date().addDays(3) },
-            { subject: 'Physics', description: 'quis nostrud exercitation ullamco', assigned: new Date('2019-11-20T11:00:00'), due: new Date().addDays(-1) }
+            { subject: 'Italian', description: 'Lorem ipsum dolor sit amet', attachments: [], assigned: new Date('2019-10-14T10:00:00'), due: new Date().addDays(1) },
+            { subject: 'Math', description: 'consectetur adipiscing elit', attachments: [], assigned: new Date('2019-11-05T12:00:00'), due: new Date().addDays(-2) },
+            { subject: 'English', description: 'sed do eiusmod tempor incididunt', attachments: [], assigned: new Date('2019-10-01T09:00:00'), due: new Date().addDays(0) },
+            { subject: 'Gym', description: 'ut labore et dolore magna aliqua', attachments: [], assigned: new Date('2019-11-19T11:00:00'), due: new Date().addDays(5) },
+            { subject: 'Art', description: 'Ut enim ad minim veniam', attachments: [], assigned: new Date('2019-11-15T08:00:00'), due: new Date().addDays(3) },
+            { subject: 'Physics', description: 'quis nostrud exercitation ullamco', attachments: [], assigned: new Date('2019-11-20T11:00:00'), due: new Date().addDays(-1) }
         ];
 
         await Student.insertMany(testData.students);
@@ -226,6 +282,53 @@ suite('lectures', () => {
         expect(a7.success).to.be.true();
         expect(sc2.assignments).to.have.length(1);
         jexpect(sc2.assignments[0]).to.include(j({ subject: 'English', description: 'New assignments!', due: HLib.weekhourToDate('1_2').addDays(daysDelta) }));
+    });
+    
+    test('addSupportMaterial', async () => {
+        const fakeSaveFile = Sinon.stub(Utils, 'saveFiles');
+        fakeSaveFile.onCall(0).resolves(['5dca7e2b461dc52c4a29be45']);
+        fakeSaveFile.onCall(1).resolves(['5dca7e2b461dc52c4a29be46', '5dca7e2b461dc52c4a29be47']);
+
+        await Teacher.insertMany(testData.teachers);
+        await SchoolClass.insertMany(testData.classes);
+        
+        // teacher not found
+        const sm1 = await lectures.addSupportMaterial('ffffffffffffffffffffffff', '5dc9c3112d698031f441e1c9', 'Science', 'Some support material.', null);
+        // teacher does not teach to class
+        const sm2 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f6', '5dc9cb4b797f6936680521b9', 'Science', 'Some support material.', null);
+        // teacher does not teach this subject to class
+        const sm3 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f6', '5dc9c3112d698031f441e1c9', 'Latin', 'Some support material.', null);
+
+        const sc1 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+
+        // ok 1
+        const sm4 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f6', '5dc9c3112d698031f441e1c9', 'Science', 'Periodic Table', 'fakeFile.txt');
+        
+        const sc2 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+        
+        // ok 2
+        const sm5 = await lectures.addSupportMaterial('5dca7e2b461dc52d681804f2', '5dc9c3112d698031f441e1c9', 'Math', 'Formulas', ['1.pdf', '2.pdf']);
+        
+        const sc3 = await SchoolClass.findById('5dc9c3112d698031f441e1c9');
+        const newMaterial = sc3.supportMaterials.find(sm => !sc2.supportMaterials.some(sm2 => sm2._id.equals(sm._id)));
+        
+        expect(fakeSaveFile.callCount).to.equal(2);
+        expect(fakeSaveFile.calledWithExactly(['fakeFile.txt'])).to.be.true();
+        expect(fakeSaveFile.calledWithExactly(['1.pdf', '2.pdf'])).to.be.true();
+
+        fakeSaveFile.restore();
+
+        expect(sm1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sm3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(sc1.supportMaterials).to.have.length(0);
+        expect(sm4.success).to.be.true();
+        expect(sc2.supportMaterials).to.have.length(1);
+        expect(Math.abs(sc2.supportMaterials[0].uploaded - new Date())).to.be.lessThan(1000);
+        jexpect(sc2.supportMaterials[0]).to.include({ subject: 'Science', description: 'Periodic Table', attachments: ['5dca7e2b461dc52c4a29be45'] });
+        expect(sm5.success).to.be.true();
+        expect(Math.abs(newMaterial.uploaded - new Date())).to.be.lessThan(1000);
+        jexpect(newMaterial).to.include({ subject: 'Math', description: 'Formulas', attachments: ['5dca7e2b461dc52c4a29be46', '5dca7e2b461dc52c4a29be47'] });
     });
     
     test('rollCall', async () => {

@@ -1,12 +1,13 @@
 'use strict';
 
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const articleSchema = new mongoose.Schema({
     title: String,
     content: String,
     authorId: {
-        type: mongoose.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     },
     date: {

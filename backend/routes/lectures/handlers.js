@@ -3,6 +3,8 @@
 const Boom = require('boom');
 const HLib = require('@emarkk/hlib');
 
+const Util = require('../../utils');
+
 const Lecture = require('../../models/Lecture');
 const SchoolClass = require('../../models/SchoolClass');
 const Parent = require('../../models/Parent');
@@ -27,12 +29,33 @@ const getDailyLectureTopics = async function(teacherUId, weekhour) {
 const getAssignments = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId });
+    
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
 
-    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 });
+    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'assignments._id': 0 }).populate('assignments.attachments');
     const assignments = schoolClass.assignments.filter(a => a.due >= new Date(Date.now()).dayStart());
+
     return { assignments };
+};
+
+const getSupportMaterials = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+    
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+        
+    const schoolClass = await SchoolClass.findOne({ _id: student.classId }, { 'supportMaterials._id': 0 }).populate('supportMaterials.attachments');
+    const supportMaterials = schoolClass.supportMaterials.reduce((obj, x) => {
+        if(obj[x.subject])
+            obj[x.subject].push(x);
+        else
+            obj[x.subject] = [x];
+        return obj;
+    }, {});
+
+    return { supportMaterials };
 };
 
 const getAttendance = async function(teacherUId) {
@@ -73,15 +96,32 @@ const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
     return { success: true };
 };
 
-const recordAssignments = async function(teacherUId, subject, description, due) {
+const recordAssignments = async function(teacherUId, subject, description, due, files) {
     const weekhour = HLib.dateToWeekhour(due);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
     if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)) || due < new Date(Date.now()).addDays(1).dayStart())
         return Boom.badRequest();
-        
+
+    const attachments = files ? await Util.saveFiles(Array.isArray(files) ? files : [files]) : [];
+
     const schoolClass = await SchoolClass.findOne({ _id: teacher.timetable.find(t => t.weekhour === weekhour).classId });
-    schoolClass.assignments.push({ subject, description, due });
+    schoolClass.assignments.push({ subject, description, due, attachments });
+    await schoolClass.save();
+
+    return { success: true };
+};
+
+const addSupportMaterial = async function(teacherUId, classId, subject, description, files) {
+    const teacher = await Teacher.findOne({ userId: teacherUId });
+
+    if(teacher === null || !teacher.timetable.some(t => t.classId.toString() === classId && t.subject === subject))
+        return Boom.badRequest();
+    
+    const attachments = await Util.saveFiles(Array.isArray(files) ? files : [files]);
+
+    const schoolClass = await SchoolClass.findOne({ _id: classId });
+    schoolClass.supportMaterials.push({ subject, description, attachments });
     await schoolClass.save();
 
     return { success: true };
@@ -118,8 +158,10 @@ const rollCall = async function(teacherUId, info) {
 module.exports = {
     getDailyLectureTopics,
     getAssignments,
+    getSupportMaterials,
     getAttendance,
     recordDailyLectureTopics,
     recordAssignments,
+    addSupportMaterial,
     rollCall
 };

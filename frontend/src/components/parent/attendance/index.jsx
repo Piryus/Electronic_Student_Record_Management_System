@@ -1,7 +1,8 @@
 import React from 'react';
-import MyTimetable from '../../utils/my-timetable';
+import Timetable from '../../utils/timetable';
 import SectionHeader from "../../utils/section-header";
-import {Button, Container, Spinner} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
+import LoadingSpinner from "../../utils/loading-spinner";
 
 export default class Attendance extends React.Component {
 
@@ -46,10 +47,12 @@ export default class Attendance extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
-        const attendance = await this.getChildAttendance();
-        this.setState({
-            childAttendance: attendance
-        });
+        if (prevProps.child._id !== this.props.child._id) {
+            const attendance = await this.getChildAttendance();
+            this.setState({
+                childAttendance: attendance
+            });
+        }
     }
 
     async getChildAttendance() {
@@ -137,10 +140,7 @@ export default class Attendance extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Attendance</SectionHeader>
-                {this.state.isLoading &&
-                <div className="d-flex">
-                    <Spinner animation="border" className="mx-auto"/>
-                </div>}
+                {this.state.isLoading && <LoadingSpinner/>}
                 {!this.state.isLoading &&
                 <>
                     <div className='mb-2 d-flex justify-content-between'>
@@ -148,7 +148,7 @@ export default class Attendance extends React.Component {
                         <Button onClick={() => this.handleWeek(0)}>Current week</Button>
                         <Button onClick={() => this.handleWeek(1)}>Next week</Button>
                     </div>
-                    < MyTimetable data={data}/>
+                    < Timetable data={data} frequency={60} />
                 </>
                 }
             </Container>

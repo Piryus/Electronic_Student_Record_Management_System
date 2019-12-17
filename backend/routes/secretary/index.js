@@ -11,7 +11,7 @@ const routes = [
         options: {
             auth: {
                 strategy: 'session',
-                scope: 'officer'
+                scope: ['officer', 'parent']
             }
         }
     },
@@ -32,6 +32,17 @@ const routes = [
                     title: Valid.articleTitle.required(),
                     content: Valid.articleContent.required()
                 }
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/parents',
+        handler: async (request, h) => secretary.getParents(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
             }
         }
     },
@@ -58,6 +69,46 @@ const routes = [
             }
         }
     },
+    {
+        method: 'POST',
+        path: '/parents',
+        handler: async (request, h) => {
+            const {parents} = request.payload;
+            return secretary.sendCredentials(parents);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    parents: Valid.array.items(Valid.id).required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/timetables',
+        handler: async (request, h) => secretary.publishTimetables(request.payload.timetablesFile),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                payload: {
+                    timetablesFile: Valid.any.required()
+                }
+            },
+            payload: {
+                maxBytes: 10485760,
+                output: 'file',
+                parse: true
+            }
+        }
+    }
 ];
 
 module.exports = routes;

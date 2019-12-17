@@ -1,12 +1,14 @@
 import React from 'react';
 import styles from './styles.module.css';
-import {Container, Row, Nav} from 'react-bootstrap';
-import {FaGraduationCap, FaCog, FaRegNewspaper, FaBook, FaAddressCard} from 'react-icons/fa';
+import {Container, Nav, Row} from 'react-bootstrap';
+import {FaAddressCard, FaBook, FaExclamationTriangle, FaGraduationCap, FaRegNewspaper, FaFilePdf} from 'react-icons/fa';
 import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
-import News from "./news/parent-news";
 import Assignments from './assignments';
 import Attendance from './attendance/';
+import News from "../utils/news";
+import Notes from "./notes";
+import Material from "./material/material";
 
 export default class Parent extends React.Component {
 
@@ -44,7 +46,8 @@ export default class Parent extends React.Component {
                            onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}/>
                 <Container fluid>
                     <Row>
-                        <Nav className={[this.state.sidebarOpen ? 'bg-light col-5':'d-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
+                        <Nav
+                            className={[this.state.sidebarOpen ? 'bg-light col-5' : 'd-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
                             <Nav.Link
                                 className={this.state.userRequest === 'news' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "news")}><FaRegNewspaper/> News</Nav.Link>
@@ -58,11 +61,16 @@ export default class Parent extends React.Component {
                                 className={this.state.userRequest === 'attendance' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "attendance")}><FaAddressCard/> Attendance</Nav.Link>
                             <Nav.Link
-                                className={this.state.userRequest === 'settings' ? styles.sidebarLinkActive : styles.sidebarLink}><FaCog/> Settings</Nav.Link>
+                                className={this.state.userRequest === 'notes' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "notes"})}><FaExclamationTriangle/> Notes
+                                from teachers</Nav.Link>
+                            <Nav.Link
+                                className={this.state.userRequest === 'material' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support material</Nav.Link>
                         </Nav>
                         <main className="col-md-10 ml-sm-auto col-lg-10 px-4 pt-5">
                             {this.state.userRequest === 'news' && (
-                                <News />
+                                <News/>
                             )}
                             {this.state.userRequest === 'grades' && (
                                 <Grades child={this.state.childSelected}/>
@@ -72,6 +80,12 @@ export default class Parent extends React.Component {
                             )}
                             {this.state.userRequest === 'attendance' && (
                                 <Attendance child={this.state.childSelected}/>
+                            )}
+                            {this.state.userRequest === 'notes' && (
+                                <Notes child={this.state.childSelected}/>
+                            )}
+                            {this.state.userRequest === 'material' && (
+                                <Material child={this.state.childSelected}/>
                             )}
                         </main>
                     </Row>

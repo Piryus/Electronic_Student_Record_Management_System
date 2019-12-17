@@ -9,6 +9,7 @@ export default class NewClassModal extends React.Component {
             className: '',
             studentsClass: [],
             error: '',
+            success: ''
         };
     }
 
@@ -59,6 +60,10 @@ export default class NewClassModal extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
+        this.setState({
+            success: "Class created successfully.",
+            error: ''
+        });
         if (json.error != null) {
             alert('Error! Please insert a class Name');
         }
@@ -76,6 +81,9 @@ export default class NewClassModal extends React.Component {
                         {this.state.error !== '' && (
                             <Alert variant='danger'>{this.state.error}</Alert>
                         )}
+                        {this.state.error === '' && this.state.success !== '' && 
+                            <Alert variant='success'>{this.state.success}</Alert>
+                        }
                         <Form.Group controlId="formBasicEmail">
                             <Form.Label>Class name</Form.Label>
                             <Form.Control type="text" placeholder="Class names examples: 1A, 1B, 3C, 5B"

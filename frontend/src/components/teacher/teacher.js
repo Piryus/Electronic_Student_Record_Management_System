@@ -1,38 +1,54 @@
-import HLib from '@emarkk/hlib/index';
 import React from 'react';
 import styles from './styles.module.css';
-import {Container, Row, Nav} from 'react-bootstrap';
-import {FaGraduationCap, FaMedal, FaBook, FaCalendarCheck, FaArrowAltCircleLeft} from 'react-icons/fa'
+import {Container, Nav, Row} from 'react-bootstrap';
+import {
+    FaArrowAltCircleLeft,
+    FaBook,
+    FaCalendarCheck,
+    FaExclamationTriangle,
+    FaFilePdf,
+    FaGraduationCap,
+    FaHandshake,
+    FaMedal,
+    FaClock
+} from 'react-icons/fa'
 import LectureTopics from './lecture-topics';
 import StudentGradesSummary from './student-grades-summary/studentGradesSummary';
 import Assignments from './assignments/assignments';
 import AppNavbar from "../utils/navbar/navbar";
 import Rollcall from './rollcall/rollcall';
 import EarlyLateRecordComponenent from '../utils/earlyLateRecordComponent/index';
+import NotesToParents from "./notes-to-parents";
+import Material from "./material/material";
+import Meetings from "./meetings";
+import FinalGrades from "./final-grades";
 
 export default class Teacher extends React.Component {
 
     constructor(props) {
         super(props);
 
+        // Create an array containing the teacher's classes of the day
+        const todayDayNumber = new Date(Date.now()).getNormalizedDay(); //FOR RELEASE
+        //const todayDayNumber = new Date('2019-12-12').getNormalizedDay(); //ONLY FOR DEVELOPMENT AND DEBUG
+        const classes = this.props.timetable.reduce((classes, class_) => {
+            if (class_.weekhour.split('_')[0] === todayDayNumber.toString()) {
+                classes.push({
+                    hour: class_.weekhour.split('_')[1],
+                    classId: class_.classId,
+                });
+            }
+            return classes;
+        }, []);
+
         let subjects = [];
-        this.props.timetable.forEach((value) =>{
+        this.props.timetable.forEach((value) => {
             subjects[value.subject] = {
                 subject: value.subject,
                 class: value.classId.toString()
             };
         });
-        const now = new Date(Date.now()).getNormalizedDay();
-
-        let hours_classes = []; 
-        this.props.timetable.forEach(t => {
-            if(t.weekhour.split('_')[0] === now.toString()){
-                hours_classes.push(            {
-                    hour: t.weekhour.split('_')[1],
-                    classId: t.classId
-                });
-            }
-        });
+        
 
         this.state = {
             userRequest: 'lecture',
@@ -40,36 +56,34 @@ export default class Teacher extends React.Component {
             classSelected: '',
             students: [],
             subjects: subjects,
-            classesHours: hours_classes,
+            classesHours: classes,
             classAttendance: [],
-            now: now
+            now: todayDayNumber,
+            allClasses: []
         };
-        this.updateClassAttendanceHandler = this.updateClassAttendanceHandler.bind(this);
     }
 
-    async updateClassAttendanceHandler(){
-        if(this.state.classesHours.length !== 0){
+    updateClassAttendanceHandler = async () => {
+        if (this.state.classesHours.length !== 0) {
             await this.getStudentAttendances();
         }
-    }
+    };
 
-    async componentDidMount(){
-            //Load all students
-            await this.getAllStudents();
-            let classes = await this.getClasses();
-            this.setState({
+    async componentDidMount() {
+        const students = await this.getAllStudents();
+        const classes = await this.getClasses();
+        const attendance = this.state.classesHours.length !== 0 ? await this.getStudentAttendances() : [];
+        this.setState({
+            students: students,
             classes: classes,
-            classSelected: classes[0]
-            });
-            if(this.state.classesHours.length !== 0){
-                await this.getStudentAttendances();
-            }
+            classSelected: classes[0],
+            classAttendance: attendance
+        });
     }
 
 
-
-    async getStudentAttendances(){
-        try{
+    async getStudentAttendances() {
+        try {
             const url = 'http://localhost:3000/attendance';
             const options = {
                 method: 'GET',
@@ -81,17 +95,14 @@ export default class Teacher extends React.Component {
             };
             let response = await fetch(url, options);
             const json = await response.json();
-
-            let attendance = json.attendance[this.state.classSelected.classId];
-            
-            this.setState({classAttendance: attendance});
-        } catch(e){
-            alert(e);
+            return json.attendance;
+        } catch (e) {
+            console.log(e);
         }
     }
 
-    async getAllStudents(){
-        try{
+    async getAllStudents() {
+        try {
             const url = 'http://localhost:3000/students';
             const options = {
                 method: 'GET',
@@ -103,11 +114,9 @@ export default class Teacher extends React.Component {
             };
             let response = await fetch(url, options);
             const json = await response.json();
-            this.setState({
-                students: json.students,
-            });
+            return json.students;
         } catch (e) {
-            alert(e);
+            console.log(e);
         }
     }
 
@@ -130,37 +139,23 @@ export default class Teacher extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-        let classes = [];
-        this.state.classesHours.forEach(ch =>{
-            let found = json.classes.find(jc => ch.classId === jc._id);
-            if(found !== undefined){
-                classes.push(
-                    {
-                        classId: found._id,
-                        name: found.name
-                    }
-                );
-            }
+        this.setState({allClasses: json.classes});
+        return json.classes.filter(class_ => {
+            return this.state.classesHours.find(classHour => classHour.classId === class_._id) !== undefined;
         });
-        return classes;
     };
-
-
-    setUserRequest(e, choice) {
-        this.setState({userRequest: choice});
-    }
 
     render() {
         const now = new Date(Date.now());
         return (
             <div className={styles.root}>
-                <AppNavbar 
-                type={this.state.userRequest === 'early-late' ? 'teacher' : 'classic'}  
-                onLogout={() => this.props.onLogout()}
-                onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}
-                classes={this.state.classes}
-                classSelection={(c) => this.selectClass(c)}
-                selectedClass={this.state.classSelected}
+                <AppNavbar
+                    type={this.state.userRequest === 'early-late' ? 'teacher' : 'classic'}
+                    onLogout={() => this.props.onLogout()}
+                    onHamburgerMenu={() => this.setState({sidebarOpen: !this.state.sidebarOpen})}
+                    classes={this.state.classes}
+                    classSelection={(c) => this.selectClass(c)}
+                    selectedClass={this.state.classSelected}
                 />
                 <Container fluid>
                     <Row>
@@ -168,40 +163,77 @@ export default class Teacher extends React.Component {
                             className={[this.state.sidebarOpen ? 'bg-light col-5' : 'd-none', "flex-column bg-light col-md-2 d-md-block", styles.sidebar]}>
                             <Nav.Link
                                 className={this.state.userRequest === 'lecture' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={(e) => this.setUserRequest(e, "lecture")}><FaGraduationCap/> Lecture
-                                topics</Nav.Link>
+                                onClick={() => this.setState({userRequest: "lecture"})}><FaGraduationCap/> Lectures</Nav.Link>
                             <Nav.Link
                                 className={this.state.userRequest === 'grades' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={(e) => this.setUserRequest(e, "grades")}><FaMedal/> Student grades</Nav.Link>
+                                onClick={() => this.setState({userRequest: "grades"})}><FaMedal/> Grades</Nav.Link>
                             <Nav.Link
                                 className={this.state.userRequest === 'assignments' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={(e) => this.setUserRequest(e, "assignments")}><FaBook/> Assignments </Nav.Link>
-                            {this.state.classesHours.find(ch => ch.hour === '0')  && (
-                            <Nav.Link className={this.state.userRequest === 'rollcall' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "rollcall")}><FaCalendarCheck/> Rollcall </Nav.Link>
+                                onClick={() => this.setState({userRequest: "assignments"})}><FaBook/> Assignments</Nav.Link>
+                            {this.state.classesHours.find(ch => ch.hour === '0') && (
+                                <Nav.Link
+                                    className={this.state.userRequest === 'rollcall' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                    onClick={() => this.setState({userRequest: "rollcall"})}><FaCalendarCheck/> Roll
+                                    call</Nav.Link>
                             )}
                             {this.state.classesHours.length > 0 && (
-                                <Nav.Link className={this.state.userRequest === 'early-late' ? styles.sidebarLinkActive : styles.sidebarLink} onClick={(e) => this.setUserRequest(e, "early-late")}><FaArrowAltCircleLeft/> Late-Entrance/Early-Exit </Nav.Link>
+                                <Nav.Link
+                                    className={this.state.userRequest === 'early-late' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                    onClick={() => this.setState({userRequest: "early-late"})}><FaArrowAltCircleLeft/> Students
+                                    attendance</Nav.Link>
                             )}
+                            <Nav.Link
+                                className={this.state.userRequest === 'notes' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "notes"})}><FaExclamationTriangle/> Notes to
+                                parents</Nav.Link>
+                            <Nav.Link
+                                className={this.state.userRequest === 'material' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support
+                                material</Nav.Link>
+                            <Nav.Link
+                                className={this.state.userRequest === 'meetings' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "meetings"})}><FaHandshake/> Meetings with
+                                parents</Nav.Link>
+                            {this.props.coordinator !== null && <Nav.Link
+                                className={this.state.userRequest === 'final-grades' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "final-grades"})}><FaClock/> Final grades 
+                                of the term</Nav.Link>}
                         </Nav>
                         <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
-                            {this.state.userRequest === 'lecture' && (<LectureTopics timetable={this.props.timetable.reduce((obj, x) => {
-                                obj[x.weekhour] = { name: x.subject, active: HLib.weekhourToDate(x.weekhour) < now };
-                                return obj;
-                            }, {})}/>)}
-                             {this.state.userRequest === 'grades' && (
-                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects} timetable={this.props.timetable} type='teacher-grades'/>
+                            {this.state.userRequest === 'lecture' && <LectureTopics timetable={this.props.timetable}/>}
+                            {this.state.userRequest === 'grades' && (
+                                <StudentGradesSummary students={this.state.students} subjects={this.state.subjects}
+                                                      timetable={this.props.timetable} type='teacher-grades'/>
                             )}
                             {this.state.userRequest === 'assignments' && (
                                 <Assignments subjects={this.state.subjects} timetable={this.props.timetable}/>
                             )}
-                            {this.state.userRequest === 'rollcall' &&(
-                                <Rollcall classAttendance={this.state.classAttendance} classId={this.state.classesHours.find(ch => ch.hour === '0').classId}  updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
+                            {this.state.userRequest === 'rollcall' && (
+                                <Rollcall classAttendance={this.state.classAttendance[this.state.classSelected._id]}
+                                          classId={this.state.classesHours.find(ch => ch.hour === '0').classId}
+                                          updateClassAttendanceOnParent={this.updateClassAttendanceHandler}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.classesHours.find(ch => ch.hour === '0' || ch.hour === '1') !== undefined && (
-                                <EarlyLateRecordComponenent type={'late-entrance'} classId={this.state.classSelected.classId} timetable={this.props.timetable} now={this.state.now}/>
+                                <EarlyLateRecordComponenent type={'late-entrance'}
+                                                            classId={this.state.classSelected._id}
+                                                            timetable={this.props.timetable} now={this.state.now}/>
                             )}
                             {this.state.userRequest === 'early-late' && this.state.classesHours.length > 0 && (
-                                <EarlyLateRecordComponenent type={'early-exit'} classId={this.state.classSelected.classId} timetable={this.props.timetable} now={this.state.now}/>
+                                <EarlyLateRecordComponenent type={'early-exit'}
+                                                            classId={this.state.classSelected._id}
+                                                            timetable={this.props.timetable} now={this.state.now}/>
+                            )}
+                            {this.state.userRequest === 'notes' &&
+                            <NotesToParents students={this.state.students}/>
+                            }
+                            {this.state.userRequest === 'material' && (
+                                <Material timetable={this.props.timetable} classes={this.state.allClasses}/>
+                            )}
+                            {this.state.userRequest === 'meetings' && (
+                                <Meetings teacherTimetable={this.props.timetable}/>
+                            )}
+                            {this.state.userRequest === 'final-grades' && (
+                                <FinalGrades selectedClass={this.state.classSelected} coordinator={this.props.coordinator}/>
                             )}
                         </main>
                     </Row>

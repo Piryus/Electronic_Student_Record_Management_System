@@ -1,6 +1,9 @@
 import React from 'react';
 import {Accordion, Card, Col, Container, Row, Spinner} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
+import LoadingSpinner from "../../utils/loading-spinner";
+import DownloadFileTable from '../../utils/downloadfiletable/downloadfiletable';
+
 
 export default class Assignments extends React.Component {
 
@@ -8,7 +11,7 @@ export default class Assignments extends React.Component {
         super(props);
         this.state = {
             childAssignment: [],
-            loading: true,
+            loading: true
         }
     }
 
@@ -21,10 +24,12 @@ export default class Assignments extends React.Component {
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
-        const assignments = await this.getChildAssignment();
-        this.setState({
-            childAssignment: assignments
-        });
+        if (prevProps.child._id !== this.props.child._id) {
+            const assignments = await this.getChildAssignment();
+            this.setState({
+                childAssignment: assignments
+            });
+        }
     }
 
     async getChildAssignment() {
@@ -54,7 +59,15 @@ export default class Assignments extends React.Component {
                     </Row>
                 </Accordion.Toggle>
                 <Accordion.Collapse eventKey={index.toString()}>
-                    <Card.Body>{item.description}</Card.Body>
+                    <Card.Body>
+                        {item.description}
+                        {item.attachments.length !== 0 &&(
+                            <div>
+                                <br></br><i>Attached files:</i>
+                                <DownloadFileTable type='assignment' files={item.attachments}/>
+                            </div>
+                        )}
+                    </Card.Body>
                 </Accordion.Collapse>
             </Card>
         );
@@ -67,7 +80,7 @@ export default class Assignments extends React.Component {
         let store = this.state.childAssignment;
         if (Array.isArray(store) && store.length) {
             store.sort(function (a, b) {
-                return new Date(a) - new Date(b);
+                return new Date(b.due) - new Date(a.due);
             });
             store.map((item) => {
                 let tmp = [];
@@ -99,10 +112,7 @@ export default class Assignments extends React.Component {
         return (
             <Container fluid>
                 <SectionHeader>Assignments</SectionHeader>
-                {this.state.loading &&
-                <div className="d-flex">
-                    <Spinner animation="border" className="mx-auto"/>
-                </div>}
+                {this.state.loading && <LoadingSpinner/>}
                 {!this.state.loading && output}
             </Container>
         )

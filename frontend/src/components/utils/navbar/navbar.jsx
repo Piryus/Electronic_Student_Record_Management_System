@@ -24,9 +24,9 @@ export default class AppNavbar extends React.Component {
         let classNotSelected = [];
         if(this.props.type === 'teacher' ) {
                 this.props.classes.forEach(c => {
-                    if (c.classId !== this.props.selectedClass.classId){
-                        childNotSelected.push(
-                            <Dropdown.Item key={c.classId}
+                    if (c._id !== this.props.selectedClass._id){
+                        classNotSelected.push(
+                            <Dropdown.Item key={c._id}
                                            onClick={() => this.props.classSelection(c)}>
                                 {c.name}
                             </Dropdown.Item>

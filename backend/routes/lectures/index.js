@@ -38,6 +38,22 @@ const routes = [
     },
     {
         method: 'GET',
+        path: '/material/{studentId}',
+        handler: async (request, h) => lectures.getSupportMaterials(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/attendance',
         handler: async (request, h) => lectures.getAttendance(request.auth.credentials.id),
         options: {
@@ -71,8 +87,8 @@ const routes = [
         method: 'POST',
         path: '/assignments',
         handler: async (request, h) => {
-            const { subject, description, due } = request.payload;
-            return lectures.recordAssignments(request.auth.credentials.id, subject, description, due);
+            const { subject, description, due, attachments } = request.payload;
+            return lectures.recordAssignments(request.auth.credentials.id, subject, description, due, attachments);
         },
         options: {
             auth: {
@@ -83,8 +99,41 @@ const routes = [
                 payload: {
                     subject: Valid.subject.required(),
                     description: Valid.longText.required(),
-                    due: Valid.date.required()
+                    due: Valid.date.required(),
+                    attachments: Valid.any
                 }
+            },
+            payload: {
+                maxBytes: 10485760,
+                output: 'file',
+                parse: true
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/material',
+        handler: async (request, h) => {
+            const { classId, subject, description, attachments } = request.payload;
+            return lectures.addSupportMaterial(request.auth.credentials.id, classId, subject, description, attachments);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                payload: {
+                    classId: Valid.id.required(),
+                    subject: Valid.subject.required(),
+                    description: Valid.shortText.required(),
+                    attachments: Valid.any.required()
+                }
+            },
+            payload: {
+                maxBytes: 10485760,
+                output: 'file',
+                parse: true
             }
         }
     },
