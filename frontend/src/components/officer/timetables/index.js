@@ -80,17 +80,10 @@ export default class TimetablesManager extends React.Component {
             dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
             let content = [];
             for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
-                if (dateObject.date < Date.now()) {
-                    content.push({
-                        text: '',
-                        color: 'bg-success text-white'
-                    });
-                } else {
-                    content.push({
-                        text: '',
-                        color: 'bg-secondary'
-                    });
-                }
+                content.push({
+                    text: '',
+                    color: 'bg-secondary'
+                });
             }
             dateObject.content = content;
             timetableData.push(dateObject);
