@@ -45,7 +45,7 @@ export default class NewAppointmentModal extends React.Component {
                         </Form.Group>
                         <Row className="justify-content-center mb-2">
                             <Col xs="auto"><Button onClick={() => this.changeWeek(-1)}><FaAngleLeft/></Button></Col>
-                            <Col xs="auto">6. January - 12. January</Col>
+                            <Col xs="auto align-self-center">6. January - 12. January</Col>
                             <Col xs="auto"><Button onClick={() => this.changeWeek(1)}><FaAngleRight/></Button></Col>
                         </Row>
                         <Row>
