@@ -1,12 +1,14 @@
 import React from "react";
-import {Alert, Button, Dropdown, Form, Modal} from "react-bootstrap";
+import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
+import {FaAngleLeft, FaAngleRight} from "react-icons/fa";
 
 export default class NewAppointmentModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             error: '',
-            selectedChild: ''
+            selectedChild: '',
+            focusWeekBeginDay: new Date()
         }
     }
 
@@ -41,6 +43,48 @@ export default class NewAppointmentModal extends React.Component {
                                 <option>Teacher Three</option>
                             </Form.Control>
                         </Form.Group>
+                        <Row className="justify-content-center mb-2">
+                            <Col xs="auto"><Button onClick={() => this.changeWeek(-1)}><FaAngleLeft/></Button></Col>
+                            <Col xs="auto">6. January - 12. January</Col>
+                            <Col xs="auto"><Button onClick={() => this.changeWeek(1)}><FaAngleRight/></Button></Col>
+                        </Row>
+                        <Row>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                        </Row>
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
