@@ -52,6 +52,35 @@ suite('students', () => {
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
         jexpect(g4.grades).to.equal(testData.students.find(s => s._id === '5dca711c89bf46419cf5d489').grades);
     });
+
+    test('getTermGrades', async () => {
+        const data = [{
+            'Latin': 5, 'English': 6, 'Art': 8, 'Science': 7, 'History': 10, 'Italian': 6, 'Math': 5, 'Physics': 5, 'Gym': 5, 'Religion': 5
+        }];
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+
+        // parent not found
+        const tg1 = await students.getTermGrades('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d491');
+        // student not found
+        const tg2 = await students.getTermGrades('5dca7e2b461dc52d681804fd', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const tg3 = await students.getTermGrades('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d48f');
+
+        // ok 1
+        const tg4 = await students.getTermGrades('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d491');
+
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d491' }, { termGrades: data });
+        
+        // ok 2
+        const tg5 = await students.getTermGrades('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d491');
+        
+        expect(tg1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg4.termGrades).to.equal([]);
+        jexpect(tg5.termGrades).to.equal(data);
+    });
     
     test('getAttendance', async () => {
         const data = [

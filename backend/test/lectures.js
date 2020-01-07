@@ -39,7 +39,7 @@ after(async () => await db.closeDatabase());
 
 suite('lectures', () => {
     
-    test('getDailyLectureTopics', async () => {
+    test('getDailyLectureTopicsOfTeacher', async () => {
         await Teacher.insertMany(testData.teachers);
         await Lecture.insertMany([
             { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_3', date: HLib.weekhourToDate('0_3'), topics: 'Test topics' },
@@ -47,18 +47,49 @@ suite('lectures', () => {
         ]);
 
         // teacher not found
-        const t1 = await lectures.getDailyLectureTopics('ffffffffffffffffffffffff', '1_1');
+        const t1 = await lectures.getDailyLectureTopicsOfTeacher('ffffffffffffffffffffffff', '1_1');
         // teacher has no lecture on that weekhour
-        const t2 = await lectures.getDailyLectureTopics('5dca7e2b461dc52d681804f3', '1_1');
+        const t2 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '1_1');
         // ok 1 (no lecture topics were entered)
-        const t3 = await lectures.getDailyLectureTopics('5dca7e2b461dc52d681804f3', '4_2');
+        const t3 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '4_2');
         // ok 2 (lecture topics already entered)
-        const t4 = await lectures.getDailyLectureTopics('5dca7e2b461dc52d681804f3', '0_3');
+        const t4 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '0_3');
         
         expect(t1.output.statusCode).to.equal(BAD_REQUEST);
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
         expect(t3.topics).to.be.null();
         expect(t4.topics).to.equal('Test topics');
+    });
+    
+    test('getDailyLectureTopicsForParent', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        await Lecture.insertMany([
+            { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_3', date: new Date('2019-12-09T11:00:00'), topics: 'Test topics' },
+            { classId: '5dc9c3112d698031f441e1c9', weekhour: '2_4', date: new Date('2019-11-20T12:00:00'), topics: 'Other topics' }
+        ]);
+
+        // parent not found
+        const t1 = await lectures.getDailyLectureTopicsForParent('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d485');
+        // student not found
+        const t2 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const t3 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d48f');
+
+        // ok 1
+        const t4 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-12-09T11:00:00').getTime());
+        // ok 2
+        const t5 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-11-29T10:02:00').getTime());
+        // ok 3
+        const t6 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-11-20T12:06:19').getTime());
+        
+        expect(t1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t4.topics).to.equal('Test topics');
+        expect(t5.topics).to.be.null();
+        expect(t6.topics).to.equal('Other topics');
     });
     
     test('getSupportMaterials', async () => {

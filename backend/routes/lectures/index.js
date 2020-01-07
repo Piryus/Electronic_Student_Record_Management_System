@@ -7,7 +7,7 @@ const routes = [
     {
         method: 'GET',
         path: '/lectures/{weekhour}',
-        handler: async (request, h) => lectures.getDailyLectureTopics(request.auth.credentials.id, request.params.weekhour),
+        handler: async (request, h) => lectures.getDailyLectureTopicsOfTeacher(request.auth.credentials.id, request.params.weekhour),
         options: {
             auth: {
                 strategy: 'session',
@@ -16,6 +16,25 @@ const routes = [
             validate: {
                 params: {
                     weekhour: Valid.weekhour.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/lectures/{studentId}',
+        handler: async (request, h) => lectures.getDailyLectureTopicsForParent(request.auth.credentials.id, request.params.studentId, request.query.datetime),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                },
+                query: {
+                    datetime: Valid.timeInt.required()
                 }
             }
         }

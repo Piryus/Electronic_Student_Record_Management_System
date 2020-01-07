@@ -22,6 +22,22 @@ const routes = [
     },
     {
         method: 'GET',
+        path: '/grades/{studentId}/term',
+        handler: async (request, h) => students.getTermGrades(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/attendance/{studentId}',
         handler: async (request, h) => students.getAttendance(request.auth.credentials.id, request.params.studentId),
         options: {

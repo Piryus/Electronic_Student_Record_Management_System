@@ -11,7 +11,7 @@ const Parent = require('../../models/Parent');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
 
-const getDailyLectureTopics = async function(teacherUId, weekhour) {
+const getDailyLectureTopicsOfTeacher = async function(teacherUId, weekhour) {
     const datetime = HLib.weekhourToDate(weekhour);
     const teacher = await Teacher.findOne({ userId: teacherUId });
 
@@ -22,6 +22,18 @@ const getDailyLectureTopics = async function(teacherUId, weekhour) {
         classId: teacher.timetable.find(t => t.weekhour === weekhour).classId,
         weekhour,
         date: datetime });
+
+    return { topics: lecture ? lecture.topics : null };
+};
+
+const getDailyLectureTopicsForParent = async function(parentUId, studentId, datetime) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+    
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    const lecture = await Lecture.findOne({ classId: student.classId, date: new Date(datetime - (datetime % (60*60*1000))) });
 
     return { topics: lecture ? lecture.topics : null };
 };
@@ -156,7 +168,8 @@ const rollCall = async function(teacherUId, info) {
 };
 
 module.exports = {
-    getDailyLectureTopics,
+    getDailyLectureTopicsOfTeacher,
+    getDailyLectureTopicsForParent,
     getAssignments,
     getSupportMaterials,
     getAttendance,

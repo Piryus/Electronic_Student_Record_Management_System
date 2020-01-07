@@ -9,6 +9,11 @@ const timetableEntrySchema = new Schema({
     weekhour: String
 });
 
+const meetingEntrySchema = new Schema({
+    parent: Schema.Types.ObjectId,
+    date: Date
+});
+
 const teacherSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId,
@@ -16,7 +21,8 @@ const teacherSchema = new Schema({
     },
     subjects: [String],
     timetable: [timetableEntrySchema],
-    meetingsTimeSlots: [String]
+    meetingsTimeSlots: [String],
+    meetings: [meetingEntrySchema]
 });
 
 module.exports = mongoose.model('Teacher', teacherSchema);

@@ -19,6 +19,16 @@ const getGrades = async function(parentUId, studentId) {
     return { grades: student.grades };
 };
 
+const getTermGrades = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId }, { 'grades._id': 0 });
+
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    return { termGrades: student.termGrades };
+};
+
 const getAttendance = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId }, { 'attendanceEvents._id': 0 });
@@ -195,6 +205,7 @@ const addSchoolClass = async function(name, students) {
 
 module.exports = {
     getGrades,
+    getTermGrades,
     getAttendance,
     getNotes,
     getStudents,
