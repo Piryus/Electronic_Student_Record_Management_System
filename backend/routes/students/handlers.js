@@ -9,6 +9,28 @@ const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
 const User = require('../../models/User');
 
+const getTeachers = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    const allTeachers = await Teacher.find().populate('userId');
+    const studentTeachers = allTeachers.filter(t => t.timetable.some(w => w.classId.equals(student.classId)));
+    const teachers = studentTeachers.map(t => {
+        return {
+            id: t._id,
+            ssn: t.userId.ssn,
+            name: t.userId.name,
+            surname: t.userId.surname,
+            subjects: [...new Set(t.timetable.filter(w => w.classId.equals(student.classId)).map(w => w.subject))]
+        };
+    })
+
+    return { teachers };
+};
+
 const getGrades = async function(parentUId, studentId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId }, { 'grades._id': 0 });
@@ -204,6 +226,7 @@ const addSchoolClass = async function(name, students) {
 };
 
 module.exports = {
+    getTeachers,
     getGrades,
     getTermGrades,
     getAttendance,

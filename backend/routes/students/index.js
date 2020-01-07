@@ -6,6 +6,22 @@ const students = require('./handlers');
 const routes = [
     {
         method: 'GET',
+        path: '/teachers/{studentId}',
+        handler: async (request, h) => students.getTeachers(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/grades/{studentId}',
         handler: async (request, h) => students.getGrades(request.auth.credentials.id, request.params.studentId),
         options: {

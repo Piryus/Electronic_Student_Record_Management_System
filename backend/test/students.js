@@ -34,6 +34,36 @@ after(async () => await db.closeDatabase());
 
 suite('students', () => {
 
+    test('getTeachers', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        // parent not found
+        const t1 = await students.getTeachers('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d48e');
+        // student not found
+        const t2 = await students.getTeachers('5dca7e2b461dc52d681804fd', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const t3 = await students.getTeachers('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d48f');
+        // ok
+        const t4 = await students.getTeachers('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d48e');
+        
+        expect(t1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(t4.teachers).to.equal([
+            { id: '5dca698eed550e4ca4aba7f5', ssn: 'DJRFUC56J13E485F', name: 'Mario', surname: 'Bianchi', subjects: ['Italian', 'History'] },
+            { id: '5dca69cf048e8e40d434017f', ssn: 'CMFOLR29R45S203O', name: 'Roberta', surname: 'Verdi', subjects: ['Math', 'Physics'] },
+            { id: '5dca6cbe7adca3346c5983cb', ssn: 'LDFVUI17P04D491B', name: 'Stefano', surname: 'Rossi', subjects: ['Latin'] },
+            { id: '5dca6cd5b83a1f3ef03e962b', ssn: 'SCBGMN21E45O956Q', name: 'Peter', surname: 'Posta', subjects: ['Art'] },
+            { id: '5dca6cf0a92bbb4dd8c0e817', ssn: 'PLVCGT02S19R549A', name: 'Federica', surname: 'Valli', subjects: ['English'] },
+            { id: '5dca6d0801ea271794cb650e', ssn: 'LCFTUI58S49G910R', name: 'Cinzia', surname: 'Tollo', subjects: ['Science'] },
+            { id: '5dca6d2038627d0bfc4167b0', ssn: 'QASVUM68G45D297P', name: 'Dario', surname: 'Resti', subjects: ['Gym'] },
+            { id: '5dca6d3620607b1e30dea42a', ssn: 'NCFTOG69F23B796K', name: 'Nina', surname: 'Fassio', subjects: ['Religion'] },
+        ]);
+    });
+
     test('getGrades', async () => {
         await Student.insertMany(testData.students);
         await Parent.insertMany(testData.parents);
