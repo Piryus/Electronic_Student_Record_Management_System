@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './styles.module.css';
 import {Container, Nav, Row} from 'react-bootstrap';
-import {FaAddressCard, FaBook, FaExclamationTriangle, FaGraduationCap, FaRegNewspaper, FaFilePdf} from 'react-icons/fa';
+import {FaAddressCard, FaBook, FaExclamationTriangle, FaGraduationCap, FaRegNewspaper, FaFilePdf, FaHandshake} from 'react-icons/fa';
 import AppNavbar from '../utils/navbar/navbar';
 import Grades from "./grades/parent-grades";
 import Assignments from './assignments';
@@ -9,6 +9,7 @@ import Attendance from './attendance/';
 import News from "../utils/news";
 import Notes from "./notes";
 import Material from "./material/material";
+import Meetings from "./meetings";
 
 export default class Parent extends React.Component {
 
@@ -67,6 +68,9 @@ export default class Parent extends React.Component {
                             <Nav.Link
                                 className={this.state.userRequest === 'material' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={() => this.setState({userRequest: "material"})}><FaFilePdf/> Support material</Nav.Link>
+                            <Nav.Link
+                                className={this.state.userRequest === 'meetings' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "meetings"})}><FaHandshake/> Meetings with teachers</Nav.Link>
                         </Nav>
                         <main className="col-md-10 ml-sm-auto col-lg-10 px-4 pt-5">
                             {this.state.userRequest === 'news' && (
@@ -86,6 +90,9 @@ export default class Parent extends React.Component {
                             )}
                             {this.state.userRequest === 'material' && (
                                 <Material child={this.state.childSelected}/>
+                            )}
+                            {this.state.userRequest === 'meetings' && (
+                                <Meetings child={this.state.childSelected}/>
                             )}
                         </main>
                     </Row>
