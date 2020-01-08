@@ -73,6 +73,22 @@ const routes = [
     },
     {
         method: 'GET',
+        path: '/timetable/{studentId}',
+        handler: async (request, h) => lectures.getTimetable(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/attendance',
         handler: async (request, h) => lectures.getAttendance(request.auth.credentials.id),
         options: {

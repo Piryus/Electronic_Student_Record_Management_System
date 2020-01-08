@@ -96,7 +96,7 @@ const getClasses = async function() {
     classes = classes.map(c => {
         const timetable = timetableInfo.filter(w => w.classId.equals(c._id));
         return { _id: c._id, name: c.name, timetable };
-    })
+    });
 
     return { classes };
 };

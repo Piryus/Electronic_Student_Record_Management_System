@@ -70,6 +70,25 @@ const getSupportMaterials = async function(parentUId, studentId) {
     return { supportMaterials };
 };
 
+const getTimetable = async function(parentUId, studentId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const student = await Student.findOne({ _id: studentId });
+    
+    if(parent === null || student === null || !parent.children.includes(student._id))
+        return Boom.badRequest();
+
+    const teachers = await Teacher.find().populate('userId');
+    
+    const timetable = teachers.filter(t => t.timetable.some(w => w.classId.equals(student.classId))).flatMap(t => {
+        const teacherInfo = { _id: t._id, ssn: t.userId.ssn, surname: t.userId.surname, name: t.userId.name };
+        return t.timetable.map(w => {
+            return { weekhour: w.weekhour, subject: w.subject, teacher: teacherInfo };
+        });
+    });
+
+    return { timetable };
+};
+
 const getAttendance = async function(teacherUId) {
     const nd = new Date(Date.now()).getNormalizedDay();
     const teacher = await Teacher.findOne({ userId: teacherUId });
@@ -172,6 +191,7 @@ module.exports = {
     getDailyLectureTopicsForParent,
     getAssignments,
     getSupportMaterials,
+    getTimetable,
     getAttendance,
     recordDailyLectureTopics,
     recordAssignments,
