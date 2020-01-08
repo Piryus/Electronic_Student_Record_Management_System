@@ -1,29 +1,37 @@
 import React from "react";
 import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {FaAngleLeft, FaAngleRight} from "react-icons/fa";
+import moment from "moment";
 
 
 export default class NewAppointmentModal extends React.Component {
     constructor(props) {
         super(props);
+        moment.locale('en-US');
         this.state = {
             error: '',
             children: [],
             selectedChild: null,
             teachers: [],
             selectedTeacher: null,
-            focusWeekBeginDay: new Date()
+            slots: [],
+            focusDay: new Date()
         }
     }
 
     async componentDidMount() {
         const children = await this.fetchChildren();
         const defaultTeachers = await this.fetchChildTeachers(children[0].id);
+        let defaultTeacherSlots = await this.fetchTeacherSlots(defaultTeachers[0].id);
+        defaultTeacherSlots = defaultTeacherSlots.filter(slot => {
+           return moment(slot.date).isSame(this.state.focusDay, 'day');
+        });
         this.setState({
             children,
             selectedChild: children[0],
             teachers: defaultTeachers,
-            selectedTeacher: defaultTeachers[0]
+            selectedTeacher: defaultTeachers[0],
+            slots: defaultTeacherSlots
         });
     }
 
@@ -55,6 +63,21 @@ export default class NewAppointmentModal extends React.Component {
         const response = await fetch(url, options);
         const json = await response.json();
         return json.teachers;
+    }
+
+    async fetchTeacherSlots(teacherId) {
+        const url = `http://localhost:3000/meetings/${teacherId}/slots`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+        const response = await fetch(url, options);
+        const json = await response.json();
+        return json.slots;
     }
 
     async selectChild(childId) {
@@ -94,45 +117,18 @@ export default class NewAppointmentModal extends React.Component {
                         </Form.Group>
                         <Row className="justify-content-center mb-2">
                             <Col xs="auto"><Button onClick={() => this.changeWeek(-1)}><FaAngleLeft/></Button></Col>
-                            <Col xs="auto align-self-center">6. January - 12. January</Col>
+                            <Col xs="auto align-self-center"><b>{moment(this.state.focusDay).format('dddd D MMMM')}</b></Col>
                             <Col xs="auto"><Button onClick={() => this.changeWeek(1)}><FaAngleRight/></Button></Col>
                         </Row>
                         <Row>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
-                            <Col xs={4}><Form.Check inline label="Jan. 12 15:00" type="radio"/></Col>
+                            {this.state.slots.map((slot, index) =>
+                                <Col xs={6} key={index}>
+                                    <Form.Check inline label={moment(slot.date).format('HH:mm')} type="radio"/>
+                                </Col>
+                            )}
+                            {this.state.slots.length === 0 &&
+                            <Col className="text-center">There isn't any available slot on this day.</Col>
+                            }
                         </Row>
                     </Form>
                 </Modal.Body>
