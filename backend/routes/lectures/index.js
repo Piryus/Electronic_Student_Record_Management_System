@@ -22,7 +22,7 @@ const routes = [
     },
     {
         method: 'GET',
-        path: '/lectures/{studentId}',
+        path: '/lectures/student/{studentId}',
         handler: async (request, h) => lectures.getDailyLectureTopicsForParent(request.auth.credentials.id, request.params.studentId, request.query.datetime),
         options: {
             auth: {
