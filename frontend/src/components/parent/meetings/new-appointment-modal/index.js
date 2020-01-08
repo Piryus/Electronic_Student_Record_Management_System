@@ -2,14 +2,69 @@ import React from "react";
 import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {FaAngleLeft, FaAngleRight} from "react-icons/fa";
 
+
 export default class NewAppointmentModal extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             error: '',
-            selectedChild: '',
+            children: [],
+            selectedChild: null,
+            teachers: [],
+            selectedTeacher: null,
             focusWeekBeginDay: new Date()
         }
+    }
+
+    async componentDidMount() {
+        const children = await this.fetchChildren();
+        const defaultTeachers = await this.fetchChildTeachers(children[0].id);
+        this.setState({
+            children,
+            selectedChild: children[0],
+            teachers: defaultTeachers,
+            selectedTeacher: defaultTeachers[0]
+        });
+    }
+
+    async fetchChildren() {
+        const url = 'http://localhost:3000/children';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+        const response = await fetch(url, options);
+        const json = await response.json();
+        return json.children;
+    }
+
+    async fetchChildTeachers(childId) {
+        const url = `http://localhost:3000/teachers/${childId}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        };
+        const response = await fetch(url, options);
+        const json = await response.json();
+        return json.teachers;
+    }
+
+    async selectChild(childId) {
+        const child = this.state.children.find(child => child.id === childId);
+        const teachers = await this.fetchChildTeachers(childId);
+        this.setState({
+            selectedChild: child,
+            teachers,
+            selectedTeacher: teachers[0]
+        });
     }
 
     render() {
@@ -26,21 +81,15 @@ export default class NewAppointmentModal extends React.Component {
                         <Form.Group controlId="formChild">
                             <Form.Label>Child:</Form.Label>
                             <Form.Control as="select"
-                                          value={this.state.selectedChild}
-                                          onChange={(e) => this.setState({selectedChild: e.target.value})}>
-                                <option>Julia</option>
-                                <option>Marco</option>
-                                <option>Pierro</option>
+                                          onChange={async (e) => this.selectChild(e.target.value)}>
+                                {this.state.children.map(child => <option value={child.id} key={child.id}>{child.name} {child.surname}</option>)}
                             </Form.Control>
                         </Form.Group>
                         <Form.Group controlId="formChild">
                             <Form.Label>Teacher:</Form.Label>
                             <Form.Control as="select"
-                                          value={this.state.selectedTeacher}
                                           onChange={(e) => this.setState({selectedTeacher: e.target.value})}>
-                                <option>Marco Rosso</option>
-                                <option>Teacher Five</option>
-                                <option>Teacher Three</option>
+                                {this.state.teachers.map(teacher => <option value={teacher} key={teacher._id}>{teacher.name} {teacher.surname}</option>)}
                             </Form.Control>
                         </Form.Group>
                         <Row className="justify-content-center mb-2">
