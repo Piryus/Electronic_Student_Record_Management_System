@@ -2,6 +2,7 @@
 
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
+const Sinon = require('sinon');
 
 const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
@@ -90,6 +91,72 @@ suite('teachers', () => {
         expect(ma2.timeSlots).to.have.length(0);
         expect(ma3.timeSlots).to.have.length(3);
         expect(ma3.timeSlots).to.equal(data);
+    });
+
+    test('getAvailableMeetingsSlots', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+
+        await Teacher.updateOne({ _id: '5dca69cf048e8e40d434017f' }, { meetingsTimeSlots: ['0_2', '1_0', '2_3', '4_2'] });
+        await Teacher.updateOne({ _id: '5dca6d0801ea271794cb650e' }, { meetingsTimeSlots: ['1_3', '4_0'] });
+        
+        await Teacher.updateOne({ _id: '5dca69cf048e8e40d434017f' }, { meetings: [
+            { parentId: '5dca781462307a4f84dd86d5', date: new Date('2019-12-09T10:45:00') },
+            { parentId: '5dca78645953000328b6131b', date: new Date('2019-12-11T11:00:00') },
+            { parentId: '5dca77de05972e0898e9c68d', date: new Date('2019-12-11T11:15:00') }
+        ] });
+        await Teacher.updateOne({ _id: '5dca6d0801ea271794cb650e' }, { meetings: [
+            { parentId: '5dca7825e60dac32e4828699', date: new Date('2019-12-13T08:30:00') }
+        ] });
+        
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-12-11T08:00:00').getTime());
+
+        // parent not found
+        const ams1 = await teachers.getAvailableMeetingsSlots('ffffffffffffffffffffffff', '5dca69cf048e8e40d434017f');
+        // teacher not found
+        const ams2 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', 'ffffffffffffffffffffffff');
+        // teacher is not teaching to any of parent's children
+        const ams3 = await teachers.getAvailableMeetingsSlots('5dca7e2b46ffff2d681804fe', '5dca69cf048e8e40d434017f');
+
+        // ok 1
+        const ams4 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca69cf048e8e40d434017f');
+        // ok 2
+        const ams5 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca6d0801ea271794cb650e');
+
+        fakeClock.restore();
+
+        expect(ams1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ams2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ams3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(ams4.slots).to.equal(j([
+            { date: new Date('2019-12-09T10:00:00'), available: true },
+            { date: new Date('2019-12-09T10:15:00'), available: true },
+            { date: new Date('2019-12-09T10:30:00'), available: true },
+            { date: new Date('2019-12-09T10:45:00'), available: false },
+            { date: new Date('2019-12-10T08:00:00'), available: true },
+            { date: new Date('2019-12-10T08:15:00'), available: true },
+            { date: new Date('2019-12-10T08:30:00'), available: true },
+            { date: new Date('2019-12-10T08:45:00'), available: true },
+            { date: new Date('2019-12-11T11:00:00'), available: false },
+            { date: new Date('2019-12-11T11:15:00'), available: false },
+            { date: new Date('2019-12-11T11:30:00'), available: true },
+            { date: new Date('2019-12-11T11:45:00'), available: true },
+            { date: new Date('2019-12-13T10:00:00'), available: true },
+            { date: new Date('2019-12-13T10:15:00'), available: true },
+            { date: new Date('2019-12-13T10:30:00'), available: true },
+            { date: new Date('2019-12-13T10:45:00'), available: true },
+        ]));
+        jexpect(ams5.slots).to.equal(j([
+            { date: new Date('2019-12-10T11:00:00'), available: true },
+            { date: new Date('2019-12-10T11:15:00'), available: true },
+            { date: new Date('2019-12-10T11:30:00'), available: true },
+            { date: new Date('2019-12-10T11:45:00'), available: true },
+            { date: new Date('2019-12-13T08:00:00'), available: true },
+            { date: new Date('2019-12-13T08:15:00'), available: true },
+            { date: new Date('2019-12-13T08:30:00'), available: false },
+            { date: new Date('2019-12-13T08:45:00'), available: true },
+        ]));
     });
 
     test('getTermGrades', async () => {

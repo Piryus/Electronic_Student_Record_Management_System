@@ -3,6 +3,7 @@
 const Boom = require('boom');
 const HLib = require('@emarkk/hlib');
 
+const Parent = require('../../models/Parent');
 const SchoolClass = require('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
@@ -30,6 +31,27 @@ const getMeetingsAvailability = async function(teacherUId) {
         return Boom.badRequest();
 
     return { timeSlots: teacher.meetingsTimeSlots };
+};
+
+const getAvailableMeetingsSlots = async function(parentUId, teacherId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const teacher = await Teacher.findById(teacherId);
+
+    if(parent === null || teacher === null)
+        return Boom.badRequest();
+
+    const children = await Student.find({ _id: { $in: parent.children }});
+
+    if(!teacher.timetable.some(w => children.map(c => c.classId.toString()).includes(w.classId.toString())))
+        return Boom.badRequest();
+
+    const slots = teacher.meetingsTimeSlots.flatMap(s => {
+        return [...Array(4).keys()].map(x => new Date(HLib.weekhourToDate(s).getTime() + x*15*60*1000));
+    }).map(s => {
+        return { date: s, available: !teacher.meetings.some(m => m.date.getTime() === s.getTime()) };
+    });
+
+    return { slots };
 };
 
 const getTermGrades = async function(teacherUId) {
@@ -85,6 +107,10 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
     return { success: true };
 };
 
+const bookMeetingSlot = async function(parentUId, teacherId, datetime) {
+    //
+};
+
 const publishTermGrades = async function(teacherUId, gradesInfo) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     
@@ -125,7 +151,9 @@ const publishTermGrades = async function(teacherUId, gradesInfo) {
 module.exports = {
     getNotes,
     getMeetingsAvailability,
+    getAvailableMeetingsSlots,
     getTermGrades,
     setMeetingsAvailability,
+    bookMeetingSlot,
     publishTermGrades
 };
