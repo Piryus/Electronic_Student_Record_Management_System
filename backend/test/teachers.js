@@ -102,12 +102,12 @@ suite('teachers', () => {
         await Teacher.updateOne({ _id: '5dca6d0801ea271794cb650e' }, { meetingsTimeSlots: ['1_3', '4_0'] });
         
         await Teacher.updateOne({ _id: '5dca69cf048e8e40d434017f' }, { meetings: [
-            { parentId: '5dca781462307a4f84dd86d5', date: new Date('2019-12-09T10:45:00') },
-            { parentId: '5dca78645953000328b6131b', date: new Date('2019-12-11T11:00:00') },
-            { parentId: '5dca77de05972e0898e9c68d', date: new Date('2019-12-11T11:15:00') }
+            { parent: '5dca781462307a4f84dd86d5', date: new Date('2019-12-09T10:45:00') },
+            { parent: '5dca78645953000328b6131b', date: new Date('2019-12-11T11:00:00') },
+            { parent: '5dca77de05972e0898e9c68d', date: new Date('2019-12-11T11:15:00') }
         ] });
         await Teacher.updateOne({ _id: '5dca6d0801ea271794cb650e' }, { meetings: [
-            { parentId: '5dca7825e60dac32e4828699', date: new Date('2019-12-13T08:30:00') }
+            { parent: '5dca7825e60dac32e4828699', date: new Date('2019-12-13T08:30:00') }
         ] });
         
         const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-12-11T08:00:00').getTime());
@@ -269,6 +269,71 @@ suite('teachers', () => {
         expect(ma5.success).to.be.true();
         expect(t4.meetingsTimeSlots).to.have.length(3);
         expect(t4.meetingsTimeSlots).to.equal(['2_0', '3_3', '4_1']);
+    });
+
+    test('bookMeetingSlot', async () => {
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        
+        await Teacher.updateOne({ _id: '5dca698eed550e4ca4aba7f5' }, { meetingsTimeSlots: ['0_3', '1_4', '2_3', '4_2'] });
+        
+        await Teacher.updateOne({ _id: '5dca698eed550e4ca4aba7f5' }, { meetings: [
+            { parent: '5dca781462307a4f84dd86d5', date: new Date('2019-11-20T11:45:00') },
+            { parent: '5dca78645953000328b6131b', date: new Date('2019-11-22T10:00:00') },
+            { parent: '5dca7825e60dac32e4828699', date: new Date('2019-11-22T10:30:00') }
+        ] });
+        
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-19T11:35:24').getTime());
+
+        // parent not found
+        const b1 = await teachers.bookMeetingSlot('ffffffffffffffffffffffff', '5dca698eed550e4ca4aba7f5');
+        // teacher not found
+        const b2 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', 'ffffffffffffffffffffffff');
+        // teacher is not teaching to any of parent's children
+        const b3 = await teachers.bookMeetingSlot('5dca7e2b46ffff2d681804fe', '5dca698eed550e4ca4aba7f5');
+        // booking in the past
+        const b4 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-18T11:15:00'));
+        const b5 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-19T10:00:00'));
+        const b6 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-19T11:36:10'));
+        // booking weekhour not allocated for meetings
+        const b7 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-21T10:46:00'));
+        const b8 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T11:00:00'));
+        // booking slot already busy
+        const b9 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:50:00'));
+        const b10 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:30:00'));
+
+        const t1 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
+        
+        // ok 1
+        const b11 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:00:00'));
+        
+        const t2 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
+
+        // ok 2
+        const b12 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804fd', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:16:00'));
+        
+        const t3 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
+
+        fakeClock.restore();
+
+        expect(b1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b5.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b6.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b7.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b8.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b9.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b10.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t1.meetings).to.have.length(3);
+        expect(b11.success).to.be.true();
+        expect(t2.meetings).to.have.length(4);
+        jexpect(t2.meetings.find(m => m.parent.equals('5dca77de05972e0898e9c68d')).date.getTime()).to.equal(new Date('2019-11-20T11:00:00').getTime());
+        expect(b12.success).to.be.true();
+        expect(t3.meetings).to.have.length(5);
+        jexpect(t3.meetings.find(m => m.parent.equals('5dca784dcf1db14678f3cadb')).date.getTime()).to.equal(new Date('2019-11-22T10:15:00').getTime());
     });
 
     test('publishTermGrades', async () => {

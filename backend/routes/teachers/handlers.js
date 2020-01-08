@@ -108,7 +108,29 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
 };
 
 const bookMeetingSlot = async function(parentUId, teacherId, datetime) {
-    //
+    const parent = await Parent.findOne({ userId: parentUId });
+    const teacher = await Teacher.findById(teacherId);
+
+    if(parent === null || teacher === null)
+        return Boom.badRequest();
+
+    const children = await Student.find({ _id: { $in: parent.children }});
+
+    if(!teacher.timetable.some(w => children.map(c => c.classId.toString()).includes(w.classId.toString())))
+        return Boom.badRequest();
+
+    datetime = new Date(datetime.getTime() - datetime.getTime() % (15*60*1000));
+    if(datetime < Date.now())
+        return Boom.badRequest();
+        
+    const t = datetime.getTime() - datetime.getTime() % (60*60*1000);
+    if(!teacher.meetingsTimeSlots.map(s => HLib.weekhourToDate(s)).some(s => s.getTime() === t) || teacher.meetings.some(m => m.date.getTime() === datetime.getTime()))
+        return Boom.badRequest();
+
+    teacher.meetings.push({ parent: parent._id, date: datetime });
+    await teacher.save();
+
+    return { success: true };
 };
 
 const publishTermGrades = async function(teacherUId, gradesInfo) {
