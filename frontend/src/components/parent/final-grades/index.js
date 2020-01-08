@@ -1,6 +1,8 @@
 import React from 'react';
 import SectionHeader from '../../utils/section-header';
 import {Container, Table, InputGroup, FormControl, Pagination} from 'react-bootstrap';
+import LoadingSpinner from "../../utils/loading-spinner";
+
 
 
 export default class ParentFinalGrades extends React.Component {
@@ -8,20 +10,10 @@ export default class ParentFinalGrades extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-                period1: { //Hardcoded. To be replaced with real data
-                    "Italian" : "8",
-                    "History" : "9",
-                    "Latin" : "10",
-                    "Math" : "9",
-                    "English" : "9",
-                    "Physics" : "9",
-                    "Art" : "9",
-                    "Science" : "9",
-                    "Gym" : "9",
-                    "Religion" : "9"
-                },
+                period1: null,
                 period2: null,
                 selectedPeriod : null,
+                isLoading: true
         }
     }
 
@@ -29,9 +21,42 @@ export default class ParentFinalGrades extends React.Component {
         await this.loadChildFinalGrades();
     }
 
+    async componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.child._id !== this.props.child._id) {
+            await this.loadChildFinalGrades();
+        }
+    }
+
     async loadChildFinalGrades(){
-        //Load child final grades here
-        this.setState({selectedPeriod: 1});
+        // Query child's grades
+        const url = 'http://localhost:3000/grades/' + this.props.child._id + '/term';
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        if(json.termGrades === undefined || json.termGrades.length === 0){
+            this.setState({selectedPeriod: null, isLoading: false});
+        } else if(json.termGrades.length === 1){
+            this.setState({
+                period1: json.termGrades[0],
+                period2: null,
+                selectedPeriod: 1,
+                isLoading: false
+            });
+        } else if(json.termGrades.length === 2){
+            this.setState({
+                period1: json.termGrades[0],
+                period2: json.termGrades[1],
+                selectedPeriod: 1,
+                isLoading: false
+            });
+        }
     }
 
     changePeriod(period){
@@ -73,12 +98,12 @@ export default class ParentFinalGrades extends React.Component {
         return(
             <Container fluid>
                 <SectionHeader>Final grades of the term</SectionHeader>
-                
-                {this.state.selectedPeriod === null &&
+                {this.state.isLoading && <LoadingSpinner/>}
+                {!this.state.isLoading && this.state.selectedPeriod === null &&
                     <i>This section is currently not available. This section will be enabled
                     when final grades are available. </i>
                 }
-                {this.state.selectedPeriod !== null &&
+                {!this.state.isLoading && this.state.selectedPeriod !== null &&
                 <div>
                     <Pagination>
                         <Pagination style = {{marginLeft: '1%'}}>
