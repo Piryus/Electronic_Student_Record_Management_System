@@ -2,6 +2,7 @@ import React from "react";
 import {Alert, Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {FaAngleLeft, FaAngleRight} from "react-icons/fa";
 import moment from "moment";
+import LoadingSpinner from "../../../utils/loading-spinner";
 
 
 export default class NewAppointmentModal extends React.Component {
@@ -14,24 +15,44 @@ export default class NewAppointmentModal extends React.Component {
             selectedChild: null,
             teachers: [],
             selectedTeacher: null,
-            slots: [],
-            focusDay: new Date()
+            teacherSlots: [],
+            displayedSlots: [],
+            focusDay: new Date(),
+            isLoading: true
         }
     }
 
     async componentDidMount() {
         const children = await this.fetchChildren();
         const defaultTeachers = await this.fetchChildTeachers(children[0].id);
-        let defaultTeacherSlots = await this.fetchTeacherSlots(defaultTeachers[0].id);
-        defaultTeacherSlots = defaultTeacherSlots.filter(slot => {
-           return moment(slot.date).isSame(this.state.focusDay, 'day');
+        let teacherSlots = await this.fetchTeacherSlots(defaultTeachers[0].id);
+        const defaultTeacherSlots = teacherSlots.filter(slot => {
+            return moment(slot.date).isSame(this.state.focusDay, 'day');
         });
         this.setState({
             children,
             selectedChild: children[0],
             teachers: defaultTeachers,
             selectedTeacher: defaultTeachers[0],
-            slots: defaultTeacherSlots
+            teacherSlots: teacherSlots,
+            displayedSlots: defaultTeacherSlots,
+            isLoading: false
+        });
+    }
+
+    async changeDay(next) {
+        let newDay = this.state.focusDay;
+        if (next === 1) {
+            newDay = moment(this.state.focusDay).add(1, 'd');
+        } else if (next === -1 && moment(this.state.focusDay).isAfter(new Date(), 'day')) {
+            newDay = moment(this.state.focusDay).add(-1, 'd');
+        }
+        const teacherSlots = this.state.teacherSlots.filter(slot => {
+            return moment(slot.date).isSame(newDay, 'day');
+        });
+        this.setState({
+            focusDay: newDay,
+            displayedSlots: teacherSlots
         });
     }
 
@@ -83,10 +104,29 @@ export default class NewAppointmentModal extends React.Component {
     async selectChild(childId) {
         const child = this.state.children.find(child => child.id === childId);
         const teachers = await this.fetchChildTeachers(childId);
+        let teacherSlots = await this.fetchTeacherSlots(teachers[0].id);
+        const defaultTeacherSlots = teacherSlots.filter(slot => {
+            return moment(slot.date).isSame(this.state.focusDay, 'day');
+        });
         this.setState({
             selectedChild: child,
             teachers,
-            selectedTeacher: teachers[0]
+            selectedTeacher: teachers[0],
+            teacherSlots,
+            displayedSlots: defaultTeacherSlots
+        });
+    }
+
+    async selectTeacher(teacherId) {
+        const teacher = this.state.teachers.find(teacher => teacher.id === teacherId);
+        let teacherSlots = await this.fetchTeacherSlots(teacherId);
+        const defaultTeacherSlots = teacherSlots.filter(slot => {
+            return moment(slot.date).isSame(this.state.focusDay, 'day');
+        });
+        this.setState({
+            selectedTeacher: teacher,
+            teacherSlots,
+            displayedSlots: defaultTeacherSlots
         });
     }
 
@@ -96,46 +136,62 @@ export default class NewAppointmentModal extends React.Component {
                 <Modal.Header closeButton>
                     <Modal.Title>Book a new appointment</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    {this.state.error !== '' &&(
-                        <Alert variant='danger'>{this.state.error}</Alert>
-                    )}
-                    <Form>
-                        <Form.Group controlId="formChild">
-                            <Form.Label>Child:</Form.Label>
-                            <Form.Control as="select"
-                                          onChange={async (e) => this.selectChild(e.target.value)}>
-                                {this.state.children.map(child => <option value={child.id} key={child.id}>{child.name} {child.surname}</option>)}
-                            </Form.Control>
-                        </Form.Group>
-                        <Form.Group controlId="formChild">
-                            <Form.Label>Teacher:</Form.Label>
-                            <Form.Control as="select"
-                                          onChange={(e) => this.setState({selectedTeacher: e.target.value})}>
-                                {this.state.teachers.map(teacher => <option value={teacher} key={teacher._id}>{teacher.name} {teacher.surname}</option>)}
-                            </Form.Control>
-                        </Form.Group>
-                        <Row className="justify-content-center mb-2">
-                            <Col xs="auto"><Button onClick={() => this.changeWeek(-1)}><FaAngleLeft/></Button></Col>
-                            <Col xs="auto align-self-center"><b>{moment(this.state.focusDay).format('dddd D MMMM')}</b></Col>
-                            <Col xs="auto"><Button onClick={() => this.changeWeek(1)}><FaAngleRight/></Button></Col>
-                        </Row>
-                        <Row>
-                            {this.state.slots.map((slot, index) =>
-                                <Col xs={6} key={index}>
-                                    <Form.Check inline label={moment(slot.date).format('HH:mm')} type="radio"/>
+                {this.state.isLoading && <LoadingSpinner/>}
+                {!this.state.isLoading &&
+                <>
+                    <Modal.Body>
+                        {this.state.error !== '' && (
+                            <Alert variant='danger'>{this.state.error}</Alert>
+                        )}
+                        <Form>
+                            <Form.Group controlId="formChild">
+                                <Form.Label>Child:</Form.Label>
+                                <Form.Control as="select"
+                                              value={this.state.selectedChild.id}
+                                              onChange={async (e) => this.selectChild(e.target.value)}>
+                                    {this.state.children.map(child => <option value={child.id}
+                                                                              key={child.id}>{child.name} {child.surname}</option>)}
+                                </Form.Control>
+                            </Form.Group>
+                            <Form.Group controlId="formChild">
+                                <Form.Label>Teacher:</Form.Label>
+                                <Form.Control as="select"
+                                              value={this.state.selectedTeacher.id}
+                                              onChange={async (e) => await this.selectTeacher(e.target.value)}>
+                                    {this.state.teachers.map(teacher => <option value={teacher.id}
+                                                                                key={teacher.id}>{teacher.name} {teacher.surname}</option>)}
+                                </Form.Control>
+                            </Form.Group>
+                            <Row className="justify-content-center mb-2">
+                                <Col xs="auto">
+                                    <Button onClick={async () => await this.changeDay(-1)}
+                                            disabled={!moment(this.state.focusDay).isAfter(Date.now(), 'day')}>
+                                        <FaAngleLeft/>
+                                    </Button>
                                 </Col>
-                            )}
-                            {this.state.slots.length === 0 &&
-                            <Col className="text-center">There isn't any available slot on this day.</Col>
-                            }
-                        </Row>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="success" onClick={() => this.handleSubmitForm()}>Book</Button>
-                    <Button variant="danger" onClick={() => this.props.onClose()}>Cancel</Button>
-                </Modal.Footer>
+                                <Col
+                                    xs="auto align-self-center"><b>{moment(this.state.focusDay).format('dddd D MMMM')}</b></Col>
+                                <Col xs="auto"><Button
+                                    onClick={async () => await this.changeDay(1)}><FaAngleRight/></Button></Col>
+                            </Row>
+                            <Row>
+                                {this.state.displayedSlots.map((slot, index) =>
+                                    <Col xs={4} key={index}>
+                                        <Form.Check inline label={moment(slot.date).format('HH:mm')} type="radio"/>
+                                    </Col>
+                                )}
+                                {this.state.displayedSlots.length === 0 &&
+                                <Col className="text-center">There isn't any available slot on this day.</Col>
+                                }
+                            </Row>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="success" onClick={() => this.handleSubmitForm()}>Book</Button>
+                        <Button variant="danger" onClick={() => this.props.onClose()}>Cancel</Button>
+                    </Modal.Footer>
+                </>
+                }
             </Modal>
         );
     }
