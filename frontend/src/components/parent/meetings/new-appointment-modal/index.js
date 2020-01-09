@@ -98,7 +98,7 @@ export default class NewAppointmentModal extends React.Component {
         };
         const response = await fetch(url, options);
         const json = await response.json();
-        return json.slots;
+        return json.slots.sort((slot1, slot2) => new Date(slot1.date) - new Date(slot2.date));
     }
 
     async selectChild(childId) {
@@ -136,7 +136,7 @@ export default class NewAppointmentModal extends React.Component {
                 <Modal.Header closeButton>
                     <Modal.Title>Book a new appointment</Modal.Title>
                 </Modal.Header>
-                {this.state.isLoading && <LoadingSpinner/>}
+                {this.state.isLoading && <div className="mt-5 mb-5"><LoadingSpinner/></div>}
                 {!this.state.isLoading &&
                 <>
                     <Modal.Body>
@@ -176,7 +176,7 @@ export default class NewAppointmentModal extends React.Component {
                             </Row>
                             <Row>
                                 {this.state.displayedSlots.map((slot, index) =>
-                                    <Col xs={4} key={index}>
+                                    <Col xs={4} key={index} className="d-flex justify-content-center">
                                         <Form.Check inline label={moment(slot.date).format('HH:mm')} type="radio"/>
                                     </Col>
                                 )}
