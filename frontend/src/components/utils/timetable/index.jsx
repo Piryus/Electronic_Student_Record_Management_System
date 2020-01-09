@@ -10,18 +10,21 @@ export default class Timetable extends Component {
         super(props);
 
         this.state = {
-            selectedWeekHour: ''
+            selectedWeekHour: '',
+            selectedDate: ''
         };
     }
 
     selectCell = (dayIndex, hourIndex) => {
         const weekHour = dayIndex + '_' + hourIndex;
+        const date = this.props.data[dayIndex];
         if (this.props.selectionHandler) {
-            this.props.selectionHandler(weekHour);
+            this.props.selectionHandler(weekHour, date);
         }
         if (this.props.selectable) {
             this.setState({
-                selectedWeekHour: weekHour
+                selectedWeekHour: weekHour,
+                selectedDate: date
             });
         }
     };
