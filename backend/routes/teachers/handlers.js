@@ -24,6 +24,19 @@ const getNotes = async function(teacherUId) {
     return { notes };
 };
 
+const getTimetable = async function(classId) {
+    const teachers = await Teacher.find().populate('userId');
+    
+    const timetable = teachers.filter(t => t.timetable.some(w => w.classId.equals(classId))).flatMap(t => {
+        const teacherInfo = { _id: t._id, ssn: t.userId.ssn, surname: t.userId.surname, name: t.userId.name };
+        return t.timetable.map(w => {
+            return { weekhour: w.weekhour, subject: w.subject, teacher: teacherInfo };
+        });
+    });
+    
+    return { timetable };
+};
+
 const getMeetingsAvailability = async function(teacherUId) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     
@@ -172,6 +185,7 @@ const publishTermGrades = async function(teacherUId, gradesInfo) {
 
 module.exports = {
     getNotes,
+    getTimetable,
     getMeetingsAvailability,
     getAvailableMeetingsSlots,
     getTermGrades,

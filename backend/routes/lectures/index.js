@@ -73,7 +73,7 @@ const routes = [
     },
     {
         method: 'GET',
-        path: '/timetable/{studentId}',
+        path: '/timetable/student/{studentId}',
         handler: async (request, h) => lectures.getTimetable(request.auth.credentials.id, request.params.studentId),
         options: {
             auth: {

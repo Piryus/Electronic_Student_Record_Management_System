@@ -17,6 +17,22 @@ const routes = [
     },
     {
         method: 'GET',
+        path: '/timetable/{classId}',
+        handler: async (request, h) => teachers.getTimetable(request.params.classId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                params: {
+                    classId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/meetings/availability',
         handler: async (request, h) => teachers.getMeetingsAvailability(request.auth.credentials.id),
         options: {
