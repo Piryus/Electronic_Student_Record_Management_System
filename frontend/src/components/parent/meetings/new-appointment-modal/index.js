@@ -18,7 +18,8 @@ export default class NewAppointmentModal extends React.Component {
             teacherSlots: [],
             displayedSlots: [],
             focusDay: new Date(),
-            isLoading: true
+            isLoading: true,
+            selectedSlot: ""
         }
     }
 
@@ -52,7 +53,8 @@ export default class NewAppointmentModal extends React.Component {
         });
         this.setState({
             focusDay: newDay,
-            displayedSlots: teacherSlots
+            displayedSlots: teacherSlots,
+            selectedSlot: ""
         });
     }
 
@@ -113,7 +115,8 @@ export default class NewAppointmentModal extends React.Component {
             teachers,
             selectedTeacher: teachers[0],
             teacherSlots,
-            displayedSlots: defaultTeacherSlots
+            displayedSlots: defaultTeacherSlots,
+            selectedSlot: ""
         });
     }
 
@@ -126,8 +129,29 @@ export default class NewAppointmentModal extends React.Component {
         this.setState({
             selectedTeacher: teacher,
             teacherSlots,
-            displayedSlots: defaultTeacherSlots
+            displayedSlots: defaultTeacherSlots,
+            selectedSlot: ""
         });
+    }
+
+    async book() {
+        const url = `http://localhost:3000/meetings/${this.state.selectedTeacher.id}/book`;
+        const options = {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                datetime: this.state.selectedSlot
+            })
+        };
+        const response = await fetch(url, options);
+        const json = await response.json();
+        if (json.success) {
+            this.props.onClose();
+        }
     }
 
     render() {
@@ -177,7 +201,14 @@ export default class NewAppointmentModal extends React.Component {
                             <Row>
                                 {this.state.displayedSlots.map((slot, index) =>
                                     <Col xs={4} key={index} className="d-flex justify-content-center">
-                                        <Form.Check inline label={moment(slot.date).format('HH:mm')} type="radio"/>
+                                        <Form.Check inline
+                                                    name="radioSlot"
+                                                    checked={this.state.selectedSlot === slot.date}
+                                                    value={slot.date}
+                                                    disabled={!slot.available || moment(slot.date).isBefore(Date.now(), 'minute')}
+                                                    className="text-success"
+                                                    onChange={(e) => this.setState({selectedSlot: e.target.value})}
+                                                    label={moment(slot.date).format('HH:mm')} type="radio"/>
                                     </Col>
                                 )}
                                 {this.state.displayedSlots.length === 0 &&
@@ -187,7 +218,7 @@ export default class NewAppointmentModal extends React.Component {
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="success" onClick={() => this.handleSubmitForm()}>Book</Button>
+                        <Button variant="success" onClick={async () => await this.book()}>Book</Button>
                         <Button variant="danger" onClick={() => this.props.onClose()}>Cancel</Button>
                     </Modal.Footer>
                 </>
