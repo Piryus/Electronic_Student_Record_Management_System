@@ -21,17 +21,17 @@ const getArticles = async function() {
     return { articles: articles.sort((a, b) => b.date - a.date) };
 };
 
+const getParents = async function() {
+    const parents = await User.find({ firstLogin: true, scope: 'parent' }).select('ssn name surname mail');
+    
+    return parents;
+};
+
 const addArticle = async function(officerUId, title, content) {
     const article = new Article({ title, content, authorId: officerUId });
     await article.save();
 
     return { success: true };
-};
-
-const getParents = async function() {
-    const parents = await User.find({firstLogin: true, scope: 'parent'})
-        .select('ssn name surname mail');
-    return parents;
 };
 
 const addParent = async function(ssn, name, surname, mail, childSsn) {
@@ -54,10 +54,11 @@ const addParent = async function(ssn, name, surname, mail, childSsn) {
 };
 
 const sendCredentials = async function(parents) {
-    for (const parentUserId of parents) {
-        const user = await User.findOne({_id: parentUserId});
+    for(const parentUId of parents) {
+        const user = await User.findById(parentUId);
         Utils.sendWelcomeEmail(user.mail, user.name + ' ' + user.surname, user.password);
     }
+
     return { success: true };
 };
 
