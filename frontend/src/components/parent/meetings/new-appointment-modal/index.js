@@ -150,6 +150,7 @@ export default class NewAppointmentModal extends React.Component {
         const response = await fetch(url, options);
         const json = await response.json();
         if (json.success) {
+            await this.selectTeacher(this.state.selectedTeacher.id);
             this.props.onClose();
         }
     }
