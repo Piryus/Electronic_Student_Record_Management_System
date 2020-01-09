@@ -69,7 +69,6 @@ export default class ParentLectureTopics extends React.Component {
     }
 
     async getChildTimetable(){
-        console.log('ciao');
         const url = 'http://localhost:3000/timetable/student/' + this.props.child._id;
         const options = {
             method: 'GET',
@@ -81,9 +80,6 @@ export default class ParentLectureTopics extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-
-        console.log(json);
-
         this.setState({timetable: json.timetable, isLoading: false});
 
     }
