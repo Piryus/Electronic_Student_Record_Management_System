@@ -9,6 +9,8 @@ const testData = require('../test-lib/testData');
 
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
+const Teacher = require('../models/Teacher');
+const User = require('../models/User');
 
 const parents = require ('../routes/parents/handlers');
 
@@ -55,6 +57,34 @@ suite('parents', () => {
         jexpect(c4.children).to.equal([
             { id: '5dca711c89bf46419cf5d485', ssn: 'JPCOME07O02C034H', name: 'Alice', surname: 'Capon' }
         ]);
+    });
+
+    test('getMeetingsBooked', async () => {
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        // parent not found
+        const m1 = await parents.getMeetingsBooked('ffffffffffffffffffffffff');
+        // ok 1
+        const m2 = await parents.getMeetingsBooked('5dca7e2b461dc52d681804fb');
+        // ok 2
+        const m3 = await parents.getMeetingsBooked('5dca7e2b461dc52d681804fd');
+
+        await Teacher.updateOne({ _id: '5dca69cf048e8e40d434017f' }, { meetings: [{ date: new Date('2019-12-10T11:00:00'), parent: '5dca784dcf1db14678f3cadb' }] });
+        await Teacher.updateOne({ _id: '5dca6cf0a92bbb4dd8c0e817' }, { meetings: [{ date: new Date('2019-12-11T09:00:00'), parent: '5dca784dcf1db14678f3cadb' }] });
+
+        // ok 3
+        const m4 = await parents.getMeetingsBooked('5dca7e2b461dc52d681804fd');
+
+        expect(m1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(m2.meetings).to.have.length(0);
+        expect(m3.meetings).to.have.length(0);
+        expect(m4.meetings).to.have.length(2);
+        jexpect(m4.meetings).to.equal(j([
+            { date: new Date('2019-12-10T11:00:00'), teacher: { _id: '5dca69cf048e8e40d434017f', ssn: 'CMFOLR29R45S203O', name: 'Roberta', surname: 'Verdi' } },
+            { date: new Date('2019-12-11T09:00:00'), teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', ssn: 'PLVCGT02S19R549A', name: 'Federica', surname: 'Valli' } }
+        ]));
     });
 
 });
