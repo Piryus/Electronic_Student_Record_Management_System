@@ -62,7 +62,7 @@ const routes = [
         path: '/teacher/{teacherId}',
         handler: async (request, h) => {
             const { ssn, name, surname, mail } = request.payload;
-            return secretary.updateTeacher(ssn, name, surname, mail);
+            return secretary.updateTeacher(request.params.teacherId, ssn, name, surname, mail);
         },
         options: {
             auth: {
