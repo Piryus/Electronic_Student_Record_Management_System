@@ -12,6 +12,15 @@ const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
 const User = require('../../models/User');
 
+const getTeachers = async function() {
+    const rawTeachers = await Teacher.find().populate('userId');
+    const teachers = rawTeachers.map(t => {
+        return { id: t._id, ssn: t.userId.ssn, name: t.userId.name, surname: t.userId.surname };
+    });
+
+    return { teachers };
+};
+
 const getArticles = async function() {
     const articles = await Article.find({}).populate({
         path: 'authorId',
@@ -84,6 +93,7 @@ const publishTimetables = async function(timetablesFile) {
 };
 
 module.exports = {
+    getTeachers,
     getArticles,
     addArticle,
     addParent,

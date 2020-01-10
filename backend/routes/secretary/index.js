@@ -6,6 +6,17 @@ const secretary = require('./handlers');
 const routes = [
     {
         method: 'GET',
+        path: '/teachers',
+        handler: async (request, h) => secretary.getTeachers(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/articles',
         handler: async (request, h) => secretary.getArticles(),
         options: {

@@ -37,8 +37,30 @@ afterEach(async () => await db.clearDatabase());
 
 after(async () => await db.closeDatabase());
 
-
 suite('secretary', () => {
+    
+    test('getTeachers', async () => {
+        await User.insertMany(testData.users);
+
+        const t1 = await secretary.getTeachers();
+
+        await Teacher.insertMany(testData.teachers);
+        
+        const t2 = await secretary.getTeachers();
+        
+        expect(t1.teachers).to.have.length(0);
+        expect(t2.teachers).to.have.length(8);
+        jexpect(t2.teachers).to.equal(j([
+            { id: '5dca698eed550e4ca4aba7f5', ssn: 'DJRFUC56J13E485F', name: 'Mario', surname: 'Bianchi' },
+            { id: '5dca69cf048e8e40d434017f', ssn: 'CMFOLR29R45S203O', name: 'Roberta', surname: 'Verdi' },
+            { id: '5dca6cbe7adca3346c5983cb', ssn: 'LDFVUI17P04D491B', name: 'Stefano', surname: 'Rossi' },
+            { id: '5dca6cd5b83a1f3ef03e962b', ssn: 'SCBGMN21E45O956Q', name: 'Peter', surname: 'Posta' },
+            { id: '5dca6cf0a92bbb4dd8c0e817', ssn: 'PLVCGT02S19R549A', name: 'Federica', surname: 'Valli' },
+            { id: '5dca6d0801ea271794cb650e', ssn: 'LCFTUI58S49G910R', name: 'Cinzia', surname: 'Tollo' },
+            { id: '5dca6d2038627d0bfc4167b0', ssn: 'QASVUM68G45D297P', name: 'Dario', surname: 'Resti' },
+            { id: '5dca6d3620607b1e30dea42a', ssn: 'NCFTOG69F23B796K', name: 'Nina', surname: 'Fassio' }
+        ]));
+    });
     
     test('getArticles', async () => {
         await User.insertMany(testData.users);
