@@ -61,8 +61,8 @@ const routes = [
         method: 'PATCH',
         path: '/teacher/{teacherId}',
         handler: async (request, h) => {
-            const { ssn, name, surname } = request.payload;
-            return secretary.updateTeacher(ssn, name, surname);
+            const { ssn, name, surname, mail } = request.payload;
+            return secretary.updateTeacher(ssn, name, surname, mail);
         },
         options: {
             auth: {
@@ -76,7 +76,8 @@ const routes = [
                 payload: {
                     ssn: Valid.ssn.required(),
                     name: Valid.name.required(),
-                    surname: Valid.name.required()
+                    surname: Valid.name.required(),
+                    mail: Valid.mail.required()
                 }
             }
         }

@@ -15,7 +15,7 @@ const User = require('../../models/User');
 const getTeachers = async function() {
     const rawTeachers = await Teacher.find().populate('userId');
     const teachers = rawTeachers.map(t => {
-        return { id: t._id, ssn: t.userId.ssn, name: t.userId.name, surname: t.userId.surname };
+        return { id: t._id, ssn: t.userId.ssn, name: t.userId.name, surname: t.userId.surname, mail: t.userId.mail };
     });
 
     return { teachers };
@@ -36,13 +36,13 @@ const getParents = async function() {
     return parents;
 };
 
-const updateTeacher = async function(teacherId, ssn, name, surname) {
+const updateTeacher = async function(teacherId, ssn, name, surname, mail) {
     const teacher = await Teacher.findById(teacherId);
 
     if(teacher === null)
         return Boom.badRequest();
 
-    await User.updateOne({ _id: teacher.userId }, { ssn, name, surname });
+    await User.updateOne({ _id: teacher.userId }, { ssn, name, surname, mail });
 
     return { success: true };
 };
