@@ -58,6 +58,30 @@ const routes = [
         }
     },
     {
+        method: 'PATCH',
+        path: '/teacher/{teacherId}',
+        handler: async (request, h) => {
+            const { ssn, name, surname } = request.payload;
+            return secretary.updateTeacher(ssn, name, surname);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                params: {
+                    teacherId: Valid.id.required(),
+                },
+                payload: {
+                    ssn: Valid.ssn.required(),
+                    name: Valid.name.required(),
+                    surname: Valid.name.required()
+                }
+            }
+        }
+    },
+    {
         method: 'POST',
         path: '/parent',
         handler: async (request, h) => {

@@ -107,6 +107,30 @@ suite('secretary', () => {
         ]));
     });
     
+    test('updateTeacher', async () => {
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        // teacher not found
+        const ut1 = await secretary.updateTeacher('ffffffffffffffffffffffff');
+
+        const t1 = await Teacher.findById('5dca6cbe7adca3346c5983cb').populate('userId');
+        
+        // ok
+        const ut2 = await secretary.updateTeacher('5dca6cbe7adca3346c5983cb', 'VHBTUR56B29R594T', 'Chanel', 'Binzi');
+        
+        const t2 = await Teacher.findById('5dca6cbe7adca3346c5983cb').populate('userId');
+
+        expect(ut1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t1.userId.ssn).to.equal('LDFVUI17P04D491B');
+        expect(t1.userId.name).to.equal('Stefano');
+        expect(t1.userId.surname).to.equal('Rossi');
+        expect(ut2.success).to.be.true();
+        expect(t2.userId.ssn).to.equal('VHBTUR56B29R594T');
+        expect(t2.userId.name).to.equal('Chanel');
+        expect(t2.userId.surname).to.equal('Binzi');
+    });
+    
     test('addArticle', async () => {
         const data = [
             { authorId: '5dca7e2b461dc52d681804f4', title: 'Example title', content: 'Some very important information here.' },

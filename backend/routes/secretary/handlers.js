@@ -36,6 +36,17 @@ const getParents = async function() {
     return parents;
 };
 
+const updateTeacher = async function(teacherId, ssn, name, surname) {
+    const teacher = await Teacher.findById(teacherId);
+
+    if(teacher === null)
+        return Boom.badRequest();
+
+    await User.updateOne({ _id: teacher.userId }, { ssn, name, surname });
+
+    return { success: true };
+};
+
 const addArticle = async function(officerUId, title, content) {
     const article = new Article({ title, content, authorId: officerUId });
     await article.save();
@@ -95,9 +106,10 @@ const publishTimetables = async function(timetablesFile) {
 module.exports = {
     getTeachers,
     getArticles,
+    getParents,
+    updateTeacher,
     addArticle,
     addParent,
-    getParents,
     sendCredentials,
     publishTimetables
 };
