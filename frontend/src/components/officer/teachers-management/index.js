@@ -51,7 +51,7 @@ export default class TeachersManagement extends React.Component {
             <Container fluid>
                 <SectionHeader>Teachers</SectionHeader>
                 <EditTeacherModal show={this.state.showEditModal} teacher={this.state.targetTeacher} onClose={async () => {
-                    await this.fetchUsers();
+                    await this.fetchTeachers();
                     this.setState({showEditModal: false})
                 }}/>
                 {this.state.isLoading && <LoadingSpinner/>}

@@ -30,7 +30,7 @@ export default class EditTeacherModal extends React.Component {
 
     async handleSubmitForm() {
         try {
-            const url = 'http://localhost:3000/users/' + this.state.id;
+            const url = 'http://localhost:3000/teacher/' + this.state.id;
             const options = {
                 method: 'PATCH',
                 headers: {
@@ -48,7 +48,7 @@ export default class EditTeacherModal extends React.Component {
             const response = await fetch(url, options);
             const responseJson = await response.json();
             if (responseJson.success) {
-                this.props.handleClose(true);
+                this.props.onClose(true);
             } else {
                 this.setState({error: 'Unable to update this user.'});
             }
