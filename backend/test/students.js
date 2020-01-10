@@ -253,46 +253,53 @@ suite('students', () => {
         await Teacher.insertMany(testData.teachers);
 
         // teacher not found
-        const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', data1);
+        const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', new Date(), 'Description', data1);
         // no student found
-        const g2 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+        const g2 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
             { studentId: 'aaaaaaaaaaaaaaaaaaaaaaaa', grade: '5+' },
             { studentId: 'bbbbbbbbbbbbbbbbbbbbbbbb', grade: '8.5' },
             { studentId: 'cccccccccccccccccccccccc', grade: '6 1/2' }
         ]);
         // only some students found
-        const g3 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+        const g3 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
             { studentId: 'aaaaaaaaaaaaaaaaaaaaaaaa', grade: '3.5' },
             { studentId: '5dca711c89bf46419cf5d489', grade: '9' },
             { studentId: 'bbbbbbbbbbbbbbbbbbbbbbbb', grade: '6+' },
             { studentId: '5dca711c89bf46419cf5d48f', grade: '10L' }
         ]);
         // students belong to multiple classes
-        const g4 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+        const g4 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
             { studentId: '5dca711c89bf46419cf5d485', grade: '3.5' },
             { studentId: '5dca711c89bf46419cf5d490', grade: '9' },
             { studentId: '5dca711c89bf46419cf5d483', grade: '6+' }
         ]);
         // teacher does not teach to class
-        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [{ studentId: '5dca711c89bf46419cf5d490', grade: '7' }]);
+        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
+            { studentId: '5dca711c89bf46419cf5d490', grade: '7' }
+        ]);
         // teacher does not teach subject
-        const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', data1);
+        const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', new Date(), 'Description', data1);
 
         const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-18T09:00:00').getTime());
         // attempt to record grades for future lecture
-        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data1);
+        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T12:00:00'), 'Description', data1);
+        
+        fakeClock.returns(new Date('2019-11-23T09:00:00').getTime());
+
+        // attempt to record grades for nonexisting lecture
+        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T09:00:00'), 'Description', data1);
 
         const s1 = await Student.find({});
 
         fakeClock.returns(new Date('2019-11-21T09:00:00').getTime());
         // ok 1
-        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data1);
+        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-18T11:00:00'), 'First description', data1);
         
         const s2 = await Student.find({});
 
         fakeClock.returns(new Date('2019-11-22T11:00:00').getTime());
         // ok 2
-        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data2);
+        const g10 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T12:00:00'), 'Written exam', data2);
         fakeClock.restore();
         
         const s3 = await Student.find({});
@@ -304,13 +311,34 @@ suite('students', () => {
         expect(g5.output.statusCode).to.equal(BAD_REQUEST);
         expect(g6.output.statusCode).to.equal(BAD_REQUEST);
         expect(g7.output.statusCode).to.equal(BAD_REQUEST);
-        data1.forEach((gr, i) => expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
-        data2.forEach((gr, i) => expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
-        expect(g8.success).to.be.true();
-        data1.forEach((gr, i) => expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.true());
-        data2.forEach((gr, i) => expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
+        expect(g8.output.statusCode).to.equal(BAD_REQUEST);
+        data1.forEach((gr, i) =>
+            expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'First description' && g.date.getTime() === new Date('2019-11-18T11:00:00').getTime() && g.value === gr.grade
+            )).to.be.false()
+        );
+        data2.forEach((gr, i) =>
+            expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T12:00:00').getTime() && g.value === gr.grade
+            )).to.be.false()
+        );
         expect(g9.success).to.be.true();
-        data2.forEach((gr, i) => expect(s3.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.true());
+        data1.forEach((gr, i) =>
+            expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'First description' && g.date.getTime() === new Date('2019-11-18T11:00:00').getTime() && g.value === gr.grade
+            )).to.be.true()
+        );
+        data2.forEach((gr, i) =>
+            expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T12:00:00').getTime() && g.value === gr.grade
+            )).to.be.false()
+        );
+        expect(g10.success).to.be.true();
+        data2.forEach((gr, i) =>
+            expect(s3.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T12:00:00').getTime() && g.value === gr.grade
+            )).to.be.true()
+        );
     });
     
     test('recordAttendance', async () => {

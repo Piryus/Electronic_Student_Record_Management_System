@@ -101,7 +101,7 @@ const getClasses = async function() {
     return { classes };
 };
 
-const recordGrades = async function(teacherUId, subject, grades) {
+const recordGrades = async function(teacherUId, subject, date, description, grades) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     const students = await Student.find({ _id: { $in: grades.map(g => g.studentId) }});
     const schoolClassesIds = students.reduce((arr, x) => {
@@ -112,10 +112,15 @@ const recordGrades = async function(teacherUId, subject, grades) {
     if(teacher === null || students.length != grades.length || schoolClassesIds.length !== 1)
         return Boom.badRequest();
 
-    if(!teacher.timetable.some(t => (t.classId.equals(schoolClassesIds[0]) && t.subject === subject && HLib.weekhourToDate(t.weekhour) < Date.now())))
+    const actualDate = new Date(date.getTime() - date.getTime() % (60*60*1000));
+
+    if(actualDate > Date.now())
         return Boom.badRequest();
 
-    students.forEach(s => s.grades.push({ value: grades.find(g => g.studentId === s._id.toString()).grade, subject }));
+    if(!teacher.timetable.some(t => (t.classId.equals(schoolClassesIds[0]) && t.subject === subject && HLib.weekhourToDate(t.weekhour).getTime() === actualDate.getTime())))
+        return Boom.badRequest();
+
+    students.forEach(s => s.grades.push({ value: grades.find(g => g.studentId === s._id.toString()).grade, subject, description, date: actualDate }));
     await Promise.all(students.map(s => s.save()));
 
     return {success: true};

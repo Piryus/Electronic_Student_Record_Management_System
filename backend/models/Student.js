@@ -14,10 +14,8 @@ const attendanceEventSchema = new Schema({
 const gradeSchema = new Schema({
     value: String,
     subject: String,
-    date: {
-        type: Date,
-        default: Date.now
-    }
+    description: String,
+    date: Date
 });
 
 const noteSchema = new Schema({
