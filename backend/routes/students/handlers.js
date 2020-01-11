@@ -3,6 +3,7 @@
 const Boom = require('boom');
 const HLib = require('@emarkk/hlib');
 
+const Calendar = require('../../models/Calendar');
 const Parent = require('../../models/Parent');
 const SchoolClass = require ('../../models/SchoolClass');
 const Student = require('../../models/Student');
@@ -38,7 +39,18 @@ const getGrades = async function(parentUId, studentId) {
     if(parent === null || student === null || !parent.children.includes(student._id))
         return Boom.badRequest();
 
-    return { grades: student.grades };
+    const schoolClass = await SchoolClass.findById(student.classId);
+
+    if(schoolClass === null)
+        return Boom.badRequest();
+
+    if(schoolClass.termsEndings.length === 2)
+        return { grades: [] };
+        
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
+    const from = schoolClass.termsEndings.length === 0 ? calendar.firstDay : schoolClass.termsEndings[0].addDays(1);
+
+    return { grades: student.grades.filter(g => g.date.isSameDayOf(from) || g.date > from) };
 };
 
 const getTermGrades = async function(parentUId, studentId) {

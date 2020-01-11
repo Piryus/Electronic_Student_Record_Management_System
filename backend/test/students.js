@@ -8,6 +8,7 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
+const Calendar = require('../models/Calendar');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
 const Teacher = require('../models/Teacher');
@@ -65,8 +66,10 @@ suite('students', () => {
     });
 
     test('getGrades', async () => {
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Parent.insertMany(testData.parents);
+        await SchoolClass.insertMany(testData.classes);
 
         // parent not found
         const g1 = await students.getGrades('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
@@ -74,13 +77,53 @@ suite('students', () => {
         const g2 = await students.getGrades('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
         // student is not child of parent
         const g3 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
-        // ok
+
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d489' }, { classId: undefined });
+
+        // student has no class
         const g4 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d489' }, { classId: '5dc9c3112d698031f441e1c9' });
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date('2020-01-30T16:00:00'), new Date('2020-06-12T15:00:00')] });
+        
+        // both terms ended
+        const g5 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [] });
+        
+        // ok 1
+        const g6 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        let s = await Student.findById('5dca711c89bf46419cf5d489');
+        s.grades.push(
+            { value: '6-', date: new Date('2019-11-14T09:00:00'), subject: 'History' },
+            { value: '8.5', date: new Date('2019-12-07T11:00:00'), subject: 'Gym' },
+            { value: '7', date: new Date('2020-01-31T12:00:00'), subject: 'Religion' },
+            { value: '5 1/2', date: new Date('2020-03-10T12:00:00'), subject: 'Physics' },
+            { value: '9+', date: new Date('2020-06-10T11:00:00'), subject: 'Science' }
+        );
+        await s.save();
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date('2020-01-30T16:00:00')] });
+
+        // ok 2
+        const g7 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        const g7sorted = g7.grades.sort((a, b) => b.date - a.date);
         
         expect(g1.output.statusCode).to.equal(BAD_REQUEST);
         expect(g2.output.statusCode).to.equal(BAD_REQUEST);
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
-        jexpect(g4.grades).to.equal(testData.students.find(s => s._id === '5dca711c89bf46419cf5d489').grades);
+        expect(g4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g5.grades).to.have.length(0);
+        expect(g6.grades).to.have.length(1);
+        expect(g6.grades[0].subject).to.equal('English');
+        expect(g6.grades[0].value).to.equal('4.5');
+        expect(g7.grades).to.have.length(3);
+        expect(g7sorted[0].subject).to.equal('Science');
+        expect(g7sorted[0].value).to.equal('9+');
+        expect(g7sorted[1].subject).to.equal('Physics');
+        expect(g7sorted[1].value).to.equal('5 1/2');
+        expect(g7sorted[2].subject).to.equal('Religion');
+        expect(g7sorted[2].value).to.equal('7');
     });
 
     test('getTermGrades', async () => {
