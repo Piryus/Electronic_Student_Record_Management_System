@@ -116,12 +116,14 @@ const getClasses = async function() {
 const recordGrades = async function(teacherUId, subject, date, description, grades) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     const students = await Student.find({ _id: { $in: grades.map(g => g.studentId) }});
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
+
     const schoolClassesIds = students.reduce((arr, x) => {
         if(!arr.some(i => i.equals(x.classId))) arr.push(x.classId);
         return arr;
     }, []);
 
-    if(teacher === null || students.length != grades.length || schoolClassesIds.length !== 1)
+    if(teacher === null || students.length != grades.length || schoolClassesIds.length !== 1 || !date.isSchoolDay(calendar))
         return Boom.badRequest();
 
     const now = new Date(Date.now());
@@ -136,20 +138,22 @@ const recordGrades = async function(teacherUId, subject, date, description, grad
 };
 
 const recordAttendance = async function(teacherUId, classId, info) {
+    const datetime = new Date(Date.now());
     const teacher = await Teacher.findOne({ userId: teacherUId });
     const students = await Student.find({ _id: { $in: info.map(i => i.studentId) }});
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(datetime) });
 
-    if(teacher === null || students.length != info.length || !students.every(s => s.classId.toString() === classId))
+    if(teacher === null || students.length != info.length || !students.every(s => s.classId.toString() === classId) || !datetime.isSchoolDay(calendar))
         return Boom.badRequest();
 
-    const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(new Date(Date.now()))).map(t => t.weekhour);
+    const whs = teacher.timetable.filter(t => t.classId.toString() === classId && HLib.weekhourToDate(t.weekhour).isSameDayOf(datetime)).map(t => t.weekhour);
 
     if(whs.length === 0 || info.some(i => i.time !== null && (!i.time.isTimeIncludedInWeekhours(whs) || !i.time.isTimeValidFor(i.attendanceEvent))))
         return Boom.badRequest();
 
     students.forEach(s => {
         let sInfo = info.find(i => i.studentId === s._id.toString());
-        s.attendanceEvents = s.attendanceEvents.filter(ae => ae.event !== sInfo.attendanceEvent || !ae.date.isSameDayOf(new Date(Date.now())));
+        s.attendanceEvents = s.attendanceEvents.filter(ae => ae.event !== sInfo.attendanceEvent || !ae.date.isSameDayOf(datetime));
         if(sInfo.time !== null)
             s.attendanceEvents.push({ date: HLib.timeToDate(sInfo.time), event: sInfo.attendanceEvent });
     });

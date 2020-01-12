@@ -292,8 +292,11 @@ suite('students', () => {
             { studentId: '5dca711c89bf46419cf5d48f', grade: '7.75' }
         ];
 
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
+
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-18T09:00:00').getTime());
 
         // teacher not found
         const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', new Date(), 'Description', data1);
@@ -323,26 +326,32 @@ suite('students', () => {
         // teacher does not teach subject
         const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', new Date(), 'Description', data1);
 
-        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-18T09:00:00').getTime());
+        fakeClock.returns(new Date('2019-12-28T11:00:00').getTime());
+
+        // attempt to record grades for holiday
+        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-25T12:00:00'), 'Description', data1);
+        
+        fakeClock.returns(new Date('2019-11-18T09:00:00').getTime());
+
         // attempt to record grades for future lecture
-        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T12:00:00'), 'Description', data1);
+        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T12:00:00'), 'Description', data1);
         
         fakeClock.returns(new Date('2019-11-23T09:00:00').getTime());
 
         // attempt to record grades for nonexisting lecture
-        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-19T09:00:00'), 'Description', data1);
+        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-19T09:00:00'), 'Description', data1);
 
         const s1 = await Student.find({});
 
         fakeClock.returns(new Date('2019-11-21T09:00:00').getTime());
         // ok 1
-        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-18T00:00:00'), 'First description', data1);
+        const g10 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-18T00:00:00'), 'First description', data1);
         
         const s2 = await Student.find({});
 
         fakeClock.returns(new Date('2019-11-22T11:00:00').getTime());
         // ok 2
-        const g10 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T08:00:00'), 'Written exam', data2);
+        const g11 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T08:00:00'), 'Written exam', data2);
         fakeClock.restore();
         
         const s3 = await Student.find({});
@@ -355,6 +364,7 @@ suite('students', () => {
         expect(g6.output.statusCode).to.equal(BAD_REQUEST);
         expect(g7.output.statusCode).to.equal(BAD_REQUEST);
         expect(g8.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g9.output.statusCode).to.equal(BAD_REQUEST);
         data1.forEach((gr, i) =>
             expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g =>
                 g.subject === 'Latin' && g.description === 'First description' && g.date.getTime() === new Date('2019-11-18T00:00:00').getTime() && g.value === gr.grade
@@ -365,7 +375,7 @@ suite('students', () => {
                 g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T08:00:00').getTime() && g.value === gr.grade
             )).to.be.false()
         );
-        expect(g9.success).to.be.true();
+        expect(g10.success).to.be.true();
         data1.forEach((gr, i) =>
             expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g =>
                 g.subject === 'Latin' && g.description === 'First description' && g.date.getTime() === new Date('2019-11-18T00:00:00').getTime() && g.value === gr.grade
@@ -376,7 +386,7 @@ suite('students', () => {
                 g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T08:00:00').getTime() && g.value === gr.grade
             )).to.be.false()
         );
-        expect(g10.success).to.be.true();
+        expect(g11.success).to.be.true();
         data2.forEach((gr, i) =>
             expect(s3.find(s => s._id.toString() === gr.studentId).grades.some(g =>
                 g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T08:00:00').getTime() && g.value === gr.grade
@@ -398,6 +408,7 @@ suite('students', () => {
             { studentId: '5dca711c89bf46419cf5d484', time: '08:09', attendanceEvent: 'late-entrance' }
         ];
 
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
 
@@ -423,29 +434,34 @@ suite('students', () => {
             { studentId: '5dca711c89bf46419cf5d483', time: '08:07', attendanceEvent: 'late-entrance' }
         ]);
 
-        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-28T08:00:00').getTime());
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-12-26T08:00:00').getTime());
+
+        // holiday
+        const a5 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data1);
+
+        fakeClock.returns(new Date('2019-11-28T08:00:00').getTime());
 
         // teacher does not teach to class
-        const a5 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
+        const a6 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
             { studentId: '5dca711c89bf46419cf5d48a', time: '08:05', attendanceEvent: 'late-entrance' }
         ]);
         // wrong time 1
-        const a6 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
+        const a7 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
             { studentId: '5dca711c89bf46419cf5d48a', time: '10:50', attendanceEvent: 'late-entrance' }
         ]);
         // wrong time 2
-        const a7 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', [
+        const a8 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', [
             { studentId: '5dca711c89bf46419cf5d48e', time: '08:40', attendanceEvent: 'late-entrance' }
         ]);
         const s1 = await Student.find();
         // ok 1 (insert)
-        const a8 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data1);
+        const a9 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data1);
         const s2 = await Student.find();
         // ok 2 (update)
-        const a9 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data2);
+        const a10 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data2);
         const s3 = await Student.find();
         // ok 3 (delete)
-        const a10 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data3);
+        const a11 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data3);
         const s4 = await Student.find();
 
         fakeClock.restore();
@@ -457,18 +473,19 @@ suite('students', () => {
         expect(a5.output.statusCode).to.equal(BAD_REQUEST);
         expect(a6.output.statusCode).to.equal(BAD_REQUEST);
         expect(a7.output.statusCode).to.equal(BAD_REQUEST);
+        expect(a8.output.statusCode).to.equal(BAD_REQUEST);
         expect(s1.filter(s => ['5dca711c89bf46419cf5d484', '5dca711c89bf46419cf5d485', '5dca711c89bf46419cf5d489', '5dca711c89bf46419cf5d48e'].includes(s._id.toString())).flatMap(s => s.attendanceEvents)).to.have.length(0);
-        expect(a8.success).to.be.true();
+        expect(a9.success).to.be.true();
         expect(s2.find(s => '5dca711c89bf46419cf5d48e' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s2.find(s => '5dca711c89bf46419cf5d48e' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:07:00'), event: 'late-entrance' }));
         expect(s2.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s2.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:09:00'), event: 'late-entrance' }));
-        expect(a9.success).to.be.true();
+        expect(a10.success).to.be.true();
         expect(s3.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s3.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:06:00'), event: 'late-entrance' }));
         expect(s3.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s3.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:06:00'), event: 'late-entrance' }));
-        expect(a10.success).to.be.true();
+        expect(a11.success).to.be.true();
         expect(s4.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents).to.have.length(0);
         expect(s4.find(s => '5dca711c89bf46419cf5d484' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s4.find(s => '5dca711c89bf46419cf5d484' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:09:00'), event: 'late-entrance' }));

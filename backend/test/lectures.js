@@ -12,6 +12,7 @@ const HLib = require('@emarkk/hlib');
 
 const Utils = require('../utils');
 
+const Calendar = require('../models/Calendar');
 const File = require('../models/File');
 const Teacher = require('../models/Teacher');
 const Lecture = require('../models/Lecture');
@@ -41,7 +42,11 @@ after(async () => await db.closeDatabase());
 suite('lectures', () => {
     
     test('getDailyLectureTopicsOfTeacher', async () => {
+        await Calendar.insertMany(testData.calendar);
         await Teacher.insertMany(testData.teachers);
+        
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-22T14:00:00').getTime());
+
         await Lecture.insertMany([
             { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_3', date: HLib.weekhourToDate('0_3'), topics: 'Test topics' },
             { classId: '5dc9c3112d698031f441e1c9', weekhour: '2_4', date: HLib.weekhourToDate('2_4'), topics: 'Other topics' }
@@ -51,18 +56,30 @@ suite('lectures', () => {
         const t1 = await lectures.getDailyLectureTopicsOfTeacher('ffffffffffffffffffffffff', '1_1');
         // teacher has no lecture on that weekhour
         const t2 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '1_1');
+
+        fakeClock.returns(new Date('2019-12-26T10:00:00').getTime());
+
+        // holiday
+        const t3 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '2_4');
+
+        fakeClock.returns(new Date('2019-11-22T14:00:00').getTime());
+
         // ok 1 (no lecture topics were entered)
-        const t3 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '4_2');
+        const t4 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '4_2');
         // ok 2 (lecture topics already entered)
-        const t4 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '0_3');
+        const t5 = await lectures.getDailyLectureTopicsOfTeacher('5dca7e2b461dc52d681804f3', '0_3');
+
+        fakeClock.restore();
         
         expect(t1.output.statusCode).to.equal(BAD_REQUEST);
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
-        expect(t3.topics).to.be.null();
-        expect(t4.topics).to.equal('Test topics');
+        expect(t3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t4.topics).to.be.null();
+        expect(t5.topics).to.equal('Test topics');
     });
     
     test('getDailyLectureTopicsForParent', async () => {
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Parent.insertMany(testData.parents);
         await Teacher.insertMany(testData.teachers);
@@ -77,20 +94,23 @@ suite('lectures', () => {
         const t2 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', 'ffffffffffffffffffffffff');
         // student is not child of parent
         const t3 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d48f');
+        // holiday
+        const t4 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-12-25T11:00:00').getTime());
 
         // ok 1
-        const t4 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-12-09T11:00:00').getTime());
+        const t5 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-12-09T11:00:00').getTime());
         // ok 2
-        const t5 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-11-29T10:02:00').getTime());
+        const t6 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-11-29T10:02:00').getTime());
         // ok 3
-        const t6 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-11-20T12:06:19').getTime());
+        const t7 = await lectures.getDailyLectureTopicsForParent('5dca7e2b461dc52d681804fa', '5dca711c89bf46419cf5d485', new Date('2019-11-20T12:06:19').getTime());
         
         expect(t1.output.statusCode).to.equal(BAD_REQUEST);
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
         expect(t3.output.statusCode).to.equal(BAD_REQUEST);
-        expect(t4.topics).to.equal('Test topics');
-        expect(t5.topics).to.be.null();
-        expect(t6.topics).to.equal('Other topics');
+        expect(t4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t5.topics).to.equal('Test topics');
+        expect(t6.topics).to.be.null();
+        expect(t7.topics).to.equal('Other topics');
     });
     
     test('getSupportMaterials', async () => {
@@ -148,9 +168,11 @@ suite('lectures', () => {
     });
     
     test('recordDailyLectureTopics', async () => {
-        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-20T15:00:00').getTime());
-
+        await Calendar.insertMany(testData.calendar);
         await Teacher.insertMany(testData.teachers);
+        
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-20T15:00:00').getTime());
+        
         await Lecture.insertMany([
             { classId: '5dc9c3112d698031f441e1c9', weekhour: '0_2', date: HLib.weekhourToDate('0_2'), topics: 'Test topics' },
             { classId: '5dc9c3112d698031f441e1c9', weekhour: '4_4', date: HLib.weekhourToDate('4_4'), topics: 'Other topics' }
@@ -163,29 +185,36 @@ suite('lectures', () => {
         // future weekhour
         const t3 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'Topics');
 
-        const t4 = await Lecture.findOne({ date: HLib.weekhourToDate('0_2') });
-        const t5 = await Lecture.findOne({ date: HLib.weekhourToDate('4_5') });
+        fakeClock.returns(new Date('2019-11-02T16:00:00').getTime());
 
-        fakeClock.returns(new Date('2019-11-23T21:00:00').getTime());
-        // ok 1 (lecture topics already entered)
-        const t6 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '0_2', 'Updated topics');
-        // ok 2 (no lecture topics were entered)
-        const t7 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'New topics');
+        // holiday
+        const t4 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'Topics');
         
-        const t8 = await Lecture.findOne({ date: HLib.weekhourToDate('0_2') });
-        const t9 = await Lecture.findOne({ date: HLib.weekhourToDate('4_5') });
+        fakeClock.returns(new Date('2019-11-23T21:00:00').getTime());
+
+        const t5 = await Lecture.findOne({ date: HLib.weekhourToDate('0_2') });
+        const t6 = await Lecture.findOne({ date: HLib.weekhourToDate('4_5') });
+
+        // ok 1 (lecture topics already entered)
+        const t7 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '0_2', 'Updated topics');
+        // ok 2 (no lecture topics were entered)
+        const t8 = await lectures.recordDailyLectureTopics('5dca7e2b461dc52d681804f4', '4_5', 'New topics');
+        
+        const t9 = await Lecture.findOne({ date: HLib.weekhourToDate('0_2') });
+        const t10 = await Lecture.findOne({ date: HLib.weekhourToDate('4_5') });
         
         fakeClock.restore();
         
         expect(t1.output.statusCode).to.equal(BAD_REQUEST);
         expect(t2.output.statusCode).to.equal(BAD_REQUEST);
         expect(t3.output.statusCode).to.equal(BAD_REQUEST);
-        jexpect(t4).to.include({ topics: 'Test topics' });
-        expect(t5).to.be.null();
-        expect(t6.success).to.be.true();
+        expect(t4.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(t5).to.include({ topics: 'Test topics' });
+        expect(t6).to.be.null();
         expect(t7.success).to.be.true();
-        jexpect(t8).to.include({ topics: 'Updated topics' });
-        jexpect(t9).to.include({ topics: 'New topics' });
+        expect(t8.success).to.be.true();
+        jexpect(t9).to.include({ topics: 'Updated topics' });
+        jexpect(t10).to.include({ topics: 'New topics' });
     });
     
     test('getAssignments', async () => {
@@ -297,29 +326,39 @@ suite('lectures', () => {
 
         const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-27T16:00:00').getTime());
 
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
         await Promise.all(data.map(i => Student.updateOne({ _id: i.studentId }, { attendanceEvents: i.attendanceEvents })));
 
         // teacher not found
         const a1 = await lectures.getAttendance('ffffffffffffffffffffffff');
+        
+        fakeClock.returns(new Date('2019-12-25T16:00:00').getTime());
+
+        // holiday
+        const a2 = await lectures.getAttendance('5dca7e2b461dc52d681804f1');
+        
+        fakeClock.returns(new Date('2019-11-27T16:00:00').getTime());
+
         // teacher has no lecture today
-        const a2 = await lectures.getAttendance('5dca7e2b461dc52d681804f2');
+        const a3 = await lectures.getAttendance('5dca7e2b461dc52d681804f2');
         // ok 1
-        const a3 = await lectures.getAttendance('5dca7e2b461dc52d681804f1');
+        const a4 = await lectures.getAttendance('5dca7e2b461dc52d681804f1');
 
         fakeClock.returns(new Date('2019-11-15T08:01:00').getTime());
         // ok 2
-        const a4 = await lectures.getAttendance('5dca7e2b461dc52d681804f2');
+        const a5 = await lectures.getAttendance('5dca7e2b461dc52d681804f2');
 
         fakeClock.restore();
 
         expect(a1.output.statusCode).to.equal(BAD_REQUEST);
         expect(a2.output.statusCode).to.equal(BAD_REQUEST);
-        jexpect(a3.attendance['5dc9c3112d698031f441e1c9'].sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
+        expect(a3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(a4.attendance['5dc9c3112d698031f441e1c9'].sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
             return { id: s._id, events: data.some(i => i.studentId === s._id) ? data.find(i => i.studentId === s._id).attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-27T16:00:00'))) : [] };
         }).sort((a, b) => b.id - a.id)));
-        jexpect(a4.attendance['5dc9c3112d698031f441e1c9'].sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
+        jexpect(a5.attendance['5dc9c3112d698031f441e1c9'].sort((a, b) => b.id.toString() - a.id.toString())).to.equal(j(testData.students.filter(s => s.classId === '5dc9c3112d698031f441e1c9').map(s => {
             return { id: s._id, events: data.some(i => i.studentId === s._id) ? data.find(i => i.studentId === s._id).attendanceEvents.filter(ae => ae.date.isSameDayOf(new Date('2019-11-15T08:01:00'))) : [] };
         }).sort((a, b) => b.id - a.id)));
     });
@@ -327,6 +366,7 @@ suite('lectures', () => {
     test('recordAssignments', async () => {
         const daysDelta = (new Date().addDays(14).weekStart().getTime() - new Date().weekStart().getTime()) / HLib.day;
         
+        await Calendar.insertMany(testData.calendar);
         await Teacher.insertMany(testData.teachers);
         await SchoolClass.insertMany(testData.classes);
         
@@ -341,15 +381,22 @@ suite('lectures', () => {
         // due date in the past
         const a5 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', HLib.weekhourToDate('1_2').addDays(-7));
 
-        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-26T08:00:00').getTime());
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-12-18T08:00:00').getTime());
+
+        // holiday
+        const a6 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Some new assignments!', new Date('2019-12-25T10:00:00'));
+        
+        fakeClock.returns(new Date('2019-11-26T08:00:00').getTime());
+
         // due date is today
-        const a6 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', new Date('2019-11-26T09:00:00'));
+        const a7 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'Assignments description here', new Date('2019-11-26T09:00:00'));
+
         fakeClock.restore();
 
         const sc1 = await SchoolClass.findOne({ _id: '5dc9c3112d698031f441e1c9' });
 
         // ok
-        const a7 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'New assignments!', HLib.weekhourToDate('1_2').addDays(daysDelta));
+        const a8 = await lectures.recordAssignments('5dca7e2b461dc52d681804f5', 'English', 'New assignments!', HLib.weekhourToDate('1_2').addDays(daysDelta));
 
         const sc2 = await SchoolClass.findOne({ _id: '5dc9c3112d698031f441e1c9' });
 
@@ -359,8 +406,9 @@ suite('lectures', () => {
         expect(a4.output.statusCode).to.equal(BAD_REQUEST);
         expect(a5.output.statusCode).to.equal(BAD_REQUEST);
         expect(a6.output.statusCode).to.equal(BAD_REQUEST);
+        expect(a7.output.statusCode).to.equal(BAD_REQUEST);
         expect(sc1.assignments).to.have.length(0);
-        expect(a7.success).to.be.true();
+        expect(a8.success).to.be.true();
         expect(sc2.assignments).to.have.length(1);
         jexpect(sc2.assignments[0]).to.include(j({ subject: 'English', description: 'New assignments!', due: HLib.weekhourToDate('1_2').addDays(daysDelta) }));
     });
@@ -442,21 +490,30 @@ suite('lectures', () => {
 
         const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-26T16:00:00').getTime());
         
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
 
         // teacher not found
         const rc1 = await lectures.rollCall('ffffffffffffffffffffffff', data1);
+
+        fakeClock.returns(new Date('2019-12-25T10:00:00').getTime());
+
+        // holiday
+        const rc2 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data1);
+        
+        fakeClock.returns(new Date('2019-11-26T16:00:00').getTime());
+
         // teacher has no lecture on first hour today
-        const rc2 = await lectures.rollCall('5dca7e2b461dc52d681804f6', data1);
+        const rc3 = await lectures.rollCall('5dca7e2b461dc52d681804f6', data1);
         // students list not complete
-        const rc3 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
+        const rc4 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
             { studentId: '5dca711c89bf46419cf5d485', present: true },
             { studentId: '5dca711c89bf46419cf5d48b', present: false },
             { studentId: '5dca711c89bf46419cf5d48f', present: true },
         ]);
         // some students not belonging to considered class
-        const rc4 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
+        const rc5 = await lectures.rollCall('5dca7e2b461dc52d681804f1', [
             { studentId: '5dca711c89bf46419cf5d486', present: true },
             { studentId: '5dca711c89bf46419cf5d487', present: false },
             { studentId: '5dca711c89bf46419cf5d488', present: true },
@@ -470,12 +527,11 @@ suite('lectures', () => {
             { studentId: '5dca711c89bf46419cf5d491', present: true },
         ]);
         // ok
-        const rc5 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data1);
+        const rc6 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data1);
         const st1 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' }, { 'attendanceEvents._id': 0 });
         // ok (change)
-        const rc6 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data2);
+        const rc7 = await lectures.rollCall('5dca7e2b461dc52d681804f1', data2);
         const st2 = await Student.find({ classId: '5dc9c3112d698031f441e1c9' }, { 'attendanceEvents._id': 0 });
-
 
         fakeClock.restore();
 
@@ -483,11 +539,12 @@ suite('lectures', () => {
         expect(rc2.output.statusCode).to.equal(BAD_REQUEST);
         expect(rc3.output.statusCode).to.equal(BAD_REQUEST);
         expect(rc4.output.statusCode).to.equal(BAD_REQUEST);
-        expect(rc5.success).to.be.true();
+        expect(rc5.output.statusCode).to.equal(BAD_REQUEST);
+        expect(rc6.success).to.be.true();
         data1.forEach(i => jexpect(st1.find(s => s._id.toString() === i.studentId).attendanceEvents).to.equal(j(i.present ? [] : [
             { date: new Date('2019-11-26T08:00:00'), event: 'absence' }
         ])));
-        expect(rc6.success).to.be.true();
+        expect(rc7.success).to.be.true();
         data2.forEach(i => jexpect(st2.find(s => s._id.toString() === i.studentId).attendanceEvents).to.equal(j(i.present ? [] : [
             { date: new Date('2019-11-26T08:00:00'), event: 'absence' }
         ])));

@@ -10,6 +10,7 @@ const testData = require('../test-lib/testData');
 
 const HLib = require('@emarkk/hlib');
 
+const Calendar = require('../models/Calendar');
 const SchoolClass = require('../models/SchoolClass');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
@@ -131,6 +132,7 @@ suite('teachers', () => {
     });
 
     test('getAvailableMeetingsSlots', async () => {
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Parent.insertMany(testData.parents);
         await Teacher.insertMany(testData.teachers);
@@ -161,6 +163,16 @@ suite('teachers', () => {
         // ok 2
         const ams5 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca6d0801ea271794cb650e');
 
+        fakeClock.returns(new Date('2019-12-24T08:00:00').getTime());
+
+        // holiday
+        const ams6 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca69cf048e8e40d434017f');
+
+        fakeClock.returns(new Date('2020-06-15T08:00:00').getTime());
+
+        // end of school
+        const ams7 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca69cf048e8e40d434017f');
+
         fakeClock.restore();
 
         expect(ams1.output.statusCode).to.equal(BAD_REQUEST);
@@ -182,7 +194,7 @@ suite('teachers', () => {
             { date: new Date('2019-12-13T10:00:00'), available: true },
             { date: new Date('2019-12-13T10:15:00'), available: true },
             { date: new Date('2019-12-13T10:30:00'), available: true },
-            { date: new Date('2019-12-13T10:45:00'), available: true },
+            { date: new Date('2019-12-13T10:45:00'), available: true }
         ]));
         jexpect(ams5.slots).to.equal(j([
             { date: new Date('2019-12-10T11:00:00'), available: true },
@@ -192,8 +204,23 @@ suite('teachers', () => {
             { date: new Date('2019-12-13T08:00:00'), available: true },
             { date: new Date('2019-12-13T08:15:00'), available: true },
             { date: new Date('2019-12-13T08:30:00'), available: false },
-            { date: new Date('2019-12-13T08:45:00'), available: true },
+            { date: new Date('2019-12-13T08:45:00'), available: true }
         ]));
+        jexpect(ams6.slots).to.equal(j([
+            { date: new Date('2020-01-07T08:00:00'), available: true },
+            { date: new Date('2020-01-07T08:15:00'), available: true },
+            { date: new Date('2020-01-07T08:30:00'), available: true },
+            { date: new Date('2020-01-07T08:45:00'), available: true },
+            { date: new Date('2020-01-08T11:00:00'), available: true },
+            { date: new Date('2020-01-08T11:15:00'), available: true },
+            { date: new Date('2020-01-08T11:30:00'), available: true },
+            { date: new Date('2020-01-08T11:45:00'), available: true },
+            { date: new Date('2020-01-10T10:00:00'), available: true },
+            { date: new Date('2020-01-10T10:15:00'), available: true },
+            { date: new Date('2020-01-10T10:30:00'), available: true },
+            { date: new Date('2020-01-10T10:45:00'), available: true }
+        ]));
+        expect(ams7.slots).to.have.length(0);
     });
 
     test('getTermGrades', async () => {
@@ -309,6 +336,7 @@ suite('teachers', () => {
     });
 
     test('bookMeetingSlot', async () => {
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Parent.insertMany(testData.parents);
         await Teacher.insertMany(testData.teachers);
@@ -333,22 +361,25 @@ suite('teachers', () => {
         const b4 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-18T11:15:00'));
         const b5 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-19T10:00:00'));
         const b6 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-19T11:36:10'));
+        // day booked is holiday
+        const b7 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-12-24T12:30:00'));
+        const b8 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-12-27T10:15:00'));
         // booking weekhour not allocated for meetings
-        const b7 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-21T10:46:00'));
-        const b8 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T11:00:00'));
+        const b9 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-21T10:46:00'));
+        const b10 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T11:00:00'));
         // booking slot already busy
-        const b9 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:50:00'));
-        const b10 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:30:00'));
+        const b11 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:50:00'));
+        const b12 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:30:00'));
 
         const t1 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
         
         // ok 1
-        const b11 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:00:00'));
+        const b13 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:00:00'));
         
         const t2 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
 
         // ok 2
-        const b12 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804fd', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:16:00'));
+        const b14 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804fd', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:16:00'));
         
         const t3 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
 
@@ -364,11 +395,13 @@ suite('teachers', () => {
         expect(b8.output.statusCode).to.equal(BAD_REQUEST);
         expect(b9.output.statusCode).to.equal(BAD_REQUEST);
         expect(b10.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b11.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b12.output.statusCode).to.equal(BAD_REQUEST);
         expect(t1.meetings).to.have.length(3);
-        expect(b11.success).to.be.true();
+        expect(b13.success).to.be.true();
         expect(t2.meetings).to.have.length(4);
         jexpect(t2.meetings.find(m => m.parent.equals('5dca77de05972e0898e9c68d')).date.getTime()).to.equal(new Date('2019-11-20T11:00:00').getTime());
-        expect(b12.success).to.be.true();
+        expect(b14.success).to.be.true();
         expect(t3.meetings).to.have.length(5);
         jexpect(t3.meetings.find(m => m.parent.equals('5dca784dcf1db14678f3cadb')).date.getTime()).to.equal(new Date('2019-11-22T10:15:00').getTime());
     });

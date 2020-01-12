@@ -3,6 +3,7 @@
 const Boom = require('boom');
 const HLib = require('@emarkk/hlib');
 
+const Calendar = require('../../models/Calendar');
 const Parent = require('../../models/Parent');
 const SchoolClass = require('../../models/SchoolClass');
 const Student = require('../../models/Student');
@@ -49,6 +50,7 @@ const getMeetingsAvailability = async function(teacherUId) {
 const getAvailableMeetingsSlots = async function(parentUId, teacherId) {
     const parent = await Parent.findOne({ userId: parentUId });
     const teacher = await Teacher.findById(teacherId);
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
     if(parent === null || teacher === null)
         return Boom.badRequest();
@@ -59,8 +61,14 @@ const getAvailableMeetingsSlots = async function(parentUId, teacherId) {
         return Boom.badRequest();
 
     const slots = teacher.meetingsTimeSlots.flatMap(s => {
-        return [...Array(4).keys()].map(x => new Date(HLib.weekhourToDate(s).getTime() + x*15*60*1000));
-    }).map(s => {
+        let sl = [];
+        for(let i = 0; i < 3; i++) {
+            const base = HLib.weekhourToDate(s).addDays(i * 7);
+            if(base.isSchoolDay(calendar))
+                sl = sl.concat([...Array(4).keys()].map(x => new Date(base.getTime() + x * 15*60*1000)));
+        }
+        return sl;
+    }).sort((a, b) => a.getTime() - b.getTime()).slice(0, teacher.meetingsTimeSlots.length * 4).map(s => {
         return { date: s, available: !teacher.meetings.some(m => m.date.getTime() === s.getTime()) };
     });
 
@@ -123,6 +131,7 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
 const bookMeetingSlot = async function(parentUId, teacherId, datetime) {
     const parent = await Parent.findOne({ userId: parentUId });
     const teacher = await Teacher.findById(teacherId);
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
     if(parent === null || teacher === null)
         return Boom.badRequest();
@@ -133,7 +142,7 @@ const bookMeetingSlot = async function(parentUId, teacherId, datetime) {
         return Boom.badRequest();
 
     datetime = new Date(datetime.getTime() - datetime.getTime() % (15*60*1000));
-    if(datetime < Date.now())
+    if(datetime < Date.now() || !datetime.isSchoolDay(calendar))
         return Boom.badRequest();
         
     const t = datetime.getTime() - datetime.getTime() % (60*60*1000);

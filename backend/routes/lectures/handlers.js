@@ -5,6 +5,7 @@ const HLib = require('@emarkk/hlib');
 
 const Util = require('../../utils');
 
+const Calendar = require('../../models/Calendar');
 const Lecture = require('../../models/Lecture');
 const SchoolClass = require('../../models/SchoolClass');
 const Parent = require('../../models/Parent');
@@ -14,8 +15,9 @@ const Teacher = require('../../models/Teacher');
 const getDailyLectureTopicsOfTeacher = async function(teacherUId, weekhour) {
     const datetime = HLib.weekhourToDate(weekhour);
     const teacher = await Teacher.findOne({ userId: teacherUId });
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
-    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour))
+    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || !datetime.isSchoolDay(calendar))
         return Boom.badRequest();
 
     const lecture = await Lecture.findOne({
@@ -29,11 +31,14 @@ const getDailyLectureTopicsOfTeacher = async function(teacherUId, weekhour) {
 const getDailyLectureTopicsForParent = async function(parentUId, studentId, datetime) {
     const parent = await Parent.findOne({ userId: parentUId });
     const student = await Student.findOne({ _id: studentId });
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
+
+    const actualDate = new Date(datetime - (datetime % (60*60*1000)));
     
-    if(parent === null || student === null || !parent.children.includes(student._id))
+    if(parent === null || student === null || !parent.children.includes(student._id) || !actualDate.isSchoolDay(calendar))
         return Boom.badRequest();
 
-    const lecture = await Lecture.findOne({ classId: student.classId, date: new Date(datetime - (datetime % (60*60*1000))) });
+    const lecture = await Lecture.findOne({ classId: student.classId, date: actualDate });
 
     return { topics: lecture ? lecture.topics : null };
 };
@@ -90,10 +95,12 @@ const getTimetable = async function(parentUId, studentId) {
 };
 
 const getAttendance = async function(teacherUId) {
-    const nd = new Date(Date.now()).getNormalizedDay();
+    const date = new Date(Date.now());
+    const nd = date.getNormalizedDay();
     const teacher = await Teacher.findOne({ userId: teacherUId });
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
-    if(teacher === null)
+    if(teacher === null || !date.isSchoolDay(calendar))
         return Boom.badRequest();
 
     const classes = teacher.timetable.filter(t => t.weekhour.startsWith(nd + '_')).map(t => t.classId);
@@ -118,8 +125,9 @@ const getAttendance = async function(teacherUId) {
 const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
     const datetime = HLib.weekhourToDate(weekhour);
     const teacher = await Teacher.findOne({ userId: teacherUId });
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
-    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || datetime > Date.now())
+    if(teacher === null || !teacher.timetable.some(t => t.weekhour === weekhour) || datetime > Date.now() || !datetime.isSchoolDay(calendar))
         return Boom.badRequest();
 
     await Lecture.findOneAndUpdate({ classId: teacher.timetable.find(t => t.weekhour === weekhour).classId, weekhour, date: datetime }, { topics }, { upsert: true });
@@ -130,8 +138,12 @@ const recordDailyLectureTopics = async function(teacherUId, weekhour, topics) {
 const recordAssignments = async function(teacherUId, subject, description, due, files) {
     const weekhour = HLib.dateToWeekhour(due);
     const teacher = await Teacher.findOne({ userId: teacherUId });
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
-    if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)) || due < new Date(Date.now()).addDays(1).dayStart())
+    if(teacher === null || weekhour === null || !teacher.timetable.some(t => (t.weekhour === weekhour && t.subject === subject)))
+        return Boom.badRequest();
+        
+    if(due < new Date(Date.now()).addDays(1).dayStart() || !due.isSchoolDay(calendar))
         return Boom.badRequest();
 
     const attachments = files ? await Util.saveFiles(Array.isArray(files) ? files : [files]) : [];
@@ -159,10 +171,12 @@ const addSupportMaterial = async function(teacherUId, classId, subject, descript
 };
 
 const rollCall = async function(teacherUId, info) {
-    const nd = new Date(Date.now()).getNormalizedDay();
+    const date = new Date(Date.now());
+    const nd = date.getNormalizedDay();
     const teacher = await Teacher.findOne({ userId: teacherUId });
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
 
-    if(teacher === null)
+    if(teacher === null || !date.isSchoolDay(calendar))
         return Boom.badRequest();
 
     const classId = (teacher.timetable.find(t => t.weekhour === nd + '_0') || {}).classId;
