@@ -26,7 +26,6 @@ class App extends React.Component {
     componentDidMount() {
         this.checkAuth().then((response) => {
             if (response.isAuth) {
-                console.log(response);
                 this.setState({
                     authenticated: true,
                     role: response.role,

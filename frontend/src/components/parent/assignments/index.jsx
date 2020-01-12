@@ -1,5 +1,5 @@
 import React from 'react';
-import {Accordion, Card, Col, Container, Row, Spinner} from "react-bootstrap";
+import {Accordion, Card, Col, Container, Row} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import LoadingSpinner from "../../utils/loading-spinner";
 import DownloadFileTable from '../../utils/downloadfiletable/downloadfiletable';
@@ -82,8 +82,8 @@ export default class Assignments extends React.Component {
             store.sort(function (a, b) {
                 return new Date(b.due) - new Date(a.due);
             });
-            store.map((item) => {
-                let tmp = [];
+            store.forEach((item) => {
+                let tmp;
                 tmp = item.due.split("T");
                 item.due = tmp[0];
                 tmp = item.assigned.split("T");

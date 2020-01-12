@@ -56,7 +56,7 @@ export default class StudentGradesSummary extends React.Component {
     computeSearchOptions() {
         let options = [];
         if (this.state.wantAddAGrade === true) {
-            this.state.studentsForSelectedClass.map((student) => {
+            this.state.studentsForSelectedClass.forEach((student) => {
                 let option = {
                     value: student,
                     label: student.name + ' ' + student.surname + ' <' + student.ssn + '>'
@@ -64,7 +64,7 @@ export default class StudentGradesSummary extends React.Component {
                 options.push(option);
             });
         } else {
-            this.state.students.map((student) => {
+            this.state.students.forEach((student) => {
                 let option = {
                     value: student,
                     label: student.name + ' ' + student.surname + ' <' + student.ssn + '>'
@@ -181,7 +181,7 @@ export default class StudentGradesSummary extends React.Component {
                 success: '',
                 error: ''
             });
-        } else if (/^([0-9]\+?|([1-9]|10)\-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude)?)$/.test(this.state.selectedGrade) === false) {
+        } else if (/^([0-9]\+?|([1-9]|10)-|[0-9](\.5|( | and )1\/2)|0\/1|1\/2|2\/3|3\/4|4\/5|5\/6|6\/7|7\/8|8\/9|9\/10|10(l|L| cum laude)?)$/.test(this.state.selectedGrade) === false) {
             this.setState({
                 warning: 'Grade format not valid. Please insert a correct grade.',
                 success: '',
@@ -191,7 +191,6 @@ export default class StudentGradesSummary extends React.Component {
             //Check if the teacher is inserting the grade in the day he has a lesson for the selected subject for the selected class
             let day = new Date(Date.now()).getNormalizedDay();
             let teacherHadLesson = false;
-            let lessonDay = -1;
             let toSplit = [];
             //Get the first day I will have lesson for this subject this week
             this.props.timetable.forEach((t) => {
@@ -231,7 +230,7 @@ export default class StudentGradesSummary extends React.Component {
         let gradesSortedTopic = [];
         let gradesDOM = [];
         if (this.state.selectedStudent !== '') {
-            this.state.selectedStudent.value.grades.map((grade) => {
+            this.state.selectedStudent.value.grades.forEach((grade) => {
                 if (gradesSortedTopic[grade.subject] == null) {
                     gradesSortedTopic[grade.subject] = [];
                 }
@@ -267,12 +266,10 @@ export default class StudentGradesSummary extends React.Component {
             }
         }
         let renderDropDownItem = [];
-        var element;
         if (this.state.wantAddAGrade === true) {
             for (let index in this.state.subjects) {
-                element = this.state.classes.find((c) => {
-                    if (c._id.toString() === this.state.subjects[index].class)
-                        return c;
+                let element = this.state.classes.find((c) => {
+                    return c._id.toString() === this.state.subjects[index].class
                 });
                 renderDropDownItem.push(
                     <Dropdown.Item key={index} onClick={async () => {

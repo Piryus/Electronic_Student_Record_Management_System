@@ -52,8 +52,7 @@ export default class TimetablesManager extends React.Component {
             this.setState({
                 classes,
                 selectedClass: classes.find(class_ => {
-                    if (class_._id === this.state.selectedClass._id)
-                        return true
+                    return class_._id === this.state.selectedClass._id;
                 })
             })
         } else {

@@ -5,14 +5,10 @@ import {Button, Dropdown, Navbar} from "react-bootstrap";
 import {TiThMenu} from 'react-icons/ti';
 
 export default class AppNavbar extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         let childNotSelected = [];
         if (this.props.type === 'parent') {
-            this.props.children.map((child) => {
+            this.props.children.forEach((child) => {
                 if (child._id !== this.props.selectedChild._id)
                     childNotSelected.push(
                         <Dropdown.Item key={child._id}

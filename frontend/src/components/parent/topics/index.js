@@ -32,6 +32,8 @@ export default class ParentLectureTopics extends React.Component {
                 focusDay.setDate(focusDay.getDate() - 7);
                 this.setState({focusDay: focusDay, topicString: ''});
                 break;
+            default:
+                break;
         }
     }
 

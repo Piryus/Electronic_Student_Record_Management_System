@@ -44,7 +44,7 @@ export default class ParentAccountEnabling extends React.Component {
 
     computeSearchOptions() {
         let options = [];
-        this.state.students.map((student) => {
+        this.state.students.forEach((student) => {
             let option = {
                 value: student,
                 label: student.name + ' ' + student.surname + ' <' + student.ssn + '>'

@@ -1,6 +1,5 @@
 import React from 'react';
 import {Alert, Button, Form, Modal} from "react-bootstrap";
-import Select from "react-select";
 
 export default class NewUserForm extends React.Component {
     constructor(props) {

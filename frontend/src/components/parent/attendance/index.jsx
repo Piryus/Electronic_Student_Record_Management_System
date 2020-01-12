@@ -29,6 +29,8 @@ export default class Attendance extends React.Component {
                 focusDay.setDate(focusDay.getDate() - 7);
                 this.setState({focusDay});
                 break;
+            default:
+                break;
         }
     }
 

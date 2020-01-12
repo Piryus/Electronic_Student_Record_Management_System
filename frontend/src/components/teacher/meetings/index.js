@@ -64,8 +64,7 @@ export default class Meetings extends React.Component {
 
     toggleWeekHour(weekHour) {
         const classAtWeekHour = this.props.teacherTimetable.find(class_ => {
-            if (class_.weekhour === weekHour)
-                return true
+            return class_.weekhour === weekHour;
         });
         if (classAtWeekHour === undefined) {
             let selectedWeekHours = this.state.selectedWeekHours;

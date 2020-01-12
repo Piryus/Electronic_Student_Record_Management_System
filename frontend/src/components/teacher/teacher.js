@@ -148,7 +148,6 @@ export default class Teacher extends React.Component {
     };
 
     render() {
-        const now = new Date(Date.now());
         return (
             <div className={styles.root}>
                 <AppNavbar
