@@ -236,10 +236,15 @@ export default class StudentGradesSummary extends React.Component {
                     gradesSortedTopic[grade.subject] = [];
                 }
                 let date = grade.date.split("T");
+                let gradeSubject;
+                if (grade.description !== undefined) {
+                    gradeSubject = `${grade.description}`;
+                } else {
+                    gradeSubject = `Grade ${gradesSortedTopic[grade.subject].length + 1}`;
+                }
                 gradesSortedTopic[grade.subject].push(
                     <Accordion.Collapse key={grade.subject} eventKey={grade.subject}>
-                        <Card.Body>Grade {gradesSortedTopic[grade.subject].length + 1}: {grade.value} Date
-                            : {date[0]}</Card.Body>
+                        <Card.Body>{gradeSubject} - {moment(date[0]).format('DD/MM/YYYY')} : <b>{grade.value}</b></Card.Body>
                     </Accordion.Collapse>
                 );
             });
