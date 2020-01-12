@@ -208,7 +208,7 @@ export default class Teacher extends React.Component {
                                 onClick={() => this.setState({userRequest: "meetings"})}><FaHandshake/> Meetings with
                                 parents</Nav.Link>
                         </Nav>
-                        <main className={"col-md-9 ml-sm-auto col-lg-10 px-4 pt-5"}>
+                        <main className={"col-md-10 ml-sm-auto col-lg-10 px-4 pt-5"}>
                             {this.state.userRequest === 'lecture' && <LectureTopics timetable={this.props.timetable}/>}
                             {this.state.userRequest === 'grades' && (
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects}
