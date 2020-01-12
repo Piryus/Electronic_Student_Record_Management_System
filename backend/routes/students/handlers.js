@@ -124,15 +124,12 @@ const recordGrades = async function(teacherUId, subject, date, description, grad
     if(teacher === null || students.length != grades.length || schoolClassesIds.length !== 1)
         return Boom.badRequest();
 
-    const actualDate = new Date(date.getTime() - date.getTime() % (60*60*1000));
+    const now = new Date(Date.now());
 
-    if(actualDate > Date.now())
+    if(!teacher.timetable.some(t => (t.classId.equals(schoolClassesIds[0]) && t.subject === subject && HLib.weekhourToDate(t.weekhour) < now && HLib.weekhourToDate(t.weekhour).isSameDayOf(date))))
         return Boom.badRequest();
 
-    if(!teacher.timetable.some(t => (t.classId.equals(schoolClassesIds[0]) && t.subject === subject && HLib.weekhourToDate(t.weekhour).getTime() === actualDate.getTime())))
-        return Boom.badRequest();
-
-    students.forEach(s => s.grades.push({ value: grades.find(g => g.studentId === s._id.toString()).grade, subject, description, date: actualDate }));
+    students.forEach(s => s.grades.push({ value: grades.find(g => g.studentId === s._id.toString()).grade, subject, description, date }));
     await Promise.all(students.map(s => s.save()));
 
     return {success: true};
