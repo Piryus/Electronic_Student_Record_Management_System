@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Form, Dropdown, Container, Alert} from 'react-bootstrap';
+import {Alert, Button, Container, Dropdown, Form} from 'react-bootstrap';
 import 'moment/locale/it.js';
 import {DatePickerInput} from 'rc-datepicker';
 import 'rc-datepicker/lib/style.css';
@@ -9,6 +9,8 @@ import HDropzone from "../../utils/hdropzone/hdropzone";
 
 export default class Assignments extends React.Component {
 
+
+    hourTable = ["08", "09", "10", "11", "12", "13"];
 
     constructor(props) {
         super(props);
@@ -23,7 +25,7 @@ export default class Assignments extends React.Component {
         this.state = {
             wantAddAssignment: false,
             subjects: this.props.subjects,
-            selectedSubject: 'Select a Subject',
+            selectedSubject: 'Select a subject',
             selectedDate: today,
             currentDay: today,
             description: '',
@@ -36,14 +38,11 @@ export default class Assignments extends React.Component {
         this.selectedFilesHandler = this.selectedFilesHandler.bind(this);
     }
 
-    hourTable = ["08", "09", "10", "11", "12", "13"];
-
-
     showFormToAddAssignment() {
         this.setState({wantAddAssignment: true});
     }
 
-    selectedFilesHandler(newSelectedFiles){
+    selectedFilesHandler(newSelectedFiles) {
         this.setState({selectedFiles: newSelectedFiles});
     }
 
@@ -94,7 +93,7 @@ export default class Assignments extends React.Component {
 
     async saveChanges(event) {
         event.preventDefault();
-        if (this.state.selectedSubject === 'Select a Subject') {
+        if (this.state.selectedSubject === 'Select a subject') {
             this.setState({
                 success: '',
                 warning: 'Please select a subject.',
@@ -168,7 +167,8 @@ export default class Assignments extends React.Component {
         let renderDropDownItem = [];
         for (let index in this.state.subjects) {
             renderDropDownItem.push(
-                <Dropdown.Item onClick={() => this.setState({selectedSubject: index})}>{index}</Dropdown.Item>
+                <Dropdown.Item key={index}
+                               onClick={() => this.setState({selectedSubject: index})}>{index}</Dropdown.Item>
             );
         }
 
@@ -177,26 +177,25 @@ export default class Assignments extends React.Component {
                 <SectionHeader>Assignments</SectionHeader>
                 {this.state.wantAddAssignment === false && (
                     <div>
-                        <p>In this section you can manage your Assignments</p><br></br>
+                        <p>In this section you can manage your assignments</p>
                         {this.state.success !== '' && this.state.warning === '' && this.state.error === '' &&
-                            <Alert variant='success'>{this.state.success}</Alert>
+                        <Alert variant='success'>{this.state.success}</Alert>
                         }
-                        <Button variant="primary" onClick={() => this.showFormToAddAssignment()}>Add an Assignment</Button>
+                        <Button variant="primary" onClick={() => this.showFormToAddAssignment()}>New assignment</Button>
                     </div>
                 )}
                 {this.state.wantAddAssignment === true && (
-                    <div>
-                        <p>Complete the form below to add an Assignment</p>
+                    <>
+                        <p>Complete the form below to add an assignment</p>
                         {this.state.success === '' && this.state.warning !== '' && this.state.error === '' &&
-                            <Alert variant='warning'>{this.state.warning}</Alert>
+                        <Alert variant='warning'>{this.state.warning}</Alert>
                         }
                         {this.state.success === '' && this.state.warning === '' && this.state.error !== '' &&
-                            <Alert variant='danger'>{this.state.error}</Alert>
+                        <Alert variant='danger'>{this.state.error}</Alert>
                         }
                         <Form>
-                        <Button onClick={(e) => this.saveChanges(e)} type="primary">Save</Button>
                             <Form.Group>
-                                <Form.Label>Subject: </Form.Label>
+                                <Form.Label>Subject</Form.Label>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="primary" id="dropdown-basic">
                                         {this.state.selectedSubject}
@@ -210,24 +209,23 @@ export default class Assignments extends React.Component {
                                 </Dropdown>
                             </Form.Group>
                             <Form.Group>
-                                <Form.Label>
-                                    Date:
-                                </Form.Label>
+                                <Form.Label>Date</Form.Label>
                                 <DatePickerInput
                                     onChange={this.onChange}
                                     value={this.state.selectedDate}
                                 />
                             </Form.Group>
                             <Form.Group>
-                                <Form.Label>
-                                    Description:
-                                </Form.Label>
+                                <Form.Label>Description</Form.Label>
                                 <Form.Control placeholder="Insert a description here." as="textarea" rows="3"
                                               onChange={(e) => this.setState({description: e.target.value})}/>
                             </Form.Group>
-                            <HDropzone selectedFilesHandler={(newSelectedFiles) => this.selectedFilesHandler(newSelectedFiles)} selectedFiles={this.state.selectedFiles}/>
+                            <HDropzone
+                                selectedFilesHandler={(newSelectedFiles) => this.selectedFilesHandler(newSelectedFiles)}
+                                selectedFiles={this.state.selectedFiles}/>
+                            <Button onClick={(e) => this.saveChanges(e)} type="primary">Save</Button>
                         </Form>
-                    </div>
+                    </>
                 )}
             </Container>
         );
