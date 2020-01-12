@@ -50,7 +50,7 @@ export default class Assignments extends React.Component {
 
     renderItem = (item, index) => {
         return (
-            <Card>
+            <Card key={item.due + item.assigned}>
                 <Accordion.Toggle as={Card.Header} eventKey={index.toString()}>
                     <Row>
                         <Col>{item.subject}</Col>

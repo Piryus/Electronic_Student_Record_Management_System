@@ -3,6 +3,7 @@ import React from 'react';
 import {Accordion, Button, Card, Container} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import LoadingSpinner from "../../utils/loading-spinner";
+import moment from "moment";
 
 export default class Grades extends React.Component {
 
@@ -58,11 +59,16 @@ export default class Grades extends React.Component {
                     gradesSortedTopic[grade.subject] = [];
                 }
                 let date = grade.date.split("T");
+                let gradeSubject;
+                if (grade.description !== undefined) {
+                    gradeSubject = `${grade.description}`;
+                } else {
+                    gradeSubject = `Grade ${gradesSortedTopic[grade.subject].length + 1}`;
+                }
                 gradesSortedTopic[grade.subject].push(
                     {
-                        htmlElement: <Accordion.Collapse eventKey={grade.subject}>
-                            <Card.Body>Grade : {grade.value} Date
-                                : {date[0]}</Card.Body>
+                        htmlElement: <Accordion.Collapse key={grade.subject + grade.date + grade.value} eventKey={grade.subject}>
+                            <Card.Body>{gradeSubject} - {moment(date[0]).format('DD/MM/YYYY')} : <b>{grade.value}</b></Card.Body>
                         </Accordion.Collapse>,
                         date: date[0],
                         grade: parseFloat(realGrade)
@@ -88,7 +94,7 @@ export default class Grades extends React.Component {
                 });
 
                 gradesDOM.push(
-                    <Card>
+                    <Card key={index}>
                         <Card.Header>
                             <Accordion.Toggle as={Button} variant="link" eventKey={index}>
                                 {index + ' ' + average}
