@@ -243,7 +243,7 @@ export default class StudentGradesSummary extends React.Component {
                     gradeSubject = `Grade ${gradesSortedTopic[grade.subject].length + 1}`;
                 }
                 gradesSortedTopic[grade.subject].push(
-                    <Accordion.Collapse key={grade.subject} eventKey={grade.subject}>
+                    <Accordion.Collapse key={grade.subject + grade.date + grade.value} eventKey={grade.subject}>
                         <Card.Body>{gradeSubject} - {moment(date[0]).format('DD/MM/YYYY')} : <b>{grade.value}</b></Card.Body>
                     </Accordion.Collapse>
                 );
