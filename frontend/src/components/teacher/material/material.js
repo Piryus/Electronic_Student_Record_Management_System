@@ -87,7 +87,7 @@ export default class Material extends React.Component {
         let renderClassDropdownMenu = [];
         let renderSubjects = [];
 
-        renderClassDropdownMenu = this.state.classes.map(c => <Dropdown.Item onClick={() => this.setState({selectedClass: c})}>{c.name}</Dropdown.Item>);
+        renderClassDropdownMenu = this.state.classes.map(c => <Dropdown.Item key={c._id} onClick={() => this.setState({selectedClass: c})}>{c.name}</Dropdown.Item>);
         if(this.state.selectedClass !== ''){
             renderSubjects = this.props.timetable.filter(t => t.classId === this.state.selectedClass._id).map(t => t.subject);
             renderSubjects = [...new Set(renderSubjects)];
