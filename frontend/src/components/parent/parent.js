@@ -59,6 +59,9 @@ export default class Parent extends React.Component {
                                 className={this.state.userRequest === 'timetable' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "timetable")}><FaCalendarAlt/> Timetable</Nav.Link>
                             <Nav.Link
+                                className={this.state.userRequest === 'topics' ? styles.sidebarLinkActive : styles.sidebarLink}
+                                onClick={() => this.setState({userRequest: "topics"})}><FaHandPaper/> Lecture topics </Nav.Link>
+                            <Nav.Link
                                 className={this.state.userRequest === 'grades' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={(e) => this.setUserRequest(e, "grades")}><FaGraduationCap/> Grades</Nav.Link>
                             <Nav.Link
@@ -83,9 +86,6 @@ export default class Parent extends React.Component {
                                 className={this.state.userRequest === 'meetings' ? styles.sidebarLinkActive : styles.sidebarLink}
                                 onClick={() => this.setState({userRequest: "meetings"})}><FaHandshake/> Meetings with
                                 teachers</Nav.Link>
-                            <Nav.Link
-                                className={this.state.userRequest === 'topics' ? styles.sidebarLinkActive : styles.sidebarLink}
-                                onClick={() => this.setState({userRequest: "topics"})}><FaHandPaper/> Lecture topics </Nav.Link>
                         </Nav>
                         <main className="col-md-10 ml-sm-auto col-lg-10 px-4 pt-5">
                             {this.state.userRequest === 'news' && (
