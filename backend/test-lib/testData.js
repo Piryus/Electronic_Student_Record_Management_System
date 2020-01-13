@@ -82,8 +82,8 @@ const calendar = [
         { start: new Date('2020-01-06T00:00:00'), end: null },
         { start: new Date('2020-02-22T00:00:00'), end: new Date('2020-02-26T00:00:00') },
         { start: new Date('2020-04-09T00:00:00'), end: new Date('2020-04-14T00:00:00') },
-        { start: new Date('2019-05-01T00:00:00'), end: new Date('2019-05-02T00:00:00') },
-        { start: new Date('2019-06-01T00:00:00'), end: new Date('2019-06-02T00:00:00') },
+        { start: new Date('2020-05-01T00:00:00'), end: new Date('2020-05-02T00:00:00') },
+        { start: new Date('2020-06-01T00:00:00'), end: new Date('2020-06-02T00:00:00') },
     ], __v: 0 }
 ];
     
