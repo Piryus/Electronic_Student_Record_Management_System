@@ -163,11 +163,13 @@ function getBasicTimetableData() {
 }
 
 function buildClassTimetableData(timetable, timetableData) {
+    let newTimetableData = timetableData;
     timetable.forEach(class_ => {
         const [day, hour] = class_.weekhour.split('_');
-        timetableData[day].content[hour].text = class_.subject + ' (' + class_.teacher.surname + ' ' + class_.teacher.name + ')';
-        timetableData[day].content[hour].color = 'bg-success text-white';
+        newTimetableData[day].content[hour].text = class_.subject + ' (' + class_.teacher.surname + ' ' + class_.teacher.name + ')';
+        newTimetableData[day].content[hour].color = 'bg-success text-white';
     });
+    return newTimetableData;
 }
 
 export {
