@@ -3,6 +3,7 @@ import {Container} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import LoadingSpinner from "../../utils/loading-spinner";
 import Timetable from "../../utils/timetable";
+import fetchCalendar from "../../utils/calendar";
 
 export default class ChildTimetable extends React.Component {
     constructor(props) {
@@ -16,14 +17,7 @@ export default class ChildTimetable extends React.Component {
 
     async componentDidMount() {
         const timetable = await this.fetchTimetable(this.props.child._id);
-        const calendar = await this.fetchCalendar();
-        calendar.firstDay = new Date(calendar.firstDay);
-        calendar.lastDay = new Date(calendar.lastDay);
-        calendar.holidays.forEach(holiday => {
-            holiday.start = new Date(holiday.start);
-            if (holiday.end !== null)
-                holiday.end = new Date(holiday.end);
-        });
+        const calendar = await fetchCalendar();
         this.setState({
             timetable,
             isLoading: false,
@@ -53,21 +47,6 @@ export default class ChildTimetable extends React.Component {
         let response = await fetch(url, options);
         const json = await response.json();
         return json.timetable;
-    }
-
-    async fetchCalendar() {
-        const url = `http://localhost:3000/calendar`;
-        const options = {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        };
-        let response = await fetch(url, options);
-        const json = await response.json();
-        return json.calendar;
     }
 
     render() {

@@ -3,6 +3,7 @@ import Timetable from '../../utils/timetable';
 import SectionHeader from "../../utils/section-header";
 import {Button, Container} from "react-bootstrap";
 import LoadingSpinner from "../../utils/loading-spinner";
+import fetchCalendar from "../../utils/calendar";
 
 export default class Attendance extends React.Component {
 
@@ -11,7 +12,8 @@ export default class Attendance extends React.Component {
         this.state = {
             childAttendance: [],
             isLoading: true,
-            focusDay: new Date(Date.now())
+            focusDay: new Date(Date.now()),
+            calendar: null
         }
     }
 
@@ -42,9 +44,11 @@ export default class Attendance extends React.Component {
 
     async componentDidMount() {
         const attendance = await this.getChildAttendance();
+        const calendar = await fetchCalendar();
         this.setState({
             childAttendance: attendance,
-            isLoading: false
+            isLoading: false,
+            calendar
         });
     }
 
@@ -138,6 +142,18 @@ export default class Attendance extends React.Component {
                 }
             });
         });
+
+        if (this.state.calendar !== null) {
+            data.forEach((day, index) => {
+                console.log(day.date)
+                if (!day.date.isSchoolDay(this.state.calendar)) {
+                    data[index].content.forEach(hour => {
+                        hour.text = 'Holiday';
+                        hour.color = 'bg-info text-white'
+                    });
+                }
+            });
+        }
 
         return (
             <Container fluid>
