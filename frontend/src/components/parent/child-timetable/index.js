@@ -3,25 +3,21 @@ import {Container} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import LoadingSpinner from "../../utils/loading-spinner";
 import Timetable from "../../utils/timetable";
-import fetchCalendar from "../../utils/calendar";
 
 export default class ChildTimetable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             timetable: null,
-            isLoading: true,
-            calendar: null
+            isLoading: true
         }
     }
 
     async componentDidMount() {
         const timetable = await this.fetchTimetable(this.props.child._id);
-        const calendar = await fetchCalendar();
         this.setState({
             timetable,
-            isLoading: false,
-            calendar
+            isLoading: false
         });
     }
 
@@ -75,23 +71,12 @@ export default class ChildTimetable extends React.Component {
             });
         }
 
-        if (this.state.calendar !== null) {
-            timetableData.forEach((day, index) => {
-                if (!day.date.isSchoolDay(this.state.calendar)) {
-                    timetableData[index].content.forEach(hour => {
-                        hour.text = 'Holiday';
-                        hour.color = 'bg-info text-white'
-                    });
-                }
-            });
-        }
-
         return (
             <Container fluid>
                 <SectionHeader>Timetable</SectionHeader>
                 {this.state.isLoading && <LoadingSpinner/>}
                 {!this.state.isLoading &&
-                    <Timetable data={timetableData} frequency={60} hideDate/>
+                <Timetable data={timetableData} frequency={60} hideDate/>
                 }
             </Container>
         );

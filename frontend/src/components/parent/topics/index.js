@@ -1,22 +1,19 @@
 import React from 'react';
 import SectionHeader from '../../utils/section-header';
-import { Container, Form, Button } from 'react-bootstrap';
+import {Button, Container, Form} from 'react-bootstrap';
 import Timetable from "../../utils/timetable";
 import LoadingSpinner from "../../utils/loading-spinner";
-import fetchCalendar from "../../utils/calendar";
-
 
 
 export default class ParentLectureTopics extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             timetable: [],
             isLoading: true,
             selectedWeekHour: '',
             topicString: '',
-            focusDay: new Date(Date.now()),
-            calendar: null
+            focusDay: new Date(Date.now())
         };
     }
 
@@ -45,10 +42,8 @@ export default class ParentLectureTopics extends React.Component {
         return new Date(date.setDate(diff));
     };
 
-    async componentDidMount(){
+    async componentDidMount() {
         await this.getChildTimetable();
-        const calendar = await fetchCalendar();
-        this.setState({calendar});
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
@@ -57,7 +52,7 @@ export default class ParentLectureTopics extends React.Component {
         }
     }
 
-    async getLectureTopics(){
+    async getLectureTopics() {
         const url = 'http://localhost:3000/timetable/' + this.props.child._id;
         const options = {
             method: 'GET',
@@ -74,7 +69,7 @@ export default class ParentLectureTopics extends React.Component {
 
     }
 
-    async getChildTimetable(){
+    async getChildTimetable() {
         const url = 'http://localhost:3000/timetable/student/' + this.props.child._id;
         const options = {
             method: 'GET',
@@ -102,7 +97,7 @@ export default class ParentLectureTopics extends React.Component {
         await this.getTopics(weekHour, dat.getTime());
     }
 
-    async getTopics(weekhour, dateInSeconds){
+    async getTopics(weekhour, dateInSeconds) {
         const url = 'http://localhost:3000/lectures/student/' + this.props.child._id + '?datetime=' + dateInSeconds;
         const options = {
             method: 'GET',
@@ -114,14 +109,14 @@ export default class ParentLectureTopics extends React.Component {
         };
         let response = await fetch(url, options);
         const json = await response.json();
-        if(json.topics === null || json.topics === undefined){
+        if (json.topics === null || json.topics === undefined) {
             this.setState({topicString: ''});
         } else {
             this.setState({topicString: json.topics});
         }
     }
 
-    render(){
+    render() {
 
         let data = [];
         for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
@@ -130,11 +125,11 @@ export default class ParentLectureTopics extends React.Component {
             dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
             let content = [];
             for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
-                    content.push({
-                        text: '',
-                        color: 'bg-light'
-                    });
-                }
+                content.push({
+                    text: '',
+                    color: 'bg-light'
+                });
+            }
             dateObject.content = content;
             data.push(dateObject);
         }
@@ -145,18 +140,7 @@ export default class ParentLectureTopics extends React.Component {
             data[day].content[hour].color = 'bg-success text-white';
         });
 
-        if (this.state.calendar !== null) {
-            data.forEach((day, index) => {
-                if (!day.date.isSchoolDay(this.state.calendar)) {
-                    data[index].content.forEach(hour => {
-                        hour.text = 'Holiday';
-                        hour.color = 'bg-info text-white'
-                    });
-                }
-            });
-        }
-
-        return(
+        return (
             <Container fluid>
                 <SectionHeader> Lecture Topics </SectionHeader>
                 {this.state.isLoading && <LoadingSpinner/>}
@@ -167,12 +151,14 @@ export default class ParentLectureTopics extends React.Component {
                         <Button onClick={() => this.handleWeek(0)}>Current week</Button>
                         <Button onClick={() => this.handleWeek(1)}>Next week</Button>
                     </div>
-                    <Timetable data={data} selectable selectionHandler={(weekhour, date) => this.handleSelection(weekhour, date)} frequency={60}/>
+                    <Timetable data={data} selectable
+                               selectionHandler={(weekhour, date) => this.handleSelection(weekhour, date)}
+                               frequency={60}/>
                     <h6>Topics covered:</h6>
                     <Form.Control as="textarea"
-                              rows="5"
-                              disabled={this.state.selectedWeekHour === ''}
-                              value={this.state.topicString}/>
+                                  rows="5"
+                                  disabled={this.state.selectedWeekHour === ''}
+                                  value={this.state.topicString}/>
                 </>
                 }
             </Container>
