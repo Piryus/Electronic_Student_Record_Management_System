@@ -76,10 +76,11 @@ export default class Timetable extends Component {
                 {hours.map((hour, hourIndex) => {
                     return (
                         <tr key={hourIndex}>
-                            <td>{hour}</td>
+                            <td style={{width: '10%'}}>{hour}</td>
                             {data.map((day, dayIndex) => {
                                 return (
                                     <td key={dayIndex}
+                                        style={{width: '18%'}}
                                         className={this.state.selectedWeekHour === dayIndex + '_' + hourIndex ? 'bg-warning' : day.content[hourIndex].color}
                                         onClick={() => this.selectCell(dayIndex, hourIndex)}>
                                         {day.content[hourIndex].text}
