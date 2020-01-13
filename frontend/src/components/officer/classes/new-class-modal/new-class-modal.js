@@ -64,8 +64,8 @@ export default class NewClassModal extends React.Component {
             success: "Class created successfully.",
             error: ''
         });
-        if (json.error != null) {
-            alert('Error! Please insert a class Name');
+        if (json.error !== null) {
+            this.setState({error: "Please insert a class name."});
         }
     }
 

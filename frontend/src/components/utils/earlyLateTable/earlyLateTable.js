@@ -37,7 +37,7 @@ export default class EarlyLateTable extends React.Component {
 
             this.setState({classEvents: attendance});
         } catch (e) {
-            alert(e);
+            console.log(e);
         }
     }
 
@@ -73,13 +73,13 @@ export default class EarlyLateTable extends React.Component {
             let response = await fetch(url, options);
             const json = await response.json();
             if (json.error != null) {
-                alert('Ops! Internal error. Please retry!');
+                // TODO Manage error
                 window.location.reload(false);
             } else {
-                alert('Event successfully removed.');
+                // TODO Add successful creation message
             }
         } catch (err) {
-            alert(err);
+            console.log(err);
             window.location.reload(false);
         }
     }
