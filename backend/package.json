@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "lab -c -m 15000"
+    "test": "lab -c -m 15000 -r html -o coverage.html"
   },
   "author": "",
   "license": "ISC",

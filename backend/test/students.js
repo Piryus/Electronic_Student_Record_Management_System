@@ -529,9 +529,12 @@ suite('students', () => {
         await Promise.all(data.map(s => students.addStudent(s.ssn, s.name, s.surname)));
         const full = await Student.find({});
 
+        const fs = full.sort((a, b) => a.ssn - b.ssn);
+
         expect(empty).to.have.length(0);
         expect(full).to.have.length(6);
-        data.forEach((s, i) => jexpect(full.sort((a, b) => a.ssn - b.ssn)[i]).to.include(data[i]));
+        for(let i = 0; i < data.length; i++)
+            jexpect(fs[i]).to.include(data[i]);
     });
 
     test('addSchoolClass', async () => {

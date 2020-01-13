@@ -92,7 +92,7 @@ const getTimetable = async function(parentUId, studentId) {
     
     const timetable = teachers.filter(t => t.timetable.some(w => w.classId.equals(student.classId))).flatMap(t => {
         const teacherInfo = { _id: t._id, ssn: t.userId.ssn, surname: t.userId.surname, name: t.userId.name };
-        return t.timetable.map(w => {
+        return t.timetable.filter(w => w.classId.equals(student.classId)).map(w => {
             return { weekhour: w.weekhour, subject: w.subject, teacher: teacherInfo };
         });
     });
