@@ -1,7 +1,7 @@
 import React from "react";
 import {Container, Dropdown, DropdownButton} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
-import Timetable from "../../utils/timetable";
+import Timetable, {fetchClassTimetableData} from "../../utils/timetable";
 import LoadingSpinner from "../../utils/loading-spinner";
 
 export default class ClassesTimetables extends React.Component {
@@ -10,7 +10,7 @@ export default class ClassesTimetables extends React.Component {
         this.state = {
             selectedClass: {},
             isLoading: true,
-            timetable: [],
+            timetableData: null,
             classes: []
         }
     }
@@ -18,14 +18,14 @@ export default class ClassesTimetables extends React.Component {
     async componentDidMount() {
         const {classes, teacherTimetable} = this.props;
         let teacherClasses = classes.filter(c => teacherTimetable.find(t => t.classId === c._id) !== undefined);
-        let timetable = [];
+        let timetableData = null;
         let selectedClass = {};
         if (teacherClasses.length > 0) {
-            timetable = await this.fetchTimetable(teacherClasses[0]._id);
+            timetableData = await fetchClassTimetableData(teacherClasses[0]._id);
             selectedClass = teacherClasses[0];
         }
         this.setState({
-            timetable,
+            timetableData,
             isLoading: false,
             classes: teacherClasses,
             selectedClass
@@ -33,54 +33,14 @@ export default class ClassesTimetables extends React.Component {
     }
 
     async selectClass(class_) {
-        const timetable = await this.fetchTimetable(class_._id);
+        const timetableData = await fetchClassTimetableData(class_._id);
         this.setState({
             selectedClass: class_,
-            timetable
+            timetableData
         });
     }
 
-    async fetchTimetable(classId) {
-        const url = `http://localhost:3000/timetable/${classId}`;
-        const options = {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        };
-        let response = await fetch(url, options);
-        const json = await response.json();
-        return json.timetable;
-    }
-
     render() {
-        // Basic data construction
-        let timetableData = [];
-        for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
-            let dateObject = {};
-            dateObject.date = new Date().weekStart();
-            dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
-            let content = [];
-            for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
-                content.push({
-                    text: '',
-                    color: 'bg-secondary'
-                });
-            }
-            dateObject.content = content;
-            timetableData.push(dateObject);
-        }
-
-        if (this.state.timetable !== null) {
-            this.state.timetable.forEach(class_ => {
-                const [day, hour] = class_.weekhour.split('_');
-                timetableData[day].content[hour].text = class_.subject + ' (' + class_.teacher.surname + ' ' + class_.teacher.name + ')';
-                timetableData[day].content[hour].color = 'bg-success text-white';
-            });
-        }
-
         return (
             <Container fluid>
                 <SectionHeader>Classes timetables</SectionHeader>
@@ -95,8 +55,8 @@ export default class ClassesTimetables extends React.Component {
                                 onClick={async () => await this.selectClass(class_)}>{class_.name}</Dropdown.Item>
                         )}
                     </DropdownButton>
-                    {this.state.timetable !== [] &&
-                    <Timetable data={timetableData} frequency={60} hideDate/>}
+                    {this.state.timetableData !== null &&
+                    <Timetable data={this.state.timetableData} frequency={60} hideDate/>}
                 </>
                 }
             </Container>

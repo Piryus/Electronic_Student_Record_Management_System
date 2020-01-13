@@ -94,3 +94,84 @@ export default class Timetable extends Component {
             </Table>);
     }
 }
+
+async function fetchStudentTimetableData(childId) {
+    const url = `http://localhost:3000/timetable/student/${childId}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    };
+    let response = await fetch(url, options);
+    const json = await response.json();
+    const timetable = json.timetable;
+
+    // Basic data construction
+    let timetableData = getBasicTimetableData();
+
+    if (timetable !== null) {
+        timetableData = buildClassTimetableData(timetable, timetableData);
+    }
+
+    return timetableData;
+}
+
+async function fetchClassTimetableData(classId) {
+    const url = `http://localhost:3000/timetable/${classId}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    };
+    let response = await fetch(url, options);
+    const json = await response.json();
+    const timetable = json.timetable;
+
+    // Basic data construction
+    let timetableData = getBasicTimetableData();
+
+    if (timetable !== null) {
+        timetableData = buildClassTimetableData(timetable, timetableData);
+    }
+
+    return timetableData;
+}
+
+function getBasicTimetableData() {
+    let timetableData = [];
+    for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
+        let dateObject = {};
+        dateObject.date = new Date().weekStart();
+        dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
+        let content = [];
+        for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
+            content.push({
+                text: '',
+                color: 'bg-secondary'
+            });
+        }
+        dateObject.content = content;
+        timetableData.push(dateObject);
+    }
+    return timetableData;
+}
+
+function buildClassTimetableData(timetable, timetableData) {
+    timetable.forEach(class_ => {
+        const [day, hour] = class_.weekhour.split('_');
+        timetableData[day].content[hour].text = class_.subject + ' (' + class_.teacher.surname + ' ' + class_.teacher.name + ')';
+        timetableData[day].content[hour].color = 'bg-success text-white';
+    });
+}
+
+export {
+    Timetable,
+    fetchStudentTimetableData,
+    fetchClassTimetableData
+};
