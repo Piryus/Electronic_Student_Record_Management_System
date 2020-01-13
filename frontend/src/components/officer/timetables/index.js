@@ -9,15 +9,15 @@ export default class TimetablesManager extends React.Component {
         this.state = {
             classes: [],
             selectedClass: null,
-            error: ''
+            error: '',
+            alertSuccess: ''
         };
     }
 
     async componentDidMount() {
         const classes = await this.getClasses();
         this.setState({
-            classes,
-            error: ''
+            classes
         });
     }
 
@@ -53,10 +53,13 @@ export default class TimetablesManager extends React.Component {
                 classes,
                 selectedClass: classes.find(class_ => {
                     return class_._id === this.state.selectedClass._id;
-                })
+                }),
+                alertSuccess: 'The timetable was successfully uploaded!',
+                error: ''
             })
         } else {
             this.setState({
+                alertSuccess: '',
                 error: 'The timetable couldn\'t be uploaded to the school servers...'
             })
         }
@@ -64,7 +67,9 @@ export default class TimetablesManager extends React.Component {
 
     async selectClass(class_) {
         this.setState({
-            selectedClass: class_
+            selectedClass: class_,
+            alertSuccess: '',
+            error: ''
         })
     }
 
@@ -104,6 +109,7 @@ export default class TimetablesManager extends React.Component {
             <Container fluid>
                 <SectionHeader>Manage timetables</SectionHeader>
                 {this.state.error !== '' && <Alert variant="danger">{this.state.error}</Alert>}
+                {this.state.alertSuccess !== '' && <Alert variant="success">{this.state.alertSuccess}</Alert>}
                 <DropdownButton className='mb-2'
                                 title={this.state.selectedClass ? this.state.selectedClass.name : 'Select a class'}>
                     {this.state.classes.map(class_ =>
