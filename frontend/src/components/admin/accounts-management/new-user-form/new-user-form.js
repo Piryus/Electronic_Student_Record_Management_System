@@ -38,7 +38,7 @@ export default class NewUserForm extends React.Component {
         } else {
             this.setState({error: true});
         }
-    };
+    }
 
     render() {
         return (

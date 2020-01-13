@@ -34,7 +34,7 @@ export default class TimetablesManager extends React.Component {
         let response = await fetch(url, options);
         const json = await response.json();
         return json.classes;
-    };
+    }
 
     async uploadTimetable(file) {
         const url = 'http://localhost:3000/timetables';
@@ -60,7 +60,7 @@ export default class TimetablesManager extends React.Component {
                 error: 'The timetable couldn\'t be uploaded to the school servers...'
             })
         }
-    };
+    }
 
     async selectClass(class_) {
         this.setState({

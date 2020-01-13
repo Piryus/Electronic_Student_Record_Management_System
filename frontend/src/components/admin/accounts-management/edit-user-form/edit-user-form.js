@@ -56,7 +56,7 @@ export default class EditUserForm extends React.Component {
         } catch (e) {
             this.setState({error: true});
         }
-    };
+    }
 
     render() {
         return (

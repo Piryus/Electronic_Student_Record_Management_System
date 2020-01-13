@@ -150,7 +150,7 @@ export default class FinalGrades extends React.Component {
 
     updateGrade(e, subject, studentId){
         let computedGrades = this.state.computedGrades;
-        let index = computedGrades.findIndex(e => e.id === studentId);
+        let index = computedGrades.findIndex(grade => grade.id === studentId);
         let index2 = computedGrades[index].grades.findIndex(g => g.subjectName === subject);
         computedGrades[index].grades[index2].integerGrade = e.target.value;
         this.setState({computedGrades: computedGrades});

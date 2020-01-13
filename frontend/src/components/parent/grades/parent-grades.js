@@ -120,5 +120,5 @@ export default class Grades extends React.Component {
                 </Accordion>}
             </Container>
         );
-    };
+    }
 }

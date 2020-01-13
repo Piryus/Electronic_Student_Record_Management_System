@@ -36,7 +36,7 @@ class Classes extends React.Component {
         let response = await fetch(url, options);
         const json = await response.json();
         return json.classes;
-    };
+    }
 
     async getAllStudents() {
         const url = 'http://localhost:3000/students';

@@ -104,14 +104,14 @@ export default class NewAppointmentModal extends React.Component {
     }
 
     async selectChild(childId) {
-        const child = this.state.children.find(child => child.id === childId);
+        const selectedChild = this.state.children.find(child => child.id === childId);
         const teachers = await this.fetchChildTeachers(childId);
         let teacherSlots = await this.fetchTeacherSlots(teachers[0].id);
         const defaultTeacherSlots = teacherSlots.filter(slot => {
             return moment(slot.date).isSame(this.state.focusDay, 'day');
         });
         this.setState({
-            selectedChild: child,
+            selectedChild,
             teachers,
             selectedTeacher: teachers[0],
             teacherSlots,
@@ -121,13 +121,13 @@ export default class NewAppointmentModal extends React.Component {
     }
 
     async selectTeacher(teacherId) {
-        const teacher = this.state.teachers.find(teacher => teacher.id === teacherId);
+        const selectedTeacher = this.state.teachers.find(teacher => teacher.id === teacherId);
         let teacherSlots = await this.fetchTeacherSlots(teacherId);
         const defaultTeacherSlots = teacherSlots.filter(slot => {
             return moment(slot.date).isSame(this.state.focusDay, 'day');
         });
         this.setState({
-            selectedTeacher: teacher,
+            selectedTeacher,
             teacherSlots,
             displayedSlots: defaultTeacherSlots,
             selectedSlot: ""

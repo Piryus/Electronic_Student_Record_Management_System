@@ -55,7 +55,7 @@ export default class EditTeacherModal extends React.Component {
         } catch (e) {
             this.setState({error: 'Unable to update this user.'});
         }
-    };
+    }
 
     render() {
         const {teacher} = this.props;

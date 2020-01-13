@@ -82,7 +82,7 @@ export default class NotesToParents extends React.Component {
                         </thead>
                         <tbody>
                         {this.state.teacherNotes.map(note => {
-                                const student = this.props.students.find(student => student._id === note.studentId);
+                                const student = this.props.students.find(s => s._id === note.studentId);
                                 return (
                                     <tr key={note.date + note.teacherId}>
                                         <td>{new Date(note.date).longString()}</td>

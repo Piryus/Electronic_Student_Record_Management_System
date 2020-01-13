@@ -33,7 +33,7 @@ export default class Parent extends React.Component {
             childSelected: child,
             sidebarOpen: false,
         });
-    };
+    }
 
     setUserRequest(e, choice) {
         this.setState({userRequest: choice});
