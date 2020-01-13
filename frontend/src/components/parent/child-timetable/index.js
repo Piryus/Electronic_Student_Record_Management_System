@@ -9,15 +9,25 @@ export default class ChildTimetable extends React.Component {
         super(props);
         this.state = {
             timetable: null,
-            isLoading: true
+            isLoading: true,
+            calendar: null
         }
     }
 
     async componentDidMount() {
         const timetable = await this.fetchTimetable(this.props.child._id);
+        const calendar = await this.fetchCalendar();
+        calendar.firstDay = new Date(calendar.firstDay);
+        calendar.lastDay = new Date(calendar.lastDay);
+        calendar.holidays.forEach(holiday => {
+            holiday.start = new Date(holiday.start);
+            if (holiday.end !== null)
+                holiday.end = new Date(holiday.end);
+        });
         this.setState({
             timetable,
-            isLoading: false
+            isLoading: false,
+            calendar
         });
     }
 
@@ -45,6 +55,21 @@ export default class ChildTimetable extends React.Component {
         return json.timetable;
     }
 
+    async fetchCalendar() {
+        const url = `http://localhost:3000/calendar`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        };
+        let response = await fetch(url, options);
+        const json = await response.json();
+        return json.calendar;
+    }
+
     render() {
         // Basic data construction
         let timetableData = [];
@@ -68,6 +93,17 @@ export default class ChildTimetable extends React.Component {
                 const [day, hour] = class_.weekhour.split('_');
                 timetableData[day].content[hour].text = class_.subject + ' (' + class_.teacher.surname + ' ' + class_.teacher.name + ')';
                 timetableData[day].content[hour].color = 'bg-success text-white';
+            });
+        }
+
+        if (this.state.calendar !== null) {
+            timetableData.forEach((day, index) => {
+                if (!day.date.isSchoolDay(this.state.calendar)) {
+                    timetableData[index].content.forEach(hour => {
+                        hour.text = 'Holiday';
+                        hour.color = 'bg-info text-white'
+                    });
+                }
             });
         }
 
