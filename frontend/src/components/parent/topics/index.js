@@ -3,6 +3,7 @@ import SectionHeader from '../../utils/section-header';
 import { Container, Form, Button } from 'react-bootstrap';
 import Timetable from "../../utils/timetable";
 import LoadingSpinner from "../../utils/loading-spinner";
+import fetchCalendar from "../../utils/calendar";
 
 
 
@@ -14,7 +15,8 @@ export default class ParentLectureTopics extends React.Component {
             isLoading: true,
             selectedWeekHour: '',
             topicString: '',
-            focusDay: new Date(Date.now())
+            focusDay: new Date(Date.now()),
+            calendar: null
         };
     }
 
@@ -45,6 +47,8 @@ export default class ParentLectureTopics extends React.Component {
 
     async componentDidMount(){
         await this.getChildTimetable();
+        const calendar = await fetchCalendar();
+        this.setState({calendar});
     }
 
     async componentDidUpdate(prevProps, prevState, snapshot) {
@@ -140,6 +144,17 @@ export default class ParentLectureTopics extends React.Component {
             data[day].content[hour].text = element.subject;
             data[day].content[hour].color = 'bg-success text-white';
         });
+
+        if (this.state.calendar !== null) {
+            data.forEach((day, index) => {
+                if (!day.date.isSchoolDay(this.state.calendar)) {
+                    data[index].content.forEach(hour => {
+                        hour.text = 'Holiday';
+                        hour.color = 'bg-info text-white'
+                    });
+                }
+            });
+        }
 
         return(
             <Container fluid>
