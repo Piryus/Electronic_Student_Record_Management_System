@@ -6,6 +6,17 @@ const lectures = require('./handlers');
 const routes = [
     {
         method: 'GET',
+        path: '/calendar',
+        handler: async (request, h) => lectures.getCalendar(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: ['admin', 'officer', 'teacher', 'parent']
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/lectures/{weekhour}',
         handler: async (request, h) => lectures.getDailyLectureTopicsOfTeacher(request.auth.credentials.id, request.params.weekhour),
         options: {

@@ -12,6 +12,12 @@ const Parent = require('../../models/Parent');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
 
+const getCalendar = async function() {
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) }, { 'holidays._id' : 0 });
+
+    return { calendar };
+};
+
 const getDailyLectureTopicsOfTeacher = async function(teacherUId, weekhour) {
     const datetime = HLib.weekhourToDate(weekhour);
     const teacher = await Teacher.findOne({ userId: teacherUId });
@@ -201,6 +207,7 @@ const rollCall = async function(teacherUId, info) {
 };
 
 module.exports = {
+    getCalendar,
     getDailyLectureTopicsOfTeacher,
     getDailyLectureTopicsForParent,
     getAssignments,

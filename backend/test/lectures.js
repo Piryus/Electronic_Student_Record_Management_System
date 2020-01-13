@@ -41,6 +41,18 @@ after(async () => await db.closeDatabase());
 
 suite('lectures', () => {
     
+    test('getCalendar', async () => {
+        await Calendar.insertMany(testData.calendar);
+
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-22T14:00:00').getTime());
+
+        const c1 = await lectures.getCalendar();
+
+        fakeClock.restore();
+        
+        jexpect(c1.calendar).to.equal(j(testData.calendar[0]));
+    });
+    
     test('getDailyLectureTopicsOfTeacher', async () => {
         await Calendar.insertMany(testData.calendar);
         await Teacher.insertMany(testData.teachers);
