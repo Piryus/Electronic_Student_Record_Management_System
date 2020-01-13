@@ -33,7 +33,7 @@ export default class Teacher extends React.Component {
         // Create an array containing the teacher's classes of the day
         const todayDayNumber = new Date(Date.now()).getNormalizedDay(); //FOR RELEASE
         //const todayDayNumber = new Date('2019-12-12').getNormalizedDay(); //ONLY FOR DEVELOPMENT AND DEBUG
-        const classes = this.props.timetable.reduce((classes, class_) => {
+        const classesHours = this.props.timetable.reduce((classes, class_) => {
             if (class_.weekhour.split('_')[0] === todayDayNumber.toString()) {
                 classes.push({
                     hour: class_.weekhour.split('_')[1],
@@ -58,7 +58,7 @@ export default class Teacher extends React.Component {
             classSelected: '',
             students: [],
             subjects: subjects,
-            classesHours: classes,
+            classesHours,
             classAttendance: [],
             now: todayDayNumber,
             allClasses: []
@@ -127,7 +127,7 @@ export default class Teacher extends React.Component {
             classSelected: c,
             sidebarOpen: false,
         });
-    };
+    }
 
     async getClasses() {
         const url = 'http://localhost:3000/classes';
@@ -145,7 +145,7 @@ export default class Teacher extends React.Component {
         return json.classes.filter(class_ => {
             return this.state.classesHours.find(classHour => classHour.classId === class_._id) !== undefined;
         });
-    };
+    }
 
     render() {
         return (
