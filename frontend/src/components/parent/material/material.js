@@ -59,13 +59,12 @@ export default class Material extends React.Component {
     }
 
     render() {
-
-        let renderSubjectDropdown = [];
-
-        renderSubjectDropdown = this.state.realFilesMetadata.map(s => <Dropdown.Item onClick={() => this.setState({
-            selectedSubject: s.subject,
-            wantedFiles: s.files
-        })}>{s.subject}</Dropdown.Item>);
+        let renderSubjectDropdown = this.state.realFilesMetadata.map(s =>
+            <Dropdown.Item onClick={() => this.setState({
+                selectedSubject: s.subject,
+                wantedFiles: s.files
+            })}
+                           key={s.subject}>{s.subject}</Dropdown.Item>);
 
         return (
             <Container fluid>
@@ -73,9 +72,8 @@ export default class Material extends React.Component {
                 {this.state.realFilesMetadata.length !== 0 &&
                 <Form>
                     <Form.Group>
-                        <Form.Label>Subject:</Form.Label>
                         <Dropdown>
-                            <Dropdown.Toggle>{this.state.selectedSubject === '' ? 'Select a Subject' : this.state.selectedSubject}</Dropdown.Toggle>
+                            <Dropdown.Toggle>{this.state.selectedSubject === '' ? 'Select a subject...' : this.state.selectedSubject}</Dropdown.Toggle>
                             <Dropdown.Menu>
                                 {renderSubjectDropdown.map(s => s)}
                             </Dropdown.Menu>

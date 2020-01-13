@@ -50,7 +50,7 @@ export default class ChildTimetable extends React.Component {
         let timetableData = [];
         for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
             let dateObject = {};
-            dateObject.date = new Date().weekStart(); // TODO Use hlib
+            dateObject.date = new Date().weekStart();
             dateObject.date.setDate(dateObject.date.getDate() + dayIndex);
             let content = [];
             for (let hourIndex = 0; hourIndex < 6; hourIndex++) {
