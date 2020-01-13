@@ -3,6 +3,8 @@
 const Boom = require('boom');
 const HLib = require('@emarkk/hlib');
 
+const Calendar = require('../../models/Calendar');
+const Parent = require('../../models/Parent');
 const SchoolClass = require('../../models/SchoolClass');
 const Student = require('../../models/Student');
 const Teacher = require('../../models/Teacher');
@@ -23,6 +25,19 @@ const getNotes = async function(teacherUId) {
     return { notes };
 };
 
+const getTimetable = async function(classId) {
+    const teachers = await Teacher.find().populate('userId');
+    
+    const timetable = teachers.filter(t => t.timetable.some(w => w.classId.equals(classId))).flatMap(t => {
+        const teacherInfo = { _id: t._id, ssn: t.userId.ssn, surname: t.userId.surname, name: t.userId.name };
+        return t.timetable.map(w => {
+            return { weekhour: w.weekhour, subject: w.subject, teacher: teacherInfo };
+        });
+    });
+    
+    return { timetable };
+};
+
 const getMeetingsAvailability = async function(teacherUId) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     
@@ -30,6 +45,34 @@ const getMeetingsAvailability = async function(teacherUId) {
         return Boom.badRequest();
 
     return { timeSlots: teacher.meetingsTimeSlots };
+};
+
+const getAvailableMeetingsSlots = async function(parentUId, teacherId) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const teacher = await Teacher.findById(teacherId);
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
+
+    if(parent === null || teacher === null)
+        return Boom.badRequest();
+
+    const children = await Student.find({ _id: { $in: parent.children }});
+
+    if(!teacher.timetable.some(w => children.map(c => c.classId.toString()).includes(w.classId.toString())))
+        return Boom.badRequest();
+
+    const slots = teacher.meetingsTimeSlots.flatMap(s => {
+        let sl = [];
+        for(let i = 0; i < 3; i++) {
+            const base = HLib.weekhourToDate(s).addDays(i * 7);
+            if(base.isSchoolDay(calendar))
+                sl = sl.concat([...Array(4).keys()].map(x => new Date(base.getTime() + x * 15*60*1000)));
+        }
+        return sl;
+    }).sort((a, b) => a.getTime() - b.getTime()).slice(0, teacher.meetingsTimeSlots.length * 4).map(s => {
+        return { date: s, available: !teacher.meetings.some(m => m.date.getTime() === s.getTime()) };
+    });
+
+    return { slots };
 };
 
 const getTermGrades = async function(teacherUId) {
@@ -85,6 +128,33 @@ const setMeetingsAvailability = async function(teacherUId, timeSlots) {
     return { success: true };
 };
 
+const bookMeetingSlot = async function(parentUId, teacherId, datetime) {
+    const parent = await Parent.findOne({ userId: parentUId });
+    const teacher = await Teacher.findById(teacherId);
+    const calendar = await Calendar.findOne({ academicYear: HLib.getAY(new Date(Date.now())) });
+
+    if(parent === null || teacher === null)
+        return Boom.badRequest();
+
+    const children = await Student.find({ _id: { $in: parent.children }});
+
+    if(!teacher.timetable.some(w => children.map(c => c.classId.toString()).includes(w.classId.toString())))
+        return Boom.badRequest();
+
+    datetime = new Date(datetime.getTime() - datetime.getTime() % (15*60*1000));
+    if(datetime < Date.now() || !datetime.isSchoolDay(calendar))
+        return Boom.badRequest();
+        
+    const t = datetime.getTime() - datetime.getTime() % (60*60*1000);
+    if(!teacher.meetingsTimeSlots.map(s => HLib.weekhourToDate(s)).some(s => s.getTime() === t) || teacher.meetings.some(m => m.date.getTime() === datetime.getTime()))
+        return Boom.badRequest();
+
+    teacher.meetings.push({ parent: parent._id, date: datetime });
+    await teacher.save();
+
+    return { success: true };
+};
+
 const publishTermGrades = async function(teacherUId, gradesInfo) {
     const teacher = await Teacher.findOne({ userId: teacherUId });
     
@@ -124,8 +194,11 @@ const publishTermGrades = async function(teacherUId, gradesInfo) {
 
 module.exports = {
     getNotes,
+    getTimetable,
     getMeetingsAvailability,
+    getAvailableMeetingsSlots,
     getTermGrades,
     setMeetingsAvailability,
+    bookMeetingSlot,
     publishTermGrades
 };

@@ -6,8 +6,40 @@ const students = require('./handlers');
 const routes = [
     {
         method: 'GET',
+        path: '/teachers/{studentId}',
+        handler: async (request, h) => students.getTeachers(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/grades/{studentId}',
         handler: async (request, h) => students.getGrades(request.auth.credentials.id, request.params.studentId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    studentId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/grades/{studentId}/term',
+        handler: async (request, h) => students.getTermGrades(request.auth.credentials.id, request.params.studentId),
         options: {
             auth: {
                 strategy: 'session',
@@ -82,7 +114,10 @@ const routes = [
     {
         method: 'POST',
         path: '/grades',
-        handler: async (request, h) => students.recordGrades(request.auth.credentials.id, request.payload.subject, request.payload.grades),
+        handler: async (request, h) => {
+            const { subject, date, description, grades } = request.payload;
+            return students.recordGrades(request.auth.credentials.id, subject, date, description, grades);
+        },
         options: {
             auth: {
                 strategy: 'session',
@@ -91,6 +126,8 @@ const routes = [
             validate: {
                 payload: {
                     subject: Valid.subject.required(),
+                    date: Valid.date.required(),
+                    description: Valid.shortText.required(),
                     grades: Valid.array.items(Valid.gradeInfo).required()
                 }
             }

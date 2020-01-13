@@ -23,7 +23,8 @@ const parents = [
     {"children":["5dca711c89bf46419cf5d483","5dca711c89bf46419cf5d489"],"_id":"5dca781462307a4f84dd86d5","userId":"5dca7e2b461dc52d681804fb","__v":0},
     {"children":["5dca711c89bf46419cf5d483","5dca711c89bf46419cf5d489"],"_id":"5dca7825e60dac32e4828699","userId":"5dca7e2b461dc52d681804fc","__v":0},
     {"children":["5dca711c89bf46419cf5d48e","5dca711c89bf46419cf5d491"],"_id":"5dca784dcf1db14678f3cadb","userId":"5dca7e2b461dc52d681804fd","__v":0},
-    {"children":["5dca711c89bf46419cf5d48e","5dca711c89bf46419cf5d491"],"_id":"5dca78645953000328b6131b","userId":"5dca7e2b461dc52d681804fe","__v":0}
+    {"children":["5dca711c89bf46419cf5d48e","5dca711c89bf46419cf5d491"],"_id":"5dca78645953000328b6131b","userId":"5dca7e2b461dc52d681804fe","__v":0},
+    {"children":["5dca711c89bf46419cf5d48a"],"_id":"5dca78645953ffff28b6131b","userId":"5dca7e2b46ffff2d681804fe","__v":0}
 ];
 const teachers = [
     {"subjects":["Italian","History"],"_id":"5dca698eed550e4ca4aba7f5","userId":"5dca7e2b461dc52d681804f1","timetable":[{"_id":"5dca736f85f1d338e47047cc","classId":"5dc9c3112d698031f441e1c9","subject":"Italian","weekhour":"0_1"},{"_id":"5dca736f85f1d338e47047cb","classId":"5dc9c3112d698031f441e1c9","subject":"History","weekhour":"1_0"},{"_id":"5dca736f85f1d338e47047ca","classId":"5dc9c3112d698031f441e1c9","subject":"Italian","weekhour":"1_1"},{"_id":"5dca736f85f1d338e47047c9","classId":"5dc9c3112d698031f441e1c9","subject":"Italian","weekhour":"2_0"},{"_id":"5dca736f85f1d338e47047c8","classId":"5dc9c3112d698031f441e1c9","subject":"Italian","weekhour":"2_1"},{"_id":"5dca736f85f1d338e47047c7","classId":"5dc9c3112d698031f441e1c9","subject":"History","weekhour":"3_1"}],"__v":0},
@@ -74,6 +75,17 @@ const files = [
     { _id: '5dc9c3112d698031f882d0cb', filename: 'divina_commedia.txt', bytes: 83264, type: 'text/plain' },
     { _id: '5dc9c3112d698031f882d0cc', filename: 'math_formulas_2.pdf', bytes: 9910, type: 'application/pdf' }
 ];
+const calendar = [
+    { _id: '5ddd742f68fd5e2fe0dce83e', academicYear: '2019/20', firstDay: new Date('2019-09-09T00:00:00'), lastDay: new Date('2020-06-10T00:00:00'), holidays: [
+        { start: new Date('2019-11-01T00:00:00'), end: null },
+        { start: new Date('2019-12-23T00:00:00'), end: new Date('2020-01-04T00:00:00') },
+        { start: new Date('2020-01-06T00:00:00'), end: null },
+        { start: new Date('2020-02-22T00:00:00'), end: new Date('2020-02-26T00:00:00') },
+        { start: new Date('2020-04-09T00:00:00'), end: new Date('2020-04-14T00:00:00') },
+        { start: new Date('2019-05-01T00:00:00'), end: new Date('2019-05-02T00:00:00') },
+        { start: new Date('2019-06-01T00:00:00'), end: new Date('2019-06-02T00:00:00') },
+    ], __v: 0 }
+];
     
 module.exports = {
     students,
@@ -82,5 +94,6 @@ module.exports = {
     users,
     classes,
     articles,
-    files
+    files,
+    calendar
 };

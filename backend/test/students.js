@@ -8,6 +8,7 @@ const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
 const testData = require('../test-lib/testData');
 
+const Calendar = require('../models/Calendar');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
 const Teacher = require('../models/Teacher');
@@ -34,9 +35,41 @@ after(async () => await db.closeDatabase());
 
 suite('students', () => {
 
-    test('getGrades', async () => {
+    test('getTeachers', async () => {
         await Student.insertMany(testData.students);
         await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        // parent not found
+        const t1 = await students.getTeachers('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d48e');
+        // student not found
+        const t2 = await students.getTeachers('5dca7e2b461dc52d681804fd', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const t3 = await students.getTeachers('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d48f');
+        // ok
+        const t4 = await students.getTeachers('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d48e');
+        
+        expect(t1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(t4.teachers).to.equal([
+            { id: '5dca698eed550e4ca4aba7f5', ssn: 'DJRFUC56J13E485F', name: 'Mario', surname: 'Bianchi', subjects: ['Italian', 'History'] },
+            { id: '5dca69cf048e8e40d434017f', ssn: 'CMFOLR29R45S203O', name: 'Roberta', surname: 'Verdi', subjects: ['Math', 'Physics'] },
+            { id: '5dca6cbe7adca3346c5983cb', ssn: 'LDFVUI17P04D491B', name: 'Stefano', surname: 'Rossi', subjects: ['Latin'] },
+            { id: '5dca6cd5b83a1f3ef03e962b', ssn: 'SCBGMN21E45O956Q', name: 'Peter', surname: 'Posta', subjects: ['Art'] },
+            { id: '5dca6cf0a92bbb4dd8c0e817', ssn: 'PLVCGT02S19R549A', name: 'Federica', surname: 'Valli', subjects: ['English'] },
+            { id: '5dca6d0801ea271794cb650e', ssn: 'LCFTUI58S49G910R', name: 'Cinzia', surname: 'Tollo', subjects: ['Science'] },
+            { id: '5dca6d2038627d0bfc4167b0', ssn: 'QASVUM68G45D297P', name: 'Dario', surname: 'Resti', subjects: ['Gym'] },
+            { id: '5dca6d3620607b1e30dea42a', ssn: 'NCFTOG69F23B796K', name: 'Nina', surname: 'Fassio', subjects: ['Religion'] },
+        ]);
+    });
+
+    test('getGrades', async () => {
+        await Calendar.insertMany(testData.calendar);
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await SchoolClass.insertMany(testData.classes);
 
         // parent not found
         const g1 = await students.getGrades('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d489');
@@ -44,13 +77,82 @@ suite('students', () => {
         const g2 = await students.getGrades('5dca7e2b461dc52d681804fb', 'ffffffffffffffffffffffff');
         // student is not child of parent
         const g3 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d48f');
-        // ok
+
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d489' }, { classId: undefined });
+
+        // student has no class
         const g4 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d489' }, { classId: '5dc9c3112d698031f441e1c9' });
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date('2020-01-30T16:00:00'), new Date('2020-06-12T15:00:00')] });
+        
+        // both terms ended
+        const g5 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [] });
+        
+        // ok 1
+        const g6 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        
+        let s = await Student.findById('5dca711c89bf46419cf5d489');
+        s.grades.push(
+            { value: '6-', date: new Date('2019-11-14T09:00:00'), subject: 'History' },
+            { value: '8.5', date: new Date('2019-12-07T11:00:00'), subject: 'Gym' },
+            { value: '7', date: new Date('2020-01-31T12:00:00'), subject: 'Religion' },
+            { value: '5 1/2', date: new Date('2020-03-10T12:00:00'), subject: 'Physics' },
+            { value: '9+', date: new Date('2020-06-10T11:00:00'), subject: 'Science' }
+        );
+        await s.save();
+        await SchoolClass.updateOne({ _id: '5dc9c3112d698031f441e1c9' }, { termsEndings: [new Date('2020-01-30T16:00:00')] });
+
+        // ok 2
+        const g7 = await students.getGrades('5dca7e2b461dc52d681804fb', '5dca711c89bf46419cf5d489');
+        const g7sorted = g7.grades.sort((a, b) => b.date - a.date);
         
         expect(g1.output.statusCode).to.equal(BAD_REQUEST);
         expect(g2.output.statusCode).to.equal(BAD_REQUEST);
         expect(g3.output.statusCode).to.equal(BAD_REQUEST);
-        jexpect(g4.grades).to.equal(testData.students.find(s => s._id === '5dca711c89bf46419cf5d489').grades);
+        expect(g4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g5.grades).to.have.length(0);
+        expect(g6.grades).to.have.length(1);
+        expect(g6.grades[0].subject).to.equal('English');
+        expect(g6.grades[0].value).to.equal('4.5');
+        expect(g7.grades).to.have.length(3);
+        expect(g7sorted[0].subject).to.equal('Science');
+        expect(g7sorted[0].value).to.equal('9+');
+        expect(g7sorted[1].subject).to.equal('Physics');
+        expect(g7sorted[1].value).to.equal('5 1/2');
+        expect(g7sorted[2].subject).to.equal('Religion');
+        expect(g7sorted[2].value).to.equal('7');
+    });
+
+    test('getTermGrades', async () => {
+        const data = [{
+            'Latin': 5, 'English': 6, 'Art': 8, 'Science': 7, 'History': 10, 'Italian': 6, 'Math': 5, 'Physics': 5, 'Gym': 5, 'Religion': 5
+        }];
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+
+        // parent not found
+        const tg1 = await students.getTermGrades('ffffffffffffffffffffffff', '5dca711c89bf46419cf5d491');
+        // student not found
+        const tg2 = await students.getTermGrades('5dca7e2b461dc52d681804fd', 'ffffffffffffffffffffffff');
+        // student is not child of parent
+        const tg3 = await students.getTermGrades('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d48f');
+
+        // ok 1
+        const tg4 = await students.getTermGrades('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d491');
+
+        await Student.updateOne({ _id: '5dca711c89bf46419cf5d491' }, { termGrades: data });
+        
+        // ok 2
+        const tg5 = await students.getTermGrades('5dca7e2b461dc52d681804fd', '5dca711c89bf46419cf5d491');
+        
+        expect(tg1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(tg4.termGrades).to.equal([]);
+        jexpect(tg5.termGrades).to.equal(data);
     });
     
     test('getAttendance', async () => {
@@ -190,50 +292,66 @@ suite('students', () => {
             { studentId: '5dca711c89bf46419cf5d48f', grade: '7.75' }
         ];
 
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
 
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-18T09:00:00').getTime());
+
         // teacher not found
-        const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', data1);
+        const g1 = await students.recordGrades('ffffffffffffffffffffffff', 'Latin', new Date(), 'Description', data1);
         // no student found
-        const g2 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+        const g2 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
             { studentId: 'aaaaaaaaaaaaaaaaaaaaaaaa', grade: '5+' },
             { studentId: 'bbbbbbbbbbbbbbbbbbbbbbbb', grade: '8.5' },
             { studentId: 'cccccccccccccccccccccccc', grade: '6 1/2' }
         ]);
         // only some students found
-        const g3 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+        const g3 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
             { studentId: 'aaaaaaaaaaaaaaaaaaaaaaaa', grade: '3.5' },
             { studentId: '5dca711c89bf46419cf5d489', grade: '9' },
             { studentId: 'bbbbbbbbbbbbbbbbbbbbbbbb', grade: '6+' },
             { studentId: '5dca711c89bf46419cf5d48f', grade: '10L' }
         ]);
         // students belong to multiple classes
-        const g4 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [
+        const g4 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
             { studentId: '5dca711c89bf46419cf5d485', grade: '3.5' },
             { studentId: '5dca711c89bf46419cf5d490', grade: '9' },
             { studentId: '5dca711c89bf46419cf5d483', grade: '6+' }
         ]);
         // teacher does not teach to class
-        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', [{ studentId: '5dca711c89bf46419cf5d490', grade: '7' }]);
+        const g5 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date(), 'Description', [
+            { studentId: '5dca711c89bf46419cf5d490', grade: '7' }
+        ]);
         // teacher does not teach subject
-        const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', data1);
+        const g6 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Math', new Date(), 'Description', data1);
 
-        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-18T09:00:00').getTime());
+        fakeClock.returns(new Date('2019-12-28T11:00:00').getTime());
+
+        // attempt to record grades for holiday
+        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-25T12:00:00'), 'Description', data1);
+        
+        fakeClock.returns(new Date('2019-11-18T09:00:00').getTime());
+
         // attempt to record grades for future lecture
-        const g7 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data1);
+        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T12:00:00'), 'Description', data1);
+        
+        fakeClock.returns(new Date('2019-11-23T09:00:00').getTime());
+
+        // attempt to record grades for nonexisting lecture
+        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-19T09:00:00'), 'Description', data1);
 
         const s1 = await Student.find({});
 
         fakeClock.returns(new Date('2019-11-21T09:00:00').getTime());
         // ok 1
-        const g8 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data1);
+        const g10 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-18T00:00:00'), 'First description', data1);
         
         const s2 = await Student.find({});
 
         fakeClock.returns(new Date('2019-11-22T11:00:00').getTime());
         // ok 2
-        const g9 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', data2);
+        const g11 = await students.recordGrades('5dca7e2b461dc52d681804f3', 'Latin', new Date('2019-11-20T08:00:00'), 'Written exam', data2);
         fakeClock.restore();
         
         const s3 = await Student.find({});
@@ -245,13 +363,35 @@ suite('students', () => {
         expect(g5.output.statusCode).to.equal(BAD_REQUEST);
         expect(g6.output.statusCode).to.equal(BAD_REQUEST);
         expect(g7.output.statusCode).to.equal(BAD_REQUEST);
-        data1.forEach((gr, i) => expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
-        data2.forEach((gr, i) => expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
-        expect(g8.success).to.be.true();
-        data1.forEach((gr, i) => expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.true());
-        data2.forEach((gr, i) => expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.false());
-        expect(g9.success).to.be.true();
-        data2.forEach((gr, i) => expect(s3.find(s => s._id.toString() === gr.studentId).grades.some(g => g.subject === 'Latin' && g.value === gr.grade)).to.be.true());
+        expect(g8.output.statusCode).to.equal(BAD_REQUEST);
+        expect(g9.output.statusCode).to.equal(BAD_REQUEST);
+        data1.forEach((gr, i) =>
+            expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'First description' && g.date.getTime() === new Date('2019-11-18T00:00:00').getTime() && g.value === gr.grade
+            )).to.be.false()
+        );
+        data2.forEach((gr, i) =>
+            expect(s1.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T08:00:00').getTime() && g.value === gr.grade
+            )).to.be.false()
+        );
+        expect(g10.success).to.be.true();
+        data1.forEach((gr, i) =>
+            expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'First description' && g.date.getTime() === new Date('2019-11-18T00:00:00').getTime() && g.value === gr.grade
+            )).to.be.true()
+        );
+        data2.forEach((gr, i) =>
+            expect(s2.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T08:00:00').getTime() && g.value === gr.grade
+            )).to.be.false()
+        );
+        expect(g11.success).to.be.true();
+        data2.forEach((gr, i) =>
+            expect(s3.find(s => s._id.toString() === gr.studentId).grades.some(g =>
+                g.subject === 'Latin' && g.description === 'Written exam' && g.date.getTime() === new Date('2019-11-20T08:00:00').getTime() && g.value === gr.grade
+            )).to.be.true()
+        );
     });
     
     test('recordAttendance', async () => {
@@ -268,6 +408,7 @@ suite('students', () => {
             { studentId: '5dca711c89bf46419cf5d484', time: '08:09', attendanceEvent: 'late-entrance' }
         ];
 
+        await Calendar.insertMany(testData.calendar);
         await Student.insertMany(testData.students);
         await Teacher.insertMany(testData.teachers);
 
@@ -293,29 +434,34 @@ suite('students', () => {
             { studentId: '5dca711c89bf46419cf5d483', time: '08:07', attendanceEvent: 'late-entrance' }
         ]);
 
-        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-28T08:00:00').getTime());
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-12-26T08:00:00').getTime());
+
+        // holiday
+        const a5 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data1);
+
+        fakeClock.returns(new Date('2019-11-28T08:00:00').getTime());
 
         // teacher does not teach to class
-        const a5 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
+        const a6 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
             { studentId: '5dca711c89bf46419cf5d48a', time: '08:05', attendanceEvent: 'late-entrance' }
         ]);
         // wrong time 1
-        const a6 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
+        const a7 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9cb4b797f6936680521b9', [
             { studentId: '5dca711c89bf46419cf5d48a', time: '10:50', attendanceEvent: 'late-entrance' }
         ]);
         // wrong time 2
-        const a7 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', [
+        const a8 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', [
             { studentId: '5dca711c89bf46419cf5d48e', time: '08:40', attendanceEvent: 'late-entrance' }
         ]);
         const s1 = await Student.find();
         // ok 1 (insert)
-        const a8 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data1);
+        const a9 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data1);
         const s2 = await Student.find();
         // ok 2 (update)
-        const a9 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data2);
+        const a10 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data2);
         const s3 = await Student.find();
         // ok 3 (delete)
-        const a10 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data3);
+        const a11 = await students.recordAttendance('5dca7e2b461dc52d681804f5', '5dc9c3112d698031f441e1c9', data3);
         const s4 = await Student.find();
 
         fakeClock.restore();
@@ -327,18 +473,19 @@ suite('students', () => {
         expect(a5.output.statusCode).to.equal(BAD_REQUEST);
         expect(a6.output.statusCode).to.equal(BAD_REQUEST);
         expect(a7.output.statusCode).to.equal(BAD_REQUEST);
+        expect(a8.output.statusCode).to.equal(BAD_REQUEST);
         expect(s1.filter(s => ['5dca711c89bf46419cf5d484', '5dca711c89bf46419cf5d485', '5dca711c89bf46419cf5d489', '5dca711c89bf46419cf5d48e'].includes(s._id.toString())).flatMap(s => s.attendanceEvents)).to.have.length(0);
-        expect(a8.success).to.be.true();
+        expect(a9.success).to.be.true();
         expect(s2.find(s => '5dca711c89bf46419cf5d48e' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s2.find(s => '5dca711c89bf46419cf5d48e' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:07:00'), event: 'late-entrance' }));
         expect(s2.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s2.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:09:00'), event: 'late-entrance' }));
-        expect(a9.success).to.be.true();
+        expect(a10.success).to.be.true();
         expect(s3.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s3.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:06:00'), event: 'late-entrance' }));
         expect(s3.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s3.find(s => '5dca711c89bf46419cf5d485' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:06:00'), event: 'late-entrance' }));
-        expect(a10.success).to.be.true();
+        expect(a11.success).to.be.true();
         expect(s4.find(s => '5dca711c89bf46419cf5d489' === s._id.toString()).attendanceEvents).to.have.length(0);
         expect(s4.find(s => '5dca711c89bf46419cf5d484' === s._id.toString()).attendanceEvents).to.have.length(1);
         jexpect(s4.find(s => '5dca711c89bf46419cf5d484' === s._id.toString()).attendanceEvents[0]).to.include(j({ date: new Date('2019-11-28T08:09:00'), event: 'late-entrance' }));

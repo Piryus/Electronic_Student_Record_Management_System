@@ -5,11 +5,6 @@ import {FaDownload} from 'react-icons/fa';
 
 
 export default class DownloadFileTable extends React.Component {
-    constructor(props){
-        super(props);
-        console.log(this.props.type);
-    }
-
     downloadFile(event, f){
         event.preventDefault();
         var file_path = "http://localhost:3000/file/" + f._id.toString();
@@ -47,7 +42,7 @@ export default class DownloadFileTable extends React.Component {
                 <tbody>
                 {this.props.files.map((f, index) => {
                      return (
-                        <tr>
+                        <tr key={f.filename + f.bytes + index}>
                             <td style={{textDecoration: 'underline'}}>
                                 {f.filename}
                             </td>

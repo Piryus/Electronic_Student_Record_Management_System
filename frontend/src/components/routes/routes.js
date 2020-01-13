@@ -56,20 +56,20 @@ export default class Routes extends React.Component {
             <Router>
                 <Switch>
                     {!this.state.authenticated && (
-                        <div>
+                        <>
                             <Route exact path='/login'>
                                 <Login setAppProps={this.state.setAppProps} />
                             </Route>
                             <Redirect to='/login' />
-                        </div>
+                        </>
                     )}
                     {this.state.authenticated && ['admin', 'officer', 'teacher', 'parent'].includes(this.state.role) && (
-                        <div>
+                        <>
                             <Route exact path='/'>
                                 <RootComponent children={extra ? extra.children : null} timetable={extra ? extra.timetable : null} coordinator={extra ? extra.coordinator : null} onLogout={() => this.logout()} />
                             </Route>
                             <Redirect to='/' />
-                        </div>
+                        </>
                     )}
                 </Switch>
             </Router>

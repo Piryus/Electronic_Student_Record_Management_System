@@ -100,7 +100,6 @@ export default class EditUserForm extends React.Component {
                             <Form.Label>SSN:</Form.Label>
                             <Form.Control type="string"
                                           placeholder="Enter SSN"
-                                          defaultValue={this.props.user.ssn}
                                           value={this.state.ssn}
                                           onChange={(e) => this.setState({ssn: e.target.value})}/>
                             <Form.Text className="text-muted">

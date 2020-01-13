@@ -80,6 +80,7 @@ class Classes extends React.Component {
                                                 </Accordion.Collapse>
                                             );
                                         }
+                                        return null;
                                     })}
                                 </Card>)
                         })
@@ -95,7 +96,7 @@ class Classes extends React.Component {
                                         <Card.Body>{student.surname} {student.name} SSN: {student.ssn} </Card.Body>
                                     </Accordion.Collapse>
                                 );
-                            }
+                            } else return null;
                         })}
                     </Card>
                 </Accordion>

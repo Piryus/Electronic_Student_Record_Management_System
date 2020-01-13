@@ -4,6 +4,7 @@ const admin = require('./admin');
 const auth = require('./auth');
 const files = require('./files');
 const lectures = require('./lectures');
+const parents = require('./parents');
 const students = require('./students');
 const secretary = require('./secretary');
 const teachers = require('./teachers');
@@ -14,6 +15,7 @@ module.exports = [
     ...auth,
     ...files,
     ...lectures,
+    ...parents,
     ...students,
     ...secretary,
     ...teachers,

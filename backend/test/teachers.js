@@ -2,6 +2,7 @@
 
 const Code = require('@hapi/code');
 const Lab = require('@hapi/lab');
+const Sinon = require('sinon');
 
 const BAD_REQUEST = 400;
 const db = require('../test-lib/db');
@@ -9,6 +10,7 @@ const testData = require('../test-lib/testData');
 
 const HLib = require('@emarkk/hlib');
 
+const Calendar = require('../models/Calendar');
 const SchoolClass = require('../models/SchoolClass');
 const Student = require('../models/Student');
 const Parent = require('../models/Parent');
@@ -71,6 +73,43 @@ suite('teachers', () => {
         jexpect(n4.notes[1]).to.equal(j({ teacherId: '5dca6cf0a92bbb4dd8c0e817', description: 'This is a first notice.', date: new Date('2019-11-10T10:06:04'), studentId: '5dca711c89bf46419cf5d489', student: 'Enzo Cremonesi' }));
     });
 
+    test('getTimetable', async () => {
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        const t1 = await teachers.getTimetable('5dc9c3112d698031f441e1c9');
+
+        jexpect(t1.timetable).to.equal(j([
+            { subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '0_1' },
+            { subject: 'History', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '1_0' },
+            { subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '1_1' },
+            { subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '2_0' },
+            { subject: 'Italian', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '2_1' },
+            { subject: 'History', teacher: { _id: '5dca698eed550e4ca4aba7f5', name: 'Mario', ssn: 'DJRFUC56J13E485F', surname: 'Bianchi' }, weekhour: '3_1' },
+            { subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '0_0' },
+            { subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '1_4' },
+            { subject: 'Physics', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '1_5' },
+            { subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '3_2' },
+            { subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '3_3' },
+            { subject: 'Physics', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '4_0' },
+            { subject: 'Math', teacher: { _id: '5dca69cf048e8e40d434017f', name: 'Roberta', ssn: 'CMFOLR29R45S203O', surname: 'Verdi' }, weekhour: '4_4' },
+            { subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '0_3' },
+            { subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '0_4' },
+            { subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '2_4' },
+            { subject: 'Latin', teacher: { _id: '5dca6cbe7adca3346c5983cb', name: 'Stefano', ssn: 'LDFVUI17P04D491B', surname: 'Rossi' }, weekhour: '4_2' },
+            { subject: 'Art', teacher: { _id: '5dca6cd5b83a1f3ef03e962b', name: 'Peter', ssn: 'SCBGMN21E45O956Q', surname: 'Posta' }, weekhour: '0_2' },
+            { subject: 'Art', teacher: { _id: '5dca6cd5b83a1f3ef03e962b', name: 'Peter', ssn: 'SCBGMN21E45O956Q', surname: 'Posta' }, weekhour: '4_5' },
+            { subject: 'English', teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', name: 'Federica', ssn: 'PLVCGT02S19R549A', surname: 'Valli' }, weekhour: '1_2' },
+            { subject: 'English', teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', name: 'Federica', ssn: 'PLVCGT02S19R549A', surname: 'Valli' }, weekhour: '2_2' },
+            { subject: 'English', teacher: { _id: '5dca6cf0a92bbb4dd8c0e817', name: 'Federica', ssn: 'PLVCGT02S19R549A', surname: 'Valli' }, weekhour: '3_0' },
+            { subject: 'Science', teacher: { _id: '5dca6d0801ea271794cb650e', name: 'Cinzia', ssn: 'LCFTUI58S49G910R', surname: 'Tollo' }, weekhour: '2_3' },
+            { subject: 'Science', teacher: { _id: '5dca6d0801ea271794cb650e', name: 'Cinzia', ssn: 'LCFTUI58S49G910R', surname: 'Tollo' }, weekhour: '4_3' },
+            { subject: 'Gym', teacher: { _id: '5dca6d2038627d0bfc4167b0', name: 'Dario', ssn: 'QASVUM68G45D297P', surname: 'Resti' }, weekhour: '1_3' },
+            { subject: 'Gym', teacher: { _id: '5dca6d2038627d0bfc4167b0', name: 'Dario', ssn: 'QASVUM68G45D297P', surname: 'Resti' }, weekhour: '4_1' },
+            { subject: 'Religion', teacher: { _id: '5dca6d3620607b1e30dea42a', name: 'Nina', ssn: 'NCFTOG69F23B796K', surname: 'Fassio' }, weekhour: '3_4' }
+        ]));
+    });
+
     test('getMeetingsAvailability', async () => {
         const data = ['0_4', '1_3', '3_2'];
 
@@ -90,6 +129,98 @@ suite('teachers', () => {
         expect(ma2.timeSlots).to.have.length(0);
         expect(ma3.timeSlots).to.have.length(3);
         expect(ma3.timeSlots).to.equal(data);
+    });
+
+    test('getAvailableMeetingsSlots', async () => {
+        await Calendar.insertMany(testData.calendar);
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+
+        await Teacher.updateOne({ _id: '5dca69cf048e8e40d434017f' }, { meetingsTimeSlots: ['0_2', '1_0', '2_3', '4_2'] });
+        await Teacher.updateOne({ _id: '5dca6d0801ea271794cb650e' }, { meetingsTimeSlots: ['1_3', '4_0'] });
+        
+        await Teacher.updateOne({ _id: '5dca69cf048e8e40d434017f' }, { meetings: [
+            { parent: '5dca781462307a4f84dd86d5', date: new Date('2019-12-09T10:45:00') },
+            { parent: '5dca78645953000328b6131b', date: new Date('2019-12-11T11:00:00') },
+            { parent: '5dca77de05972e0898e9c68d', date: new Date('2019-12-11T11:15:00') }
+        ] });
+        await Teacher.updateOne({ _id: '5dca6d0801ea271794cb650e' }, { meetings: [
+            { parent: '5dca7825e60dac32e4828699', date: new Date('2019-12-13T08:30:00') }
+        ] });
+        
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-12-11T08:00:00').getTime());
+
+        // parent not found
+        const ams1 = await teachers.getAvailableMeetingsSlots('ffffffffffffffffffffffff', '5dca69cf048e8e40d434017f');
+        // teacher not found
+        const ams2 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', 'ffffffffffffffffffffffff');
+        // teacher is not teaching to any of parent's children
+        const ams3 = await teachers.getAvailableMeetingsSlots('5dca7e2b46ffff2d681804fe', '5dca69cf048e8e40d434017f');
+
+        // ok 1
+        const ams4 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca69cf048e8e40d434017f');
+        // ok 2
+        const ams5 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca6d0801ea271794cb650e');
+
+        fakeClock.returns(new Date('2019-12-24T08:00:00').getTime());
+
+        // holiday
+        const ams6 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca69cf048e8e40d434017f');
+
+        fakeClock.returns(new Date('2020-06-15T08:00:00').getTime());
+
+        // end of school
+        const ams7 = await teachers.getAvailableMeetingsSlots('5dca7e2b461dc52d681804fc', '5dca69cf048e8e40d434017f');
+
+        fakeClock.restore();
+
+        expect(ams1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ams2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(ams3.output.statusCode).to.equal(BAD_REQUEST);
+        jexpect(ams4.slots).to.equal(j([
+            { date: new Date('2019-12-09T10:00:00'), available: true },
+            { date: new Date('2019-12-09T10:15:00'), available: true },
+            { date: new Date('2019-12-09T10:30:00'), available: true },
+            { date: new Date('2019-12-09T10:45:00'), available: false },
+            { date: new Date('2019-12-10T08:00:00'), available: true },
+            { date: new Date('2019-12-10T08:15:00'), available: true },
+            { date: new Date('2019-12-10T08:30:00'), available: true },
+            { date: new Date('2019-12-10T08:45:00'), available: true },
+            { date: new Date('2019-12-11T11:00:00'), available: false },
+            { date: new Date('2019-12-11T11:15:00'), available: false },
+            { date: new Date('2019-12-11T11:30:00'), available: true },
+            { date: new Date('2019-12-11T11:45:00'), available: true },
+            { date: new Date('2019-12-13T10:00:00'), available: true },
+            { date: new Date('2019-12-13T10:15:00'), available: true },
+            { date: new Date('2019-12-13T10:30:00'), available: true },
+            { date: new Date('2019-12-13T10:45:00'), available: true }
+        ]));
+        jexpect(ams5.slots).to.equal(j([
+            { date: new Date('2019-12-10T11:00:00'), available: true },
+            { date: new Date('2019-12-10T11:15:00'), available: true },
+            { date: new Date('2019-12-10T11:30:00'), available: true },
+            { date: new Date('2019-12-10T11:45:00'), available: true },
+            { date: new Date('2019-12-13T08:00:00'), available: true },
+            { date: new Date('2019-12-13T08:15:00'), available: true },
+            { date: new Date('2019-12-13T08:30:00'), available: false },
+            { date: new Date('2019-12-13T08:45:00'), available: true }
+        ]));
+        jexpect(ams6.slots).to.equal(j([
+            { date: new Date('2020-01-07T08:00:00'), available: true },
+            { date: new Date('2020-01-07T08:15:00'), available: true },
+            { date: new Date('2020-01-07T08:30:00'), available: true },
+            { date: new Date('2020-01-07T08:45:00'), available: true },
+            { date: new Date('2020-01-08T11:00:00'), available: true },
+            { date: new Date('2020-01-08T11:15:00'), available: true },
+            { date: new Date('2020-01-08T11:30:00'), available: true },
+            { date: new Date('2020-01-08T11:45:00'), available: true },
+            { date: new Date('2020-01-10T10:00:00'), available: true },
+            { date: new Date('2020-01-10T10:15:00'), available: true },
+            { date: new Date('2020-01-10T10:30:00'), available: true },
+            { date: new Date('2020-01-10T10:45:00'), available: true }
+        ]));
+        expect(ams7.slots).to.have.length(0);
     });
 
     test('getTermGrades', async () => {
@@ -202,6 +333,77 @@ suite('teachers', () => {
         expect(ma5.success).to.be.true();
         expect(t4.meetingsTimeSlots).to.have.length(3);
         expect(t4.meetingsTimeSlots).to.equal(['2_0', '3_3', '4_1']);
+    });
+
+    test('bookMeetingSlot', async () => {
+        await Calendar.insertMany(testData.calendar);
+        await Student.insertMany(testData.students);
+        await Parent.insertMany(testData.parents);
+        await Teacher.insertMany(testData.teachers);
+        
+        await Teacher.updateOne({ _id: '5dca698eed550e4ca4aba7f5' }, { meetingsTimeSlots: ['0_3', '1_4', '2_3', '4_2'] });
+        
+        await Teacher.updateOne({ _id: '5dca698eed550e4ca4aba7f5' }, { meetings: [
+            { parent: '5dca781462307a4f84dd86d5', date: new Date('2019-11-20T11:45:00') },
+            { parent: '5dca78645953000328b6131b', date: new Date('2019-11-22T10:00:00') },
+            { parent: '5dca7825e60dac32e4828699', date: new Date('2019-11-22T10:30:00') }
+        ] });
+        
+        const fakeClock = Sinon.stub(Date, 'now').returns(new Date('2019-11-19T11:35:24').getTime());
+
+        // parent not found
+        const b1 = await teachers.bookMeetingSlot('ffffffffffffffffffffffff', '5dca698eed550e4ca4aba7f5');
+        // teacher not found
+        const b2 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', 'ffffffffffffffffffffffff');
+        // teacher is not teaching to any of parent's children
+        const b3 = await teachers.bookMeetingSlot('5dca7e2b46ffff2d681804fe', '5dca698eed550e4ca4aba7f5');
+        // booking in the past
+        const b4 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-18T11:15:00'));
+        const b5 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-19T10:00:00'));
+        const b6 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-19T11:36:10'));
+        // day booked is holiday
+        const b7 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-12-24T12:30:00'));
+        const b8 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-12-27T10:15:00'));
+        // booking weekhour not allocated for meetings
+        const b9 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-21T10:46:00'));
+        const b10 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T11:00:00'));
+        // booking slot already busy
+        const b11 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:50:00'));
+        const b12 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:30:00'));
+
+        const t1 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
+        
+        // ok 1
+        const b13 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804f9', '5dca698eed550e4ca4aba7f5', new Date('2019-11-20T11:00:00'));
+        
+        const t2 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
+
+        // ok 2
+        const b14 = await teachers.bookMeetingSlot('5dca7e2b461dc52d681804fd', '5dca698eed550e4ca4aba7f5', new Date('2019-11-22T10:16:00'));
+        
+        const t3 = await Teacher.findById('5dca698eed550e4ca4aba7f5');
+
+        fakeClock.restore();
+
+        expect(b1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b2.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b3.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b4.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b5.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b6.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b7.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b8.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b9.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b10.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b11.output.statusCode).to.equal(BAD_REQUEST);
+        expect(b12.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t1.meetings).to.have.length(3);
+        expect(b13.success).to.be.true();
+        expect(t2.meetings).to.have.length(4);
+        jexpect(t2.meetings.find(m => m.parent.equals('5dca77de05972e0898e9c68d')).date.getTime()).to.equal(new Date('2019-11-20T11:00:00').getTime());
+        expect(b14.success).to.be.true();
+        expect(t3.meetings).to.have.length(5);
+        jexpect(t3.meetings.find(m => m.parent.equals('5dca784dcf1db14678f3cadb')).date.getTime()).to.equal(new Date('2019-11-22T10:15:00').getTime());
     });
 
     test('publishTermGrades', async () => {

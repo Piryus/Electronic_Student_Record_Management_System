@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Table} from "react-bootstrap";
 import moment from 'moment';
+import fetchCalendar from "../calendar";
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -8,25 +9,45 @@ const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 export default class Timetable extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
-            selectedWeekHour: ''
+            selectedWeekHour: '',
+            selectedDate: '',
+            calendar: null
         };
+    }
+
+    async componentDidMount() {
+        const calendar = await fetchCalendar();
+        this.setState({calendar});
     }
 
     selectCell = (dayIndex, hourIndex) => {
         const weekHour = dayIndex + '_' + hourIndex;
+        const date = this.props.data[dayIndex];
         if (this.props.selectionHandler) {
-            this.props.selectionHandler(weekHour);
+            this.props.selectionHandler(weekHour, date);
         }
         if (this.props.selectable) {
             this.setState({
-                selectedWeekHour: weekHour
+                selectedWeekHour: weekHour,
+                selectedDate: date
             });
         }
     };
 
     render() {
+        const {data} = this.props;
+        if (this.state.calendar !== null && !this.props.hideDate) {
+            data.forEach((day, index) => {
+                if (!day.date.isSchoolDay(this.state.calendar)) {
+                    data[index].content.forEach(hour => {
+                        hour.text = 'Holiday';
+                        hour.color = 'bg-info text-white'
+                    });
+                }
+            });
+        }
+
         const hours = [];
         let time = moment('8:00', 'HH:mm');
         let endOfDay = moment('14:00', 'HH:mm');
@@ -40,7 +61,7 @@ export default class Timetable extends Component {
                 <thead>
                 <tr>
                     <th/>
-                    {this.props.data.map((day, index) => {
+                    {data.map((day, index) => {
                         let dayString;
                         if (this.props.hideDate) {
                             dayString = days[index];
@@ -55,10 +76,11 @@ export default class Timetable extends Component {
                 {hours.map((hour, hourIndex) => {
                     return (
                         <tr key={hourIndex}>
-                            <td>{hour}</td>
-                            {this.props.data.map((day, dayIndex) => {
+                            <td style={{width: '10%'}}>{hour}</td>
+                            {data.map((day, dayIndex) => {
                                 return (
                                     <td key={dayIndex}
+                                        style={{width: '18%'}}
                                         className={this.state.selectedWeekHour === dayIndex + '_' + hourIndex ? 'bg-warning' : day.content[hourIndex].color}
                                         onClick={() => this.selectCell(dayIndex, hourIndex)}>
                                         {day.content[hourIndex].text}

@@ -1,5 +1,5 @@
 import React from "react";
-import {Alert, Button, Container, Form, Modal} from "react-bootstrap";
+import {Alert, Button, Form, Modal} from "react-bootstrap";
 import Select from "react-select";
 
 export default class NewNoteForm extends React.Component {

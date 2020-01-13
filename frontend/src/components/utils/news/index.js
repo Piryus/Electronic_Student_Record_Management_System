@@ -51,7 +51,7 @@ export default class News extends React.Component {
                                      handleClose={() => this.setState({showNewArticleModal: false})}/>
                     {this.state.articles.map(article => {
                         return (
-                            <div className="mb-4" key={article.id}>
+                            <div className="mb-4" key={article._id}>
                                 <h5>{article.title}</h5>
                                 <span className="font-italic"><FaCalendar size={14}
                                                                           className="align-baseline mr-2"/>{new Date(article.date).longString()} - by&nbsp;

@@ -37,8 +37,30 @@ afterEach(async () => await db.clearDatabase());
 
 after(async () => await db.closeDatabase());
 
-
 suite('secretary', () => {
+    
+    test('getTeachers', async () => {
+        await User.insertMany(testData.users);
+
+        const t1 = await secretary.getTeachers();
+
+        await Teacher.insertMany(testData.teachers);
+        
+        const t2 = await secretary.getTeachers();
+        
+        expect(t1.teachers).to.have.length(0);
+        expect(t2.teachers).to.have.length(8);
+        jexpect(t2.teachers).to.equal(j([
+            { id: '5dca698eed550e4ca4aba7f5', ssn: 'DJRFUC56J13E485F', name: 'Mario', surname: 'Bianchi', mail: 'mario.bianchi@teacher.com' },
+            { id: '5dca69cf048e8e40d434017f', ssn: 'CMFOLR29R45S203O', name: 'Roberta', surname: 'Verdi', mail: 'roberta.verdi@teacher.com' },
+            { id: '5dca6cbe7adca3346c5983cb', ssn: 'LDFVUI17P04D491B', name: 'Stefano', surname: 'Rossi', mail: 'stefano.rossi@teacher.com' },
+            { id: '5dca6cd5b83a1f3ef03e962b', ssn: 'SCBGMN21E45O956Q', name: 'Peter', surname: 'Posta', mail: 'peter.posta@teacher.com' },
+            { id: '5dca6cf0a92bbb4dd8c0e817', ssn: 'PLVCGT02S19R549A', name: 'Federica', surname: 'Valli', mail: 'federica.valli@teacher.com' },
+            { id: '5dca6d0801ea271794cb650e', ssn: 'LCFTUI58S49G910R', name: 'Cinzia', surname: 'Tollo', mail: 'cinzia.tollo@teacher.com' },
+            { id: '5dca6d2038627d0bfc4167b0', ssn: 'QASVUM68G45D297P', name: 'Dario', surname: 'Resti', mail: 'dario.resti@teacher.com' },
+            { id: '5dca6d3620607b1e30dea42a', ssn: 'NCFTOG69F23B796K', name: 'Nina', surname: 'Fassio', mail: 'nina.fassio@teacher.com' }
+        ]));
+    });
     
     test('getArticles', async () => {
         await User.insertMany(testData.users);
@@ -63,6 +85,52 @@ suite('secretary', () => {
             date: new Date(a.date),
             __v: a.__v
         })).sort((a, b) => b.date - a.date)));
+    });
+    
+    test('getParents', async () => {
+        await User.insertMany(testData.users);
+
+        const p1 = await secretary.getParents();
+
+        await User.updateOne({ _id: '5dca7e2b461dc52d681804fa' }, { firstLogin: true });
+        await User.updateOne({ _id: '5dca7e2b461dc52d681804fd' }, { firstLogin: true });
+        await User.updateOne({ _id: '5dca7e2b461dc52d681804fe' }, { firstLogin: true });
+
+        const p2 = await secretary.getParents();
+
+        expect(p1).to.have.length(0);
+        expect(p2).to.have.length(3);
+        jexpect(p2).to.equal(j([
+            { _id: '5dca7e2b461dc52d681804fa', ssn: 'JFMCL00C02H025N', name: 'Tiziana', surname: 'Gentile', mail: 'tiziana.gentile@parent.com' },
+            { _id: '5dca7e2b461dc52d681804fd', ssn: 'BCOAEN01B09O049L', name: 'Lucia', surname: 'Monge', mail: 'lucia.monge@parent.com' },
+            { _id: '5dca7e2b461dc52d681804fe', ssn: 'GELOEN01E09P064N', name: 'Corrado', surname: 'Bianchi', mail: 'corrado.bianchi@parent.com' }
+        ]));
+    });
+    
+    test('updateTeacher', async () => {
+        await Teacher.insertMany(testData.teachers);
+        await User.insertMany(testData.users);
+
+        // teacher not found
+        const ut1 = await secretary.updateTeacher('ffffffffffffffffffffffff');
+
+        const t1 = await Teacher.findById('5dca6cbe7adca3346c5983cb').populate('userId');
+        
+        // ok
+        const ut2 = await secretary.updateTeacher('5dca6cbe7adca3346c5983cb', 'VHBTUR56B29R594T', 'Chanel', 'Binzi', 'chanel.binzi@teacher.com');
+        
+        const t2 = await Teacher.findById('5dca6cbe7adca3346c5983cb').populate('userId');
+
+        expect(ut1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(t1.userId.ssn).to.equal('LDFVUI17P04D491B');
+        expect(t1.userId.name).to.equal('Stefano');
+        expect(t1.userId.surname).to.equal('Rossi');
+        expect(t1.userId.mail).to.equal('stefano.rossi@teacher.com');
+        expect(ut2.success).to.be.true();
+        expect(t2.userId.ssn).to.equal('VHBTUR56B29R594T');
+        expect(t2.userId.name).to.equal('Chanel');
+        expect(t2.userId.surname).to.equal('Binzi');
+        expect(t2.userId.mail).to.equal('chanel.binzi@teacher.com');
     });
     
     test('addArticle', async () => {
@@ -105,6 +173,13 @@ suite('secretary', () => {
         const u2 = await User.findOne({ ssn: 'CMDFUR58H28D382T' });
         const p2 = await Parent.findOne({ userId: u2._id });
 
+        expect(getRandomPassword.callCount).to.equal(1);
+        expect(sendWelcomeEmail.callCount).to.equal(1);
+        expect(sendWelcomeEmail.calledWithExactly('abbah.lucex@parent.com', 'Abbah Lucex', 'q34!.7tv4t78R%329n,w90w')).to.be.true();
+
+        getRandomPassword.restore();
+        sendWelcomeEmail.restore();
+        
         expect(u1).to.be.null();
         jexpect(u2).to.include({ ssn: 'CMDFUR58H28D382T', name: 'Abbah', surname: 'Lucex', mail: 'abbah.lucex@parent.com', scope: ['parent'] });
         jexpect(p2).to.include({ userId: u2._id.toString(), children: ['5dca711c89bf46419cf5d490'] });
@@ -112,13 +187,25 @@ suite('secretary', () => {
         expect(a1.output.statusCode).to.equal(BAD_REQUEST);
         expect(a2.output.statusCode).to.equal(BAD_REQUEST);
         expect(a3.success).to.be.true();
+    });
+    
+    test('sendCredentials', async () => {
+        const sendWelcomeEmail = Sinon.stub(Utils, 'sendWelcomeEmail');
 
-        expect(getRandomPassword.callCount).to.equal(1);
-        expect(sendWelcomeEmail.callCount).to.equal(1);
-        expect(sendWelcomeEmail.calledWithExactly('abbah.lucex@parent.com', 'Abbah Lucex', 'q34!.7tv4t78R%329n,w90w')).to.be.true();
+        await Parent.insertMany(testData.parents);
+        await User.insertMany(testData.users);
 
-        getRandomPassword.restore();
+        const sc1 = await secretary.sendCredentials(['5dca7e2b461dc52d681804fb', '5dca7e2b461dc52d681804fa', '5dca7e2b461dc52d681804fc', '5dca7e2b461dc52d681804fe']);
+
+        expect(sendWelcomeEmail.callCount).to.equal(4);
+        expect(sendWelcomeEmail.calledWithExactly('barbara.galli@parent.com', 'Barbara Galli', 'parentB_1')).to.be.true();
+        expect(sendWelcomeEmail.calledWithExactly('tiziana.gentile@parent.com', 'Tiziana Gentile', 'parentA_2')).to.be.true();
+        expect(sendWelcomeEmail.calledWithExactly('fabio.cremonesi@parent.com', 'Fabio Cremonesi', 'parentB_2')).to.be.true();
+        expect(sendWelcomeEmail.calledWithExactly('corrado.bianchi@parent.com', 'Corrado Bianchi', 'parentC_2')).to.be.true();
+
         sendWelcomeEmail.restore();
+
+        expect(sc1.success).to.be.true();
     });
     
     test('publishTimetables', async () => {
@@ -155,21 +242,27 @@ suite('secretary', () => {
         const timetable = (all, id) => all.find(t => t._id.equals(id)).timetable.map(w => {
             return { classId: w.classId, subject: w.subject, weekhour: w.weekhour };
         });
+
         const fakeParseTimetablesFile = Sinon.stub(HLib, 'parseTimetablesFile').returns(data);
+        fakeParseTimetablesFile.onCall(0).returns(null);
 
         await SchoolClass.insertMany(testData.classes);
         await Teacher.insertMany(testData.teachers);
         await User.insertMany(testData.users);
 
+        // parsing failed
         const pt1 = await secretary.publishTimetables('somefile');
+        // ok
+        const pt2 = await secretary.publishTimetables('somefile');
 
         const t1 = await Teacher.find();
 
-        expect(fakeParseTimetablesFile.callCount).to.equal(1);
+        expect(fakeParseTimetablesFile.callCount).to.equal(2);
 
         fakeParseTimetablesFile.restore();
         
-        expect(pt1.success).to.be.true();
+        expect(pt1.output.statusCode).to.equal(BAD_REQUEST);
+        expect(pt2.success).to.be.true();
         jexpect(timetable(t1, '5dca698eed550e4ca4aba7f5')).to.equal([
             { classId: '5dc9c3112d698031f441e1c9', subject: 'Italian', weekhour: '0_3' },
             { classId: '5dc9c3112d698031f441e1c9', subject: 'History', weekhour: '1_2' },

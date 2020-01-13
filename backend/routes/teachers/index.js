@@ -17,12 +17,44 @@ const routes = [
     },
     {
         method: 'GET',
+        path: '/timetable/{classId}',
+        handler: async (request, h) => teachers.getTimetable(request.params.classId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'teacher'
+            },
+            validate: {
+                params: {
+                    classId: Valid.id.required()
+                }
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/meetings/availability',
         handler: async (request, h) => teachers.getMeetingsAvailability(request.auth.credentials.id),
         options: {
             auth: {
                 strategy: 'session',
                 scope: 'teacher'
+            }
+        }
+    },
+    {
+        method: 'GET',
+        path: '/meetings/{teacherId}/slots',
+        handler: async (request, h) => teachers.getAvailableMeetingsSlots(request.auth.credentials.id, request.params.teacherId),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    teacherId: Valid.id.required()
+                }
             }
         }
     },
@@ -49,6 +81,25 @@ const routes = [
             validate: {
                 payload: {
                     timeSlots: Valid.array.items(Valid.weekhour).required()
+                }
+            }
+        }
+    },
+    {
+        method: 'POST',
+        path: '/meetings/{teacherId}/book',
+        handler: async (request, h) => teachers.bookMeetingSlot(request.auth.credentials.id, request.params.teacherId, request.payload.datetime),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'parent'
+            },
+            validate: {
+                params: {
+                    teacherId: Valid.id.required()
+                },
+                payload: {
+                    datetime: Valid.date.required()
                 }
             }
         }

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert, Button, Container, FormControl, InputGroup, Pagination, Row, Table} from 'react-bootstrap';
+import {Alert, Button, Container, FormControl, InputGroup, Row, Table} from 'react-bootstrap';
 import {FaSistrix} from 'react-icons/fa';
 import NewUserForm from "./new-user-form/new-user-form";
 import DeleteUserModal from "./delete-user-modal/delete-user-modal";
@@ -88,12 +88,22 @@ export default class AccountsManagement extends React.Component {
     render() {
         return (
             <Container fluid>
-                <DeleteUserModal user={this.state.targetUser} show={this.state.showDeleteUserModal} handleClose={async () => {await this.fetchUsers(); this.setState({showDeleteUserModal: false})}} />
-                <EditUserForm user={this.state.targetUser} show={this.state.showEditUserForm} handleClose={async () => {await this.fetchUsers(); this.setState({showEditUserForm: false})}} />
+                <DeleteUserModal user={this.state.targetUser} show={this.state.showDeleteUserModal}
+                                 handleClose={async () => {
+                                     await this.fetchUsers();
+                                     this.setState({showDeleteUserModal: false})
+                                 }}/>
+                <EditUserForm user={this.state.targetUser} show={this.state.showEditUserForm} handleClose={async () => {
+                    await this.fetchUsers();
+                    this.setState({showEditUserForm: false})
+                }}/>
                 <SectionHeader>Users</SectionHeader>
                 <Row className="mb-2">
                     <Button onClick={() => this.setState({showNewUserForm: true})}>New user</Button>
-                    <NewUserForm show={this.state.showNewUserForm} handleClose={async (hasAddedUser) => {await this.fetchUsers(); this.handleCloseNewUserForm(hasAddedUser)}} />
+                    <NewUserForm show={this.state.showNewUserForm} handleClose={async (hasAddedUser) => {
+                        await this.fetchUsers();
+                        this.handleCloseNewUserForm(hasAddedUser)
+                    }}/>
                     <InputGroup className={"ml-auto col-8 col-md-5 col-lg-4 col-xl-3"}>
                         <InputGroup.Prepend>
                             <InputGroup.Text id="basic-addon1"><FaSistrix/></InputGroup.Text>
@@ -106,8 +116,9 @@ export default class AccountsManagement extends React.Component {
                         />
                     </InputGroup>
                 </Row>
-                {this.state.hasAddedUser &&(
-                    <Alert variant='success'>The user has been successfully created and will receive an email containing their credentials.</Alert>
+                {this.state.hasAddedUser && (
+                    <Alert variant='success'>The user has been successfully created and will receive an email containing
+                        their credentials.</Alert>
                 )}
                 <Row>
                     <Table className="col" striped hover bordered responsive size="sm">
@@ -130,8 +141,10 @@ export default class AccountsManagement extends React.Component {
                                 <td className="align-middle">{user.mail}</td>
                                 <td className="align-middle">{user.scope}</td>
                                 <td>
-                                    <Button size="sm" className='mr-1' onClick={() => this.popUpdateUserForm(user)}>Edit</Button>
-                                    <Button size="sm" onClick={() => this.popDeleteUserModal(user)} variant={'danger'}>Delete</Button>
+                                    <Button size="sm" className='mr-1'
+                                            onClick={() => this.popUpdateUserForm(user)}>Edit</Button>
+                                    <Button size="sm" onClick={() => this.popDeleteUserModal(user)}
+                                            variant={'danger'}>Delete</Button>
                                 </td>
                             </tr>
                         )}

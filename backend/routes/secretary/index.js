@@ -6,6 +6,17 @@ const secretary = require('./handlers');
 const routes = [
     {
         method: 'GET',
+        path: '/teachers',
+        handler: async (request, h) => secretary.getTeachers(),
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            }
+        }
+    },
+    {
+        method: 'GET',
         path: '/articles',
         handler: async (request, h) => secretary.getArticles(),
         options: {
@@ -43,6 +54,31 @@ const routes = [
             auth: {
                 strategy: 'session',
                 scope: 'officer'
+            }
+        }
+    },
+    {
+        method: 'PATCH',
+        path: '/teacher/{teacherId}',
+        handler: async (request, h) => {
+            const { ssn, name, surname, mail } = request.payload;
+            return secretary.updateTeacher(request.params.teacherId, ssn, name, surname, mail);
+        },
+        options: {
+            auth: {
+                strategy: 'session',
+                scope: 'officer'
+            },
+            validate: {
+                params: {
+                    teacherId: Valid.id.required(),
+                },
+                payload: {
+                    ssn: Valid.ssn.required(),
+                    name: Valid.name.required(),
+                    surname: Valid.name.required(),
+                    mail: Valid.mail.required()
+                }
             }
         }
     },
