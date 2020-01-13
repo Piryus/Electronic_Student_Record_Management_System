@@ -130,13 +130,14 @@ const moveFile = function(src, dst) {
 const parseTimetablesFile = function(inputFile, schoolClasses, teachers) {
     const CLASS_SEPARATOR = '@', TEACHER_SUBJECT_SEPARATOR = ':';
 
-    const inputData = fs.readFileSync(inputFile.path).toString().replace(/\r/g, '');
+    const inputData = fs.readFileSync(inputFile.path).toString().replace(/\r/gm, '');
 
     if(inputData.indexOf(CLASS_SEPARATOR) !== -1)
         return null;
     
     const timetableData = [];
-    const classes = inputData.replace(/\n(\n)+/, CLASS_SEPARATOR).split(CLASS_SEPARATOR);
+    const classes = inputData.replace(/\n(\n)+/gm, CLASS_SEPARATOR).split(CLASS_SEPARATOR);
+    console.log(classes);
 
     for(let cl of classes) {
         cl = cl.split('\n').filter(l => l !== '').map(l => l.split('\t'));
@@ -163,9 +164,9 @@ const parseTimetablesFile = function(inputFile, schoolClasses, teachers) {
                 timetableData.push({ teacherId: teachers[t]._id, classId, subject, weekhour: [j, i-2].join('_') });
             }
         }
-
-        return timetableData;
     }
+
+    return timetableData;
 };
 
 module.exports = {
