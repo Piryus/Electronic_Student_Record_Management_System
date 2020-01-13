@@ -137,7 +137,6 @@ const parseTimetablesFile = function(inputFile, schoolClasses, teachers) {
     
     const timetableData = [];
     const classes = inputData.replace(/\n(\n)+/gm, CLASS_SEPARATOR).split(CLASS_SEPARATOR);
-    console.log(classes);
 
     for(let cl of classes) {
         cl = cl.split('\n').filter(l => l !== '').map(l => l.split('\t'));
