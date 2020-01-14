@@ -93,7 +93,7 @@ export default class ParentLectureTopics extends React.Component {
 
         var newdate = year + "-" + month + "-" + day;
         var dat = new Date(newdate);
-        dat.setHours(dat.getHours() + 7 + parseInt(w_h[1]));
+        dat.setHours(dat.getHours() + 8 + parseInt(w_h[1]));
         await this.getTopics(weekHour, dat.getTime());
     }
 
