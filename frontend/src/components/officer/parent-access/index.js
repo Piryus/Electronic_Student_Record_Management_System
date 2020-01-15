@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Container, Form, Table} from "react-bootstrap";
+import {Button, Container, Form, Table, Alert} from "react-bootstrap";
 import SectionHeader from "../../utils/section-header";
 import ParentAccountEnabling from "./new-parent-account";
 
@@ -9,7 +9,8 @@ export default class ParentAccess extends React.Component {
         this.state = {
             parents: [],
             selectedParents: 0,
-            showNewAccountCreation: false
+            showNewAccountCreation: false,
+            credentialSentAlert: false
         }
     }
 
@@ -54,7 +55,10 @@ export default class ParentAccess extends React.Component {
             })
         };
         let response = await fetch(url, options);
-        return await response.json();
+        let json = await response.json();
+        if (json.success) {
+            this.setState({credentialSentAlert: true})
+        }
     }
 
     toggleSelectAll(select) {
@@ -79,7 +83,8 @@ export default class ParentAccess extends React.Component {
             <Container fluid>
                 <SectionHeader>Manage parents accesses</SectionHeader>
                 <Button variant="primary" className="m-1" onClick={() => this.setState({showNewAccountCreation: true})}>Create a new parent account</Button>
-                <Button variant="primary" className="m-1" onClick={() => this.sendCredentials()}>Send credentials to selected parents ({this.state.selectedParents})</Button>
+                <Button variant="primary" className="m-1" onClick={async () => await this.sendCredentials()}>Send credentials to selected parents ({this.state.selectedParents})</Button>
+                <Alert variant="success" className="mt-1" show={this.state.credentialSentAlert}>Credentials have been sent to the selected parents.</Alert>
                 <h6 className="mt-2">List of parents who haven't logged in yet:</h6>
                 <Table responsive striped size="sm" className="mt-1">
                     <thead>
