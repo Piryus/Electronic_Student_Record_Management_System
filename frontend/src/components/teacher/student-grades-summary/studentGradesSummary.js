@@ -11,6 +11,16 @@ export default class StudentGradesSummary extends React.Component {
 
     constructor(props) {
         super(props);
+
+        let sub_classes = [];
+        for(var i in this.props.subjects){
+            let elems = this.props.timetable.filter(t => t.subject===i);
+            sub_classes[i] = elems;
+        }
+
+        console.log(sub_classes);
+
+
         this.state = {
             wantAddAGrade: false,
             searchOptions: [],
@@ -24,11 +34,14 @@ export default class StudentGradesSummary extends React.Component {
             students: this.props.students,
             studentsForSelectedClass: [],
             subjects: this.props.subjects,
+            sub_classes: sub_classes,
             classes: [],
             success: '',
             error: '',
             warning: ''
         }
+
+        console.log(sub_classes);
     }
 
     async componentDidMount() {
@@ -231,21 +244,27 @@ export default class StudentGradesSummary extends React.Component {
         let gradesDOM = [];
         if (this.state.selectedStudent !== '') {
             this.state.selectedStudent.value.grades.forEach((grade) => {
-                if (gradesSortedTopic[grade.subject] == null) {
-                    gradesSortedTopic[grade.subject] = [];
+                if(this.state.sub_classes[grade.subject]!== undefined){
+                    let f = this.state.sub_classes[grade.subject].find(e => e.classId.toString() === this.state.selectedStudent.value.classId.toString());
+                    if(f !== undefined){
+                        if (gradesSortedTopic[grade.subject] == null) {
+                            gradesSortedTopic[grade.subject] = [];
+                        }
+                        let date = grade.date.split("T");
+                        let gradeSubject;
+                        if (grade.description !== undefined) {
+                            gradeSubject = `${grade.description}`;
+                        } else {
+                            gradeSubject = `Grade ${gradesSortedTopic[grade.subject].length + 1}`;
+                        }
+                        gradesSortedTopic[grade.subject].push(
+                            <Accordion.Collapse key={grade.subject + grade.date + grade.value} eventKey={grade.subject}>
+                                <Card.Body>{gradeSubject} - {moment(date[0]).format('DD/MM/YYYY')} : <b>{grade.value}</b></Card.Body>
+                            </Accordion.Collapse>
+                        );
+                    }
                 }
-                let date = grade.date.split("T");
-                let gradeSubject;
-                if (grade.description !== undefined) {
-                    gradeSubject = `${grade.description}`;
-                } else {
-                    gradeSubject = `Grade ${gradesSortedTopic[grade.subject].length + 1}`;
-                }
-                gradesSortedTopic[grade.subject].push(
-                    <Accordion.Collapse key={grade.subject + grade.date + grade.value} eventKey={grade.subject}>
-                        <Card.Body>{gradeSubject} - {moment(date[0]).format('DD/MM/YYYY')} : <b>{grade.value}</b></Card.Body>
-                    </Accordion.Collapse>
-                );
+
             });
             let index;
             for (index in gradesSortedTopic) {
