@@ -48,7 +48,13 @@ export default class News extends React.Component {
                     <Button onClick={() => this.setState({showNewArticleModal: true})} className="mb-2">Write an
                         article</Button>}
                     <NewArticleModal show={this.state.showNewArticleModal}
-                                     handleClose={() => this.setState({showNewArticleModal: false})}/>
+                                     handleClose={async () => {
+                                         const articles = await this.fetchArticles();
+                                         this.setState({
+                                             articles, 
+                                             showNewArticleModal: false
+                                         });
+                                     }}/>
                     {this.state.articles.map(article => {
                         return (
                             <div className="mb-4" key={article._id}>
