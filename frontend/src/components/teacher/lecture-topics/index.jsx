@@ -6,11 +6,14 @@ import Toast from "react-bootstrap/Toast";
 
 class LectureTopics extends Component {
 
-    state = {
-        selectedWeekHour: '',
-        topicString: '',
-        showToast: false,
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedWeekHour: '',
+            topicString: '',
+            showToast: false
+        };
+    }
 
     async getTopic(weekHour) {
         const url = 'http://localhost:3000/lectures/' + weekHour;
@@ -88,8 +91,13 @@ class LectureTopics extends Component {
         }
 
         this.props.timetable.forEach(class_ => {
+            let foundClassName = '';
+            if (this.props.classes.length > 0)
+                foundClassName = this.props.classes.find(c => {
+                    return c._id === class_.classId
+                }).name;
             const [day, hour] = class_.weekhour.split('_');
-            data[day].content[hour].text = class_.subject;
+            data[day].content[hour].text = class_.subject + ' (' + foundClassName + ')';
             data[day].content[hour].color = 'bg-success text-white';
         });
 

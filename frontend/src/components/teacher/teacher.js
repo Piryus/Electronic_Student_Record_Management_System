@@ -208,7 +208,7 @@ export default class Teacher extends React.Component {
                                 parents</Nav.Link>
                         </Nav>
                         <main className={"col-md-10 ml-sm-auto col-lg-10 px-4 pt-5"}>
-                            {this.state.userRequest === 'lecture' && <LectureTopics timetable={this.props.timetable}/>}
+                            {this.state.userRequest === 'lecture' && <LectureTopics classes={this.state.allClasses} timetable={this.props.timetable}/>}
                             {this.state.userRequest === 'grades' && (
                                 <StudentGradesSummary students={this.state.students} subjects={this.state.subjects}
                                                       timetable={this.props.timetable} type='teacher-grades'/>
@@ -238,7 +238,7 @@ export default class Teacher extends React.Component {
                                 <Material timetable={this.props.timetable} classes={this.state.allClasses}/>
                             )}
                             {this.state.userRequest === 'meetings' && (
-                                <Meetings teacherTimetable={this.props.timetable}/>
+                                <Meetings teacherTimetable={this.props.timetable} classes={this.state.allClasses}/>
                             )}
                             {this.state.userRequest === 'final-grades' && (
                                 <FinalGrades selectedClass={this.state.classSelected}

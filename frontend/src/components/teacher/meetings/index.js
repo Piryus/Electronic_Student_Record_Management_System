@@ -99,8 +99,13 @@ export default class Meetings extends React.Component {
         }
 
         this.props.teacherTimetable.forEach(class_ => {
+            let foundClassName = '';
+            if (this.props.classes.length > 0)
+                foundClassName = this.props.classes.find(c => {
+                    return c._id === class_.classId
+                }).name;
             const [day, hour] = class_.weekhour.split('_');
-            data[day].content[hour].text = class_.subject;
+            data[day].content[hour].text = class_.subject + ' (' + foundClassName + ')';
             data[day].content[hour].color = 'bg-danger text-white';
         });
 
