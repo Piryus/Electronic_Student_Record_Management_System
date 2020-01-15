@@ -154,6 +154,7 @@ export default class Rollcall extends React.Component{
                 wantEditCheckboxes: false,
                 studentAbsenceStates: unsetModificationFlags
             });
+            window.location.reload();
             this.props.updateClassAttendanceOnParent();
         }
     }
