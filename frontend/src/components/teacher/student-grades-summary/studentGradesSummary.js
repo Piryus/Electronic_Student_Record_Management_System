@@ -18,8 +18,6 @@ export default class StudentGradesSummary extends React.Component {
             sub_classes[i] = elems;
         }
 
-        console.log(sub_classes);
-
 
         this.state = {
             wantAddAGrade: false,
@@ -40,8 +38,6 @@ export default class StudentGradesSummary extends React.Component {
             error: '',
             warning: ''
         }
-
-        console.log(sub_classes);
     }
 
     async componentDidMount() {
@@ -286,20 +282,24 @@ export default class StudentGradesSummary extends React.Component {
         }
         let renderDropDownItem = [];
         if (this.state.wantAddAGrade === true) {
-            for (let index in this.state.subjects) {
-                let element = this.state.classes.find((c) => {
-                    return c._id.toString() === this.state.subjects[index].class
+            for (let index in this.state.sub_classes) {
+                let element = this.state.classes.filter((c) => {
+                    let found = this.state.sub_classes[index].find(sc => sc.classId === c._id);
+                    return found;
                 });
-                renderDropDownItem.push(
-                    <Dropdown.Item key={index} onClick={async () => {
-                        this.setState({
-                            selectedSubject: index,
-                            selectedClass: element.name,
-                            selectedClassId: element._id.toString()
-                        });
-                        await this.getStudentsForSelectedClass(element._id.toString());
-                    }}>{element.name + ' ' + index}</Dropdown.Item>
-                );
+                element.forEach(e =>{
+                    renderDropDownItem.push(
+                        <Dropdown.Item key={index} onClick={async () => {
+                            this.setState({
+                                selectedSubject: index,
+                                selectedClass: e.name,
+                                selectedClassId: e._id.toString()
+                            });
+                            await this.getStudentsForSelectedClass(e._id.toString());
+                        }}>{e.name + ' ' + index}</Dropdown.Item>
+                    );
+                });
+
             }
         }
 
