@@ -59,7 +59,7 @@ export default class FinalGrades extends React.Component {
                 id: s.studentId,
                 name: s.surname + " " + s.name,
                 grades: Object.entries(s.grades).map((value) => {
-                    return {subjectName: value[0], suggestedGrade: value[1].toString(), integerGrade:  Math.trunc( value[1] ).toString()};
+                    return {subjectName: value[0], suggestedGrade: value[1].toString(), integerGrade:  Math.round(value[1]).toString()};
                 })
             }
             this.state.classSubjects.forEach(subject => {
