@@ -63,7 +63,7 @@ Date.prototype.isSchoolDay = function(calendar) {
 };
 
 const getRandomPassword = function () {
-    const chars = 'abcdefghijklmnopqrstuvwxyz!@#$%^&*()-+<>ABCDEFGHIJKLMNOP1234567890';
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP1234567890';
     let password = '';
     for (let x = 0; x < 16; x++) {
         let i = Math.floor(Math.random() * chars.length);

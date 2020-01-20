@@ -12,10 +12,12 @@ const Teacher = require('../models/Teacher');
 const login = async function (request, h) {
     try {
         const {mail, password} = request.payload;
-        const user = await User.findOne({mail});
+        let user = await User.findOne({mail});
         if (user === null || password !== user.password) {
             return Boom.forbidden('Invalid mail/password.');
         } else {
+            user.firstLogin = false;
+            await user.save();
             request.cookieAuth.set({
                 id: user._id
             });

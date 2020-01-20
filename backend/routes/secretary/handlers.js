@@ -65,7 +65,7 @@ const addParent = async function(ssn, name, surname, mail, childSsn) {
 
     const user = new User({ ssn, name, surname, mail, password, scope: ['parent'], firstLogin: true });
     await user.save();
-    const parent = new Parent({ userId: user._id, children: [student._id], firstLogin: true });
+    const parent = new Parent({ userId: user._id, children: [student._id] });
     await parent.save();
 
     Utils.sendWelcomeEmail(mail, name + ' ' + surname, password);

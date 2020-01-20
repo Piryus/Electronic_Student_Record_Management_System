@@ -52,7 +52,7 @@ export default class Grades extends React.Component {
         //Building of Grades and Subejects DOM
         let gradesSortedTopic = [];
         let gradesDOM = [];
-        if (this.state.childGrades !== null) {
+        if (this.state.childGrades) {
             this.state.childGrades.forEach((grade) => {
                 let realGrade = grade.value.gradify();
                 if (gradesSortedTopic[grade.subject] == null) {

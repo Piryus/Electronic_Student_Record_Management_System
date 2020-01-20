@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emarkk/hlib": "^1.0.9",
+    "@emarkk/hlib": "^1.0.10",
     "bootstrap": "^4.3.1",
     "jsx": "^0.9.89",
     "moment": "^2.24.0",

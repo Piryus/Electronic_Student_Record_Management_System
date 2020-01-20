@@ -400,7 +400,7 @@ module.exports = function(fullname, password) {
                                                                                         <tr>
                                                                                             <td class="attributes_item">
                                                                                                 <span class="f-fallback">
-                                                                                                <strong>Login Page:</strong>&nbsp;<a href="http://localhost:3000">http://localhost:3000</a></span>
+                                                                                                <strong>Login Page:</strong>&nbsp;<a href="http://localhost:3001">http://localhost:3001</a></span>
                                                                                             </td>
                                                                                         </tr>
                                                                                         <tr>
