@@ -16,7 +16,7 @@
     "@hapi/cookie": "^10.1.2",
     "@hapi/hapi": "^18.4.0",
     "@hapi/inert": "^5.2.2",
-    "@hapi/joi": "14.x.x",
+    "@hapi/joi": "17.x.x",
     "boom": "7.x.x",
     "mongoose": "^5.7.8",
     "nodemailer": "6.3.x",
